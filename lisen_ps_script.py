@@ -3,10 +3,13 @@
 
 from shutil import copyfile
 from flask import Flask, request, render_template
+from db import db_set, db_find
 from jsonschema import validate
 import yaml
 import json
 import os
+import sys
+
 app = Flask(__name__)
 def open_config(conf, path, path_t):
     try:
@@ -30,9 +33,8 @@ def validate_yaml(loads):
        - write_files
     """
     try:
-        print(yaml.load(loads))
-        print(yaml.load(schema))
         validate(yaml.load(loads), yaml.load(schema))
+        yaml.safe_load(loads)
         return True
     except:
         return False
@@ -66,16 +68,16 @@ def write_config(conf, path, path_t, path_old):
 
 @app.route("/", methods=['POST', 'GET'])
 def hello():
-    print(json.dumps(request.json))
-    file = open(os.path.join(os.getcwd(),'json'), 'w+')
-    file.writelines(json.dumps(request.json))
+    if request.__dict__['environ']['REQUEST_METHOD'] == 'POST':
+        print(json.dumps(request.json))
+        db_set(json.dumps(request.json), target=['clients', 'json'])
     return render_template('index.html')
 
 @app.route("/config", methods=['POST', 'GET'])
 def config():
-    path = '/data/config/conf.yaml'
-    path_t = '/data/config/conf.tmp'
-    path_old = '/data/config/conf.old'
+    path = '/Users/energy/PycharmProjects/monitoring_system/data/conf.yaml'
+    path_t = '/Users/energy/PycharmProjects/monitoring_system/data/conf.tmp'
+    path_old = '/Users/energy/PycharmProjects/monitoring_system/data/conf.old'
     conf = ''
     write_config(conf, path, path_t, path_old)
     conf = open_config(conf, path, path_t)
@@ -91,6 +93,11 @@ def config():
         if not write_config(conf, path, path_t, path_old):
             valid = 2
     return render_template('config.html', conf=conf, valid=valid)
+
+@app.route("/requests", methods=['GET'])
+def requests_p():
+    database_json = db_find(target=['clients', 'json'])
+    return render_template('requests.html', data=database_json)
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)

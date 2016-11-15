@@ -1,0 +1,28 @@
+{% extends "index.html" %}
+{% block title %}Requests{% endblock %}
+{% block content %}
+<div class="row">
+<div class="col-xs-12 col-md-8">
+<div class="panel panel-default">
+  <div class="panel-heading">Tasks status</div>
+<table class="table">
+    <thead>
+    <tr>
+        <th>User info</th>
+        <th>Version</th>
+        <th>Data</th>
+    </tr>
+    </thead>
+    <tbody>
+{% for i in data %}
+    <tr>
+        <td>{{ i['Userinfo'] }}</td>
+        <td>{{ i['Version'] }}</td>
+        <td>{{ i['Timeinfo'] }}</td>
+    </tr>
+{% endfor %}
+</table>
+</div>
+</div>
+</div>
+{% endblock %}
