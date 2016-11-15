@@ -70,7 +70,7 @@ def write_config(conf, path, path_t, path_old):
 def hello():
     if request.__dict__['environ']['REQUEST_METHOD'] == 'POST':
         print(json.dumps(request.json))
-        db_set(json.dumps(request.json), target=['clients', 'json'])
+        db_set(json.loads(json.dumps(request.json)), target=['clients', 'json'])
     return render_template('index.html')
 
 @app.route("/config", methods=['POST', 'GET'])
