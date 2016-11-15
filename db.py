@@ -4,7 +4,7 @@ from bson.objectid import ObjectId
 def db_path(target=None):
     if target is None:
         target = ['database', 'forms']
-    db = pymongo.MongoClient()
+    db = pymongo.MongoClient('mongoDB', 27017)
     if len(target) == 1:
         return db[target[0]]
     elif len(target) == 2:
