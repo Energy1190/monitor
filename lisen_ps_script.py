@@ -39,8 +39,6 @@ def validate_yaml(loads):
          type: array
        hostname:
          type: string
-       write_files:
-         type: array
     required:
         - users
         - hostname
