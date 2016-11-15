@@ -23,35 +23,15 @@ def open_config(conf, path, path_t):
 
 def validate_yaml(loads):
     schema = """
-    type: object
-    properties:
-       users:
-         type: array
-         items:
-           type: object
-           properties:
-             name:
-               type: string
-           required:
-            - name
-            - ssh-authorized-keys
-       coreos:
-         type: array
-         properties:
-           - update
-           - units
-         optional:
-           - update
-           - units
-       hostname:
-         type: string
     required:
-        - users
-        - hostname
-    optional:
-        - coreos
+       - users
+       - coreos
+       - hostname
+       - write_files
     """
     try:
+        print(yaml.load(loads))
+        print(yaml.load(schema))
         validate(yaml.load(loads), yaml.load(schema))
         return True
     except:
@@ -101,6 +81,7 @@ def config():
     conf = open_config(conf, path, path_t)
     try:
         request.form['validate']
+        print(validate_yaml(request.form['config']))
         if validate_yaml(request.form['config']):
             valid = 1
         else:
