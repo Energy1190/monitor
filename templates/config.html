@@ -1,0 +1,25 @@
+{% extends "index.html" %}
+{% block title %}Config{% endblock %}
+{% block content %}
+{% if valid == 1 %}
+<div class="jumbotron">
+    <div class="container">
+        <p>The validate is completed successfully</p>
+    </div>
+</div>
+{% elif valid == 2 %}
+<div class="jumbotron">
+    <div class="container">
+        <p>Validate has revealed a configuration problem</p>
+    </div>
+</div>
+{% endif %}
+<form method="post" name="config">
+    <div class="form-group">
+      <label for="comment">Config:</label>
+      <textarea class="form-control" rows="30" id="config" name="config">{{ conf }}</textarea>
+    </div>
+    <button class="btn btn-success" type="submit" id="save" name="save">Save</button>
+    <button class="btn btn-success" type="submit" id="validate" name="validate">Validate</button>
+</form>
+{% endblock %}

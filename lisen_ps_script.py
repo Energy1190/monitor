@@ -1,0 +1,111 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+from shutil import copyfile
+from flask import Flask, request, render_template
+from jsonschema import validate
+import yaml
+import json
+import os
+app = Flask(__name__)
+def open_config(conf, path, path_t):
+    try:
+        request.form['validate']
+        return request.form['config']
+    except:
+        if os.path.exists(path):
+            copyfile(path, path_t)
+            file = open(path_t, 'r')
+            conf = file.read()
+            file.close()
+            os.remove(path_t)
+        return conf
+
+def validate_yaml(loads):
+    schema = """
+    type: object
+    properties:
+       users:
+         type: array
+         items:
+           type: object
+           properties:
+             name:
+               type: string
+           required:
+            - name
+            - ssh-authorized-keys
+       coreos:
+         type: array
+       hostname:
+         type: string
+       write_files:
+         type: array
+    required:
+        - users
+        - hostname
+    """
+    try:
+        validate(yaml.load(loads), yaml.load(schema))
+        return True
+    except:
+        return False
+
+def write_config(conf, path, path_t, path_old):
+    if request.__dict__['environ']['REQUEST_METHOD'] == 'POST':
+        try:
+            request.form['validate']
+            return validate_yaml(request.form['config'])
+        except:
+            if os.path.exists(path):
+                if os.path.exists(path_old):
+                  os.remove(path_old)
+                copyfile(path, path_old)
+            try:
+                if validate_yaml(request.form['config']):
+                    file = open(path_t, 'w+')
+                    file.writelines(request.form['config'])
+                    file.close()
+                    copyfile(path_t, path)
+                    os.remove(path_t)
+                else:
+                    return validate_yaml(request.form['config'])
+            except:
+                if os.path.exists(path):
+                    if os.path.exists(path_old):
+                      os.remove(path)
+                    copyfile(path_old, path)
+                    os.remove(path_old)
+    return True
+
+@app.route("/", methods=['POST', 'GET'])
+def hello():
+    print(json.dumps(request.json))
+    file = open(os.path.join(os.getcwd(),'json'), 'w+')
+    file.writelines(json.dumps(request.json))
+    return render_template('index.html')
+
+@app.route("/config", methods=['POST', 'GET'])
+def config():
+    path = '/data/config/conf.yaml'
+    path_t = '/data/config/conf.tmp'
+    path_old = '/data/config/conf.old'
+    conf = ''
+    write_config(conf, path, path_t, path_old)
+    conf = open_config(conf, path, path_t)
+    try:
+        request.form['validate']
+        if validate_yaml(request.form['config']):
+            valid = 1
+        else:
+            valid = 2
+    except:
+        valid = 0
+        if not write_config(conf, path, path_t, path_old):
+            valid = 2
+    return render_template('config.html', conf=conf, valid=valid)
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5000)
+
+
