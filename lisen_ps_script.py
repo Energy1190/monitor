@@ -37,11 +37,19 @@ def validate_yaml(loads):
             - ssh-authorized-keys
        coreos:
          type: array
+         properties:
+           - update
+           - units
+         optional:
+           - update
+           - units
        hostname:
          type: string
     required:
         - users
         - hostname
+    optional:
+        - coreos
     """
     try:
         validate(yaml.load(loads), yaml.load(schema))
