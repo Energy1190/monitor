@@ -75,9 +75,9 @@ def hello():
 
 @app.route("/config", methods=['POST', 'GET'])
 def config():
-    path = '/Users/energy/PycharmProjects/monitoring_system/data/conf.yaml'
-    path_t = '/Users/energy/PycharmProjects/monitoring_system/data/conf.tmp'
-    path_old = '/Users/energy/PycharmProjects/monitoring_system/data/conf.old'
+    path = '/data/config/conf.yaml'
+    path_t = '/data/config/conf.tmp'
+    path_old = '/data/config/conf.old'
     conf = ''
     write_config(conf, path, path_t, path_old)
     conf = open_config(conf, path, path_t)
