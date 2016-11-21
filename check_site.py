@@ -47,7 +47,7 @@ def main():
                     send_mail('Fail db connect to www.iso.ru', host='www.iso.ru')
             if not get_db_connect('https://subversion.iso.ru', flag='forbidden'):
                 time.sleep(300)
-                if not get_db_connect('https://subversion.iso.ru', flag='forbidden'):
+                if not get_db_connect('http://subversion.iso.ru', flag='forbidden'):
                     send_mail('Fail main connect to subversion.iso.ru', host='subversion.iso.ru')
             if not get_db_connect('https://trackstudio.iso.ru'):
                 time.sleep(300)
