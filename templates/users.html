@@ -1,24 +1,24 @@
-{% extends "index.html" %}
+% extends "index.html" %}
 {% block title %}Requests{% endblock %}
 {% block content %}
 <div class="row">
 <div class="col-xs-12 col-md-8">
 <div class="panel panel-default">
-  <div class="panel-heading">All requests</div>
+  <div class="panel-heading">Users</div>
 <table class="table">
     <thead>
     <tr>
-        <th>User info</th>
-        <th>Version</th>
-        <th>Data</th>
+        <th>Name</th>
+        <th>Time</th>
+        <th>All logon's</th>
     </tr>
     </thead>
     <tbody>
 {% for i in data %}
     <tr>
-        <td>{{ i['Userinfo'] }}</td>
-        <td>{{ i['Version'] }}</td>
-        <td>{{ i['Timeinfo'] }}</td>
+        <td>{{ i['username'] }}</td>
+        <td>{{ i['time'] }}</td>
+        <td>{{ i['copmslist'] }}</td>
     </tr>
 {% endfor %}
 </table>

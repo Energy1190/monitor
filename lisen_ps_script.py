@@ -70,7 +70,9 @@ def write_config(conf, path, path_t, path_old):
 def hello():
     if request.__dict__['environ']['REQUEST_METHOD'] == 'POST':
         print(json.dumps(request.json))
-        db_set(json.loads(json.dumps(request.json)), target=['clients', 'json'])
+        trg = json.dumps(request.json)
+        trg['Status'] = 'New'
+        db_set(trg, target=['clients', 'json'])
     return render_template('index.html')
 
 @app.route("/config", methods=['POST', 'GET'])
@@ -98,6 +100,16 @@ def config():
 def requests_p():
     database_json = db_find(target=['clients', 'json'])
     return render_template('requests.html', data=database_json)
+
+@app.route("/users", methods=['GET'])
+def requests_p():
+    database_json = db_find(target=['clients', 'users'])
+    return render_template('users.html', data=database_json)
+
+@app.route("/comps", methods=['GET'])
+def requests_p():
+    database_json = db_find(target=['clients', 'comps'])
+    return render_template('comps.html', data=database_json)
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)

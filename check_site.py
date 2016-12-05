@@ -58,4 +58,4 @@ def main():
         send_mail('End work')
 
 if __name__ == '__main__':
-    main()
+    print(get_db_connect('https://subversion.iso.ru', flag='forbidden'))
