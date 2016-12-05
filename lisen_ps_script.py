@@ -102,12 +102,12 @@ def requests_p():
     return render_template('requests.html', data=database_json)
 
 @app.route("/users", methods=['GET'])
-def requests_p():
+def users_p():
     database_json = db_find(target=['clients', 'users'])
     return render_template('users.html', data=database_json)
 
 @app.route("/comps", methods=['GET'])
-def requests_p():
+def comps_p():
     database_json = db_find(target=['clients', 'comps'])
     return render_template('comps.html', data=database_json)
 
