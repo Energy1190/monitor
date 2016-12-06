@@ -26,7 +26,7 @@ class Comp():
         self.psversion = trg['Version']
 
 class User():
-    def __init__(self, trg)
+    def __init__(self, trg):
         self.username = trg['Userinfo']['Username']
         self.domain = trg['Userinfo']['Domainname']
         self.computername = trg['Userinfo']['Computername']
