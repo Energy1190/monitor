@@ -37,7 +37,7 @@ class User():
         except:
             pass
 
-def main():
+def edit_json():
     try:
         trg = db_get('New', target=['clients', 'json'], fild='Status')
     except:
