@@ -20,7 +20,7 @@ class Comp():
         self.network = trg['Networkinfo']
         self.groups = trg['Groupsinfo']
         self.errors = trg['Errorinfo']
-        self.programm = trg['Programinfo']
+        self.programm = trg['Programsinfo']
         self.service = trg['Serviceinfo']
         self.task = trg['Tasksinfo']
         self.psversion = trg['Version']
