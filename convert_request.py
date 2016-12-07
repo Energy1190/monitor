@@ -52,7 +52,7 @@ def edit_json():
             else:
                 for i in list(db_trg):
                     if db_trg[i] != trgt.__dict__[i]:
-                        db_update({i: trgt.__dict__[i]}, target=['clients', 'comps'], id=int(db_trg['_id']))
+                        db_update({i: trgt.__dict__[i]}, target=['clients', 'comps'], id=int(str(db_trg['_id'])))
         usr_trg = db_get(trg['Userinfo']['Username'], target=['clients', 'users'], fild='Computername')
         if not usr_trg:
             db_set(User(trg).__dict__, target=['clients', 'users'])
@@ -63,4 +63,4 @@ def edit_json():
                    db_update({i: trgt.__dict__[i]}, target=['clients', 'users'], id=int(str(usr_trg['_id'])))
             tgt_list = usr_trg['copmslist'].append({trgt.computername: trgt.time})
             db_update({'copmslist': tgt_list}, target=['clients', 'users'], id=int(str(int(usr_trg['_id'])))
-        db_update({'Status': 'Old'}, target=['clients', 'json'], id=int(trg['_id']))
+        db_update({'Status': 'Old'}, target=['clients', 'json'], id=int(str(trg['_id'])))
