@@ -5,6 +5,7 @@ import requests
 import smtplib
 import time
 from email.mime.text import MIMEText
+from get_config import get_section
 
 def send_mail(text, host='site'):
     msg = MIMEText(text)
@@ -37,25 +38,16 @@ def main():
     send_mail('Start work')
     try:
         while True:
-            if not get_db_connect('http://iso.ru'):
-                time.sleep(300)
-                if not get_db_connect('http://iso.ru'):
-                    send_mail('Fail main connect to www.iso.ru', host='www.iso.ru')
-            if not get_db_connect('http://iso.ru/system/ajax/documents.php?_path=main.root.ru.press-center.news&limit=10&offset=10&_type=296&_sort=-_publish_time',flag='db'):
-                time.sleep(300)
-                if not get_db_connect('http://iso.ru/system/ajax/documents.php?_path=main.root.ru.press-center.news&limit=10&offset=10&_type=296&_sort=-_publish_time',flag='db'):
-                    send_mail('Fail db connect to www.iso.ru', host='www.iso.ru')
-            if not get_db_connect('https://subversion.iso.ru', flag='forbidden'):
-                time.sleep(300)
-                if not get_db_connect('http://subversion.iso.ru', flag='forbidden'):
-                    send_mail('Fail main connect to subversion.iso.ru', host='subversion.iso.ru')
-            if not get_db_connect('https://trackstudio.iso.ru'):
-                time.sleep(300)
-                if not get_db_connect('https://trackstudio.iso.ru'):
-                    send_mail('Fail main connect to trackstudio.iso.ru', host='trackstudio.iso.ru')
+            target = get_section('[Check HTTP]')
+            for i in range(0, len(target)):
+                if target[i][0:4] == 'http':
+                    if not get_db_connect(target[i], flag=target[i+1]):
+                        time.sleep(300)
+                        if not get_db_connect(target[i], flag=target[i+1]):
+                            send_mail('Fail connect to {0} as {1}'.format(target[i], target[i+1]), host=target[i])
             time.sleep(3600)
     finally:
         send_mail('End work')
 
 if __name__ == '__main__':
-    print(get_db_connect('https://subversion.iso.ru', flag='forbidden'))
+    print('https'[0:3])
