@@ -45,7 +45,7 @@ def edit_json():
     if trg:
         if int(trg['Version']) > 2:
             trgt = Comp(trg)
-            db_trg = db_get(trg['Userinfo']['Computername'], target=['clients', 'comps'], fild='Computername')
+            db_trg = db_get(trg['Userinfo']['Computername'], target=['clients', 'comps'], fild='computername')
             if not db_trg:
                 db_set(Comp(trg).__dict__, target=['clients', 'comps'])
                 pass
@@ -53,7 +53,7 @@ def edit_json():
                 for i in list(db_trg):
                     if db_trg[i] != trgt.__dict__[i]:
                         db_update({i: trgt.__dict__[i]}, target=['clients', 'comps'], id=str(db_trg['_id']))
-        usr_trg = db_get(trg['Userinfo']['Username'], target=['clients', 'users'], fild='Computername')
+        usr_trg = db_get(trg['Userinfo']['Username'], target=['clients', 'users'], fild='username')
         if not usr_trg:
             db_set(User(trg).__dict__, target=['clients', 'users'])
         else:
