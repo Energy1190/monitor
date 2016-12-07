@@ -71,7 +71,7 @@ def write_config(conf, path, path_t, path_old):
 def hello():
     if request.__dict__['environ']['REQUEST_METHOD'] == 'POST':
         print(json.dumps(request.json))
-        trg = json.dumps(request.json)
+        trg = json.loads(request.json)
         trg['Status'] = 'New'
         db_set(trg, target=['clients', 'json'])
         try:
