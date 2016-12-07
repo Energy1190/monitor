@@ -62,5 +62,5 @@ def edit_json():
                 if usr_trg[i] != trgt.__dict__[i] and i != 'copmslist':
                     db_update({i: trgt.__dict__[i]}, target=['clients', 'users'], id=int(str(usr_trg['_id'])))
             tgt_list = usr_trg['copmslist'].append({trgt.computername: trgt.time})
-            db_update({'copmslist': tgt_list}, target=['clients', 'users'], id=int(str(int(usr_trg['_id'])))
+            db_update({'copmslist': tgt_list}, target=['clients', 'users'], id=int(str(usr_trg['_id'])))
         db_update({'Status': 'Old'}, target=['clients', 'json'], id=int(str(trg['_id'])))
