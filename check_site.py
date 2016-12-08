@@ -39,12 +39,7 @@ def get_check_list():
     return [{'target': target[i], 'flag': target[i+1]} for i in range(0, len(target)) if target[i][0:4] == 'http']
 
 def main():
-<<<<<<< HEAD
     send_mail(str('Start work. Checks: {0}'.format([str(i['target'] + ' as ' + i['flag']) for i in get_check_list()])))
-=======
-    print(get_section('[Check HTTP]'))
-    send_mail(str('Start work. Checks: ' + ','.join(get_section('[Check HTTP]'))))
->>>>>>> origin/master
     try:
         while True:
             target = get_check_list()
