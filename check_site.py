@@ -36,7 +36,7 @@ def get_db_connect(http, flag='url'):
 
 def main():
     print(get_section('[Check HTTP]'))
-    send_mail('Start work')
+    send_mail(str('Start work. Checks: ' + ','.join(get_section('[Check HTTP]'))))
     try:
         while True:
             target = get_section('[Check HTTP]')
