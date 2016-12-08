@@ -34,20 +34,25 @@ def get_db_connect(http, flag='url'):
     except:
         return False
 
+def get_check_list():
+    target = get_section('[Check HTTP]')
+    return [{'target': target[i], 'flag': target[i+1]} for i in range(0, len(target)) if target[i][0:4] == 'http']
+
 def main():
-    send_mail('Start work')
+    send_mail(str('Start work. Checks: {0}'.format([str(i['target'] + ' as ' + i['flag']) for i in get_check_list()])))
     try:
         while True:
-            target = get_section('[Check HTTP]')
-            for i in range(0, len(target)):
-                if target[i][0:4] == 'http':
-                    if not get_db_connect(target[i], flag=target[i+1]):
-                        time.sleep(300)
-                        if not get_db_connect(target[i], flag=target[i+1]):
-                            send_mail('Fail connect to {0} as {1}'.format(target[i], target[i+1]), host=target[i])
+            target = get_check_list()
+            for i in target:
+                if not get_db_connect(i['target'], flag=i['flag']):
+                    time.sleep(300)
+                    if not get_db_connect(i['target'], flag=i['flag']):
+                        send_mail('Fail connect to {0} as {1}'.format(i['target'], i['flag']), host=i['target'])
             time.sleep(3600)
     finally:
         send_mail('End work')
 
 if __name__ == '__main__':
-    print('https'[0:3])
+#    print(get_check_list())
+    pass
+
