@@ -35,6 +35,7 @@ def get_db_connect(http, flag='url'):
         return False
 
 def main():
+    print(get_section('[Check HTTP]'))
     send_mail('Start work')
     try:
         while True:
