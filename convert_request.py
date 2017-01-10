@@ -51,16 +51,22 @@ def edit_json():
                 pass
             else:
                 for i in list(db_trg):
-                    if db_trg[i] != trgt.__dict__[i] and i != '_id':
-                        db_update({i: trgt.__dict__[i]}, target=['clients', 'comps'], id=str(db_trg['_id']))
+                    try:
+                        if db_trg[i] != trgt.__dict__[i] and i != '_id':
+                            db_update({i: trgt.__dict__[i]}, target=['clients', 'comps'], id=str(db_trg['_id']))
+                    except KeyError:
+                        pass
         usr_trg = db_get(trg['Userinfo']['Username'], target=['clients', 'users'], fild='username')
         if not usr_trg:
             db_set(User(trg).__dict__, target=['clients', 'users'])
         else:
             trgt = User(trg)
             for i in list(usr_trg):
-                if usr_trg[i] != trgt.__dict__[i] and i != 'copmslist' and i != '_id':
-                    db_update({i: trgt.__dict__[i]}, target=['clients', 'users'], id=str(usr_trg['_id']))
+                try:
+                    if usr_trg[i] != trgt.__dict__[i] and i != 'copmslist' and i != '_id':
+                        db_update({i: trgt.__dict__[i]}, target=['clients', 'users'], id=str(usr_trg['_id']))
+                except KeyError:
+                    pass
             tgt_list = usr_trg['copmslist'].append({trgt.computername: trgt.time})
             db_update({'copmslist': tgt_list}, target=['clients', 'users'], id=str(usr_trg['_id']))
         db_update({'Status': 'Old'}, target=['clients', 'json'], id=str(trg['_id']))
