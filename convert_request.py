@@ -97,3 +97,5 @@ def check_base(target):
                         break
                     else:
                         db_del(i, target=target)
+                else:
+                    db_del(i, target=target)
