@@ -99,3 +99,5 @@ def check_base(target):
                         db_del(i, target=target)
                 else:
                     db_del(i, target=target)
+        if name not in i:
+            db_del(i, target=target)
