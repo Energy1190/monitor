@@ -103,7 +103,7 @@ def config():
 @app.route("/requests/route", methods=['GET'])
 def requests_r():
     database_json = db_find(target=['route', 'incoming'])
-    return render_template('requests.html', data=database_json)
+    return render_template('requests_route.html', data=database_json)
 
 @app.route("/requests/json", methods=['GET'])
 def requests_j():
