@@ -1,24 +1,20 @@
 {% extends "index.html" %}
-{% block title %}Requests from powershell{% endblock %}
+{% block title %}Requests from route{% endblock %}
 {% block content %}
 <div class="row">
 <div class="col-xs-12 col-md-8">
 <div class="panel panel-default">
-  <div class="panel-heading">All requests from powershell</div>
+  <div class="panel-heading">All requests from route</div>
 <table class="table">
     <thead>
     <tr>
-        <th>User info</th>
-        <th>Version</th>
         <th>Data</th>
     </tr>
     </thead>
     <tbody>
 {% for i in data %}
     <tr>
-        <td>{{ i['Userinfo'] }}</td>
-        <td>{{ i['Version'] }}</td>
-        <td>{{ i['Timeinfo'] }}</td>
+        <td>{{ i }}</td>
     </tr>
 {% endfor %}
 </table>

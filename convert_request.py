@@ -1,5 +1,5 @@
 import time
-from db import db_get, db_find, db_update, db_set, db_del
+from db import db_get, db_find, db_update, db_set, db_del, db_del_all
 
 def isfloat(value):
     try:
@@ -71,11 +71,14 @@ def edit_json():
             db_update({'copmslist': tgt_list}, target=['clients', 'users'], id=str(usr_trg['_id']))
         db_update({'Status': 'Old'}, target=['clients', 'json'], id=str(trg['_id']))
 
-def delete_old_reqests():
+def delete_old_reqests(target, status='Old'):
     try:
-        trg = db_get('Old', target=['clients', 'json'], fild='Status')
-        for i in trg:
-            db_del(i, target=['clients', 'json'])
+        if status:
+            trg = db_get(status, target=target, fild='Status')
+            for i in trg:
+                db_del(i, target=target)
+        else:
+            db_del_all(target=target)
     except:
         pass
 

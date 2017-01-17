@@ -100,8 +100,13 @@ def config():
             valid = 2
     return render_template('config.html', conf=conf, valid=valid)
 
-@app.route("/requests", methods=['GET'])
-def requests_p():
+@app.route("/requests/route", methods=['GET'])
+def requests_r():
+    database_json = db_find(target=['route', 'incoming'])
+    return render_template('requests.html', data=database_json)
+
+@app.route("/requests/json", methods=['GET'])
+def requests_j():
     database_json = db_find(target=['clients', 'json'])
     return render_template('requests.html', data=database_json)
 
