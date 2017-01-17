@@ -1,6 +1,12 @@
 import pymongo
 from bson.objectid import ObjectId
 
+def id_test(num):
+    try:
+        return ObjectId(num)
+    except:
+        return ObjectId(str(num))
+
 def db_path(target=None):
     if target is None:
         target = ['database', 'forms']
@@ -15,18 +21,24 @@ def db_set(dict_db, target=None):
 
 def db_get(id, target=None, fild='_id'):
     if fild == '_id':
-        id = ObjectId(id)
+        id = id_test(id)
     return db_path(target).find_one({fild: id})
 
 def db_update(dict_db, target=None, fild='_id', id=None):
     if '_id' in dict_db:
         del dict_db['_id']
     if fild == '_id':
-        fild = {'_id': ObjectId(id)}
+        fild = {'_id': id_test(id)}
     return db_path(target).replace_one(fild, dict_db)
 
 def db_find(target=None):
     return db_path(target).find()
+
+def db_del(dict_db, target=None):
+    return db_path(target).delete_one(dict_db)
+
+def db_del_all(target=None):
+    return db_path(target).delete_one({})
 
 if __name__ == "__main__":
     db = pymongo.MongoClient()
