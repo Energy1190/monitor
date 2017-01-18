@@ -32,13 +32,13 @@ def db_update(dict_db, target=None, fild='_id', id=None):
     return db_path(target).replace_one(fild, dict_db)
 
 def db_find(target=None):
-    return db_path(target).find()
+    return db_path(target).find(limit=100)
 
 def db_del(dict_db, target=None):
     return db_path(target).delete_one(dict_db)
 
 def db_del_all(target=None):
-    return db_path(target).delete_one({})
+    return db_path(target).delete_many({})
 
 if __name__ == "__main__":
     db = pymongo.MongoClient()

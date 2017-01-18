@@ -13,13 +13,6 @@ import sys
 
 app = Flask(__name__)
 
-def get_data(target):
-    database_json = db_find(target=target)
-    if len(database_json) > 100:
-        return database_json[:100]
-    else:
-        return database_json
-
 def open_config(conf, path, path_t):
     try:
         request.form['validate']
@@ -110,7 +103,8 @@ def config():
 
 @app.route("/requests/route", methods=['GET'])
 def requests_r():
-    return render_template('requests_route.html', data=get_data(['clients', 'route']))
+    database_json = db_find(target=['clients', 'json'])
+    return render_template('requests_route.html', data=database_json)
 
 @app.route("/requests/json", methods=['GET'])
 def requests_j():
