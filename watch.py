@@ -5,7 +5,7 @@ import requests
 import smtplib
 import time
 from email.mime.text import MIMEText
-from get_config import get_section
+from configuration import get_section
 
 def send_mail(text, host='site'):
     msg = MIMEText(text)

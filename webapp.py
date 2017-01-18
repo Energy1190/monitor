@@ -5,7 +5,7 @@ from shutil import copyfile
 from flask import Flask, request, render_template
 from db import db_set, db_find
 from jsonschema import validate
-from convert_request import edit_json
+from requests_s import edit_json
 import yaml
 import json
 import os

@@ -1,9 +1,9 @@
 import multiprocessing
 import time
 import datetime
-from lisen_ps_script import app
-from check_site import main
-from convert_request import edit_json, delete_old_reqests, check_base
+from webapp import app
+from watch import main
+from requests_s import edit_json, delete_old_reqests, check_base
 
 def application():
     app.run(port=5000, host='0.0.0.0')
@@ -31,6 +31,9 @@ def edit_requests():
             delete_old_reqests(['route', 'warn'], status=None)
             delete_old_reqests(['route', 'err'], status=None)
             delete_old_reqests(['route', 'over'], status=None)
+            y = 1
+        elif datetime.datetime.now().hour == 2:
+            y = 0
 
 if __name__ == '__main__':
     proc1 = multiprocessing.Process(name='app', target=application)

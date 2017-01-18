@@ -11,7 +11,11 @@ def isfloat(value):
 def return_nub(x):
     return int(''.join([i for i in x if isfloat(i)]))
 
-class Comp():
+class Base():
+    def set_dict(self):
+        self.dict = {i: self.__dict__[i] for i in self.__dict__ if i != 'dict' and i != 'message'}
+
+class Comp(Base):
     def __init__(self, trg):
         self.computername = trg['Userinfo']['Computername']
         self.system = trg['Systeminfo']
@@ -24,18 +28,26 @@ class Comp():
         self.service = trg['Serviceinfo']
         self.task = trg['Tasksinfo']
         self.psversion = trg['Version']
+        self.dict = self.set_dict()
 
-class User():
+class User(Base):
     def __init__(self, trg):
         self.username = trg['Userinfo']['Username']
         self.domain = trg['Userinfo']['Domainname']
         self.computername = trg['Userinfo']['Computername']
         self.time = time.strftime('%d.%m.%Y %H:%M:%S',  time.gmtime(return_nub(trg['Timeinfo'])/1000.))
         self.copmslist = [{self.computername: self.time}]
+        self.dict = self.set_dict()
         try:
             self.grouppolicy = trg['GroupPolicyinfo']
         except:
             pass
+
+class Route(Base):
+    def __init__(self, trg):
+        self.time = eval(trg['time'])
+        self.message = trg['message']
+        self.dict = self.set_dict()
 
 def edit_json():
     try:
@@ -47,28 +59,23 @@ def edit_json():
             trgt = Comp(trg)
             db_trg = db_get(trg['Userinfo']['Computername'], target=['clients', 'comps'], fild='computername')
             if not db_trg:
-                db_set(Comp(trg).__dict__, target=['clients', 'comps'])
+                db_set(trgt.dict, target=['clients', 'comps'])
                 pass
             else:
                 for i in list(db_trg):
                     try:
-                        if db_trg[i] != trgt.__dict__[i] and i != '_id':
-                            db_update({i: trgt.__dict__[i]}, target=['clients', 'comps'], id=str(db_trg['_id']))
+                        if i != '_id' and db_trg[i] != trgt.dict[i]:
+                            db_update(trgt.dict, target=['clients', 'comps'], id=str(db_trg['_id']))
+                            break
                     except KeyError:
                         pass
         usr_trg = db_get(trg['Userinfo']['Username'], target=['clients', 'users'], fild='username')
         if not usr_trg:
-            db_set(User(trg).__dict__, target=['clients', 'users'])
+            db_set(User(trg).dict, target=['clients', 'users'])
         else:
             trgt = User(trg)
-            for i in list(usr_trg):
-                try:
-                    if usr_trg[i] != trgt.__dict__[i] and i != 'copmslist' and i != '_id':
-                        db_update({i: trgt.__dict__[i]}, target=['clients', 'users'], id=str(usr_trg['_id']))
-                except KeyError:
-                    pass
-            tgt_list = usr_trg['copmslist'].append({trgt.computername: trgt.time})
-            db_update({'copmslist': tgt_list}, target=['clients', 'users'], id=str(usr_trg['_id']))
+            trgt.copmslist = usr_trg['copmslist'].append({trgt.computername: trgt.time})
+            db_update(trgt.dict, target=['clients', 'users'], id=str(usr_trg['_id']))
         db_update({'Status': 'Old'}, target=['clients', 'json'], id=str(trg['_id']))
 
 def delete_old_reqests(target, status='Old'):
@@ -99,8 +106,11 @@ def check_base(target):
                         y.append(i[j])
                         break
                     else:
+                        print('delete:', i)
                         db_del(i, target=target)
                 else:
+                    print('delete:', i)
                     db_del(i, target=target)
         if name not in i:
             db_del(i, target=target)
+
