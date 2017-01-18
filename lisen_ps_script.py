@@ -103,7 +103,12 @@ def config():
 
 @app.route("/requests/route", methods=['GET'])
 def requests_r():
-    database_json = db_find(target=['route', 'incoming'])
+    database_json = db_find(target=['route', 'over'])
+    return render_template('requests_route.html', data=database_json)
+
+@app.route("/requests/route/<name>", methods=['GET'])
+def requests_a(name):
+    database_json = db_find(target=['route', name])
     return render_template('requests_route.html', data=database_json)
 
 @app.route("/requests/json", methods=['GET'])
