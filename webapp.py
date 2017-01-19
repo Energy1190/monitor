@@ -5,7 +5,7 @@ from shutil import copyfile
 from flask import Flask, request, render_template
 from db import db_set, db_find
 from jsonschema import validate
-from requests_s import edit_json
+from requests_s import processing_incoming_json
 import yaml
 import json
 import os
@@ -75,7 +75,7 @@ def hello():
         trg['Status'] = 'New'
         db_set(trg, target=['clients', 'json'])
         try:
-            edit_json()
+            processing_incoming_json(['clients', 'json'], ['clients', 'users'], ['clients', 'comps'])
         except:
             pass
     return render_template('index.html')
