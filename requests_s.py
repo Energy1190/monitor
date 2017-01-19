@@ -171,6 +171,7 @@ def check_base(target):
 
 def processing_incoming(target, out_target):
     t = db_get(None, target=target, fild=None)
+    print(t)
     x = Route(t, target=target)
     if x.set_dict():
         x.set(x.dict, target=out_target)
