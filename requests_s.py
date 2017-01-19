@@ -193,6 +193,7 @@ def get_database_incoming(target, status=None):
 def processing_incoming_json(target, out_target_users, out_target_comps):
     t = get_database_incoming(target, status='New')
     if t:
+        print(t)
         if int(t['Version']) > 2:
             x = Comp(t, target=out_target_comps)
             y = x.get_dsttrg(t['Userinfo']['Computername'], 'computername')
