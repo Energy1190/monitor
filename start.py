@@ -3,13 +3,18 @@ import time
 import datetime
 from webapp import app
 from watch import main
-from requests_s import edit_json, delete_old_reqests, check_base
+from requests_s import edit_json, delete_old_reqests, check_base, processing_incoming
 
 def application():
     app.run(port=5000, host='0.0.0.0')
 
 def daemon():
     main()
+
+def processing_logs():
+    while True:
+        if not processing_incoming(['route', 'incoming'], ['route', 'base']):
+            time.sleep(5)
 
 def edit_requests():
     x = 0
@@ -39,6 +44,7 @@ if __name__ == '__main__':
     proc1 = multiprocessing.Process(name='app', target=application)
     proc2 = multiprocessing.Process(name='daemon', target=daemon)
     proc3 = multiprocessing.Process(name='editor', target=edit_requests)
+    proc4 = multiprocessing.Process(name='logs', target=processing_logs)
     proc1.start()
     proc2.start()
     proc3.start()

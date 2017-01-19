@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+#  -*- coding: utf-8 -*-
+
 import time
 from db import db_get, db_find, db_update, db_set, db_del, db_del_all
 
@@ -15,8 +18,16 @@ class Base():
     def set_dict(self):
         self.dict = {i: self.__dict__[i] for i in self.__dict__ if i != 'dict' and i != 'message'}
 
+    def delete(self, trg, target=None):
+        if target:
+            db_del(trg, target=target)
+
+    def set(self, trg, target=None):
+        if target:
+            db_set(trg, target=target)
+
 class Comp(Base):
-    def __init__(self, trg):
+    def __init__(self, trg, target=None):
         self.computername = trg['Userinfo']['Computername']
         self.system = trg['Systeminfo']
         self.hard = trg['Harddriveinfo']
@@ -31,7 +42,7 @@ class Comp(Base):
         self.dict = self.set_dict()
 
 class User(Base):
-    def __init__(self, trg):
+    def __init__(self, trg, target=None):
         self.username = trg['Userinfo']['Username']
         self.domain = trg['Userinfo']['Domainname']
         self.computername = trg['Userinfo']['Computername']
@@ -44,10 +55,52 @@ class User(Base):
             pass
 
 class Route(Base):
-    def __init__(self, trg):
-        self.time = eval(trg['time'])
-        self.message = trg['message']
-        self.dict = self.set_dict()
+    """ Класс обрабатывающий входящие сообщения с роутера. Согласно документации
+        возможны следующие переменные:
+
+        * name - Имя сообщения.
+        * id - ID сообщения.
+        * prio - Приоритет сообщения.
+        * event - Описание сообщения.
+        * action - Действие.
+        * rev - ?.
+        * conntime - Время соединения.
+        * rule - Используемое правило.
+        * recvif - Имя принимающего интерфейса.
+        * connipproto - Протокол для данного соединения.
+        * conn - Статус соединения.
+        * connrecvif - Имя интерфейса отправителя.
+        * conndestif - Имя интерфейса назнаяения.
+        * connsrcip - IP-адрес отправителя.
+        * connsrcport - Порт отправителя.
+        * conndestip - IP-адрес назначения.
+        * conndestport - Порт назначения.
+        * origsent - Число байт, отправленных инициатором.
+        * termsent - Число байт, отправленных инициатором.
+
+        Для подсчета трафика необходимы только логи уровня Info.
+        Предпологаемое место расположение в базе: 'route' - 'info'.
+    """
+    def __init__(self, trg, target=None):
+        if trg:
+            self.status = True
+            self.time = eval(trg['time'])
+            self.message = trg['message']
+            self.level = lambda x: target[1] if len(target) > 1 else target[0](target)
+            self.dict = self.set_dict()
+            self.dict['level'] = self.level
+            self.dict['time'] = self.time
+        else:
+            self.status = False
+
+    def set_dict(self):
+        if self.status:
+            x = self.message.split(sep=' ')
+            self.name = x[0][:-1]
+            self.dict['name'] = self.name
+            return {i.split(sep='=')[0]: i.split(sep='=')[0] for i in x}
+        else:
+            return False
 
 def edit_json():
     try:
@@ -65,6 +118,7 @@ def edit_json():
                 for i in list(db_trg):
                     try:
                         if i != '_id' and db_trg[i] != trgt.dict[i]:
+                            trgt.computername = db_trg['computername']
                             db_update(trgt.dict, target=['clients', 'comps'], id=str(db_trg['_id']))
                             break
                     except KeyError:
@@ -75,6 +129,7 @@ def edit_json():
         else:
             trgt = User(trg)
             trgt.copmslist = usr_trg['copmslist'].append({trgt.computername: trgt.time})
+            trgt.username = usr_trg['username']
             db_update(trgt.dict, target=['clients', 'users'], id=str(usr_trg['_id']))
         db_update({'Status': 'Old'}, target=['clients', 'json'], id=str(trg['_id']))
 
@@ -114,3 +169,15 @@ def check_base(target):
         if name not in i:
             db_del(i, target=target)
 
+def processing_incoming(target, out_target):
+    t = db_get(None, target=target, fild=None)
+    x = Route(t, target=target)
+    if x.set_dict():
+        x.set(x.dict, target=out_target)
+        x.delete(t,target=target)
+        return True
+    else:
+        return False
+
+if __name__ == '__main__':
+    print(help(Route))
