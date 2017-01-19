@@ -18,11 +18,11 @@ def return_nub(x):
 class Base():
     def __init__(self, trg, target=None):
         self.old = []
-        self.dict = {}
+        self.dicts = {}
         self.dst = target
 
     def set_dict(self):
-        self.dict = {i: self.__dict__[i] for i in self.__dict__ if i != 'dict' and i != 'message' and i != 'dst'}
+        self.dicts = {i: self.__dict__[i] for i in self.__dict__ if i != 'dict' and i != 'message' and i != 'dst'}
 
     def delete(self, trg, target=None):
         if target:
@@ -39,17 +39,17 @@ class Base():
             if srctrg:
                 db_update(srctrg, target=target, fild=dsttrg)
             else:
-                db_update(self.dict, target=target, fild=dsttrg)
+                db_update(self.dicts, target=target, fild=dsttrg)
         elif dsttrg:
             if srctrg:
                 db_update(srctrg, target=self.dst, fild=dsttrg)
             else:
-                db_update(self.dict, target=self.dst, fild=dsttrg)
+                db_update(self.dicts, target=self.dst, fild=dsttrg)
 
     def check_dict(self, target_dict):
-        for i in self.dict:
+        for i in self.dicts:
             if i != '_id' and i != 'old' and i in target_dict:
-                if self.dict[i] != target_dict[i]:
+                if self.dicts[i] != target_dict[i]:
                     self.old.append({i: target_dict[i], 'time': datetime.datetime.now()})
 
     def get_dsttrg(self, src, fild):
@@ -74,7 +74,7 @@ class Comp(Base):
         self.task = trg['Tasksinfo']
         self.psversion = trg['Version']
         self.old = []
-        self.dict = self.set_dict()
+        self.dicts = self.set_dict()
 
 class User(Base):
     def __init__(self, trg, target=None):
@@ -84,7 +84,7 @@ class User(Base):
         self.computername = trg['Userinfo']['Computername']
         self.time = time.strftime('%d.%m.%Y %H:%M:%S',  time.gmtime(return_nub(trg['Timeinfo'])/1000.))
         self.copmslist = [{self.computername: self.time}]
-        self.dict = self.set_dict()
+        self.dicts = self.set_dict()
         try:
             self.grouppolicy = trg['GroupPolicyinfo']
         except:
@@ -128,9 +128,9 @@ class Route(Base):
             self.time = eval(trg['time'])
             self.message = trg['message']
             self.level = lambda x: target[1] if len(target) > 1 else target[0](target)
-            self.dict = self.set_dict()
-            self.dict['level'] = self.level
-            self.dict['time'] = self.time
+            self.dicts = self.set_dict()
+            self.dicts['level'] = self.level
+            self.dicts['time'] = self.time
         else:
             self.status = False
 
@@ -138,7 +138,7 @@ class Route(Base):
         if self.status:
             x = self.message.split(sep=' ')
             self.name = x[0][:-1]
-            self.dict['name'] = self.name
+            self.dicts['name'] = self.name
             return {i.split(sep='=')[0]: i.split(sep='=')[0] for i in x}
         else:
             return False
@@ -200,21 +200,21 @@ def processing_incoming_json(target, out_target_users, out_target_comps):
                 x.check_dict(y)
                 x.update(dsttrg=y)
             else:
-                x.set(x.dict)
+                x.set(x.dicts)
         x = User(t, target=out_target_users)
         y = x.get_dsttrg(t['Userinfo']['Username'], 'username')
         if y:
             x.check_dict(y)
             x.update(dsttrg=y)
         else:
-            x.set(x.dict)
+            x.set(x.dicts)
 
 def processing_incoming_route(target, out_target):
     t = get_database_incoming(target, status=None)
     print(t)
     x = Route(t, target=target)
     if x.set_dict():
-        x.set(x.dict, target=out_target)
+        x.set(x.dicts, target=out_target)
         x.delete(t,target=target)
         return True
     else:
