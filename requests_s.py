@@ -200,14 +200,14 @@ def processing_incoming_json(target, out_target_users, out_target_comps):
                 x.check_dict(y)
                 x.update(dsttrg=y)
             else:
-                x.set()
+                x.set(x.dict)
         x = User(t, target=out_target_users)
         y = x.get_dsttrg(t['Userinfo']['Username'], 'username')
         if y:
             x.check_dict(y)
             x.update(dsttrg=y)
         else:
-            x.set()
+            x.set(x.dict)
 
 def processing_incoming_route(target, out_target):
     t = get_database_incoming(target, status=None)
