@@ -28,11 +28,12 @@ def db_get(id, target=None, fild='_id'):
         return db_path(target).find_one()
 
 def db_update(dict_db, target=None, fild='_id', id=None):
-    if '_id' in dict_db:
-        del dict_db['_id']
-    if fild == '_id':
-        fild = {'_id': id_test(id)}
-    return db_path(target).replace_one(fild, dict_db)
+    if dict_db:
+        if '_id' in dict_db:
+            del dict_db['_id']
+        if fild == '_id':
+            fild = {'_id': id_test(id)}
+        return db_path(target).replace_one(fild, dict_db)
 
 def db_find(target=None):
     return db_path(target).find(limit=100)
