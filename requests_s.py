@@ -2,6 +2,7 @@
 #  -*- coding: utf-8 -*-
 
 import time
+import datetime
 from db import db_get, db_find, db_update, db_set, db_del, db_del_all
 
 def isfloat(value):
@@ -15,8 +16,13 @@ def return_nub(x):
     return int(''.join([i for i in x if isfloat(i)]))
 
 class Base():
+    def __init__(self, trg, target=None):
+        self.old = []
+        self.dict = {}
+        self.dst = target
+
     def set_dict(self):
-        self.dict = {i: self.__dict__[i] for i in self.__dict__ if i != 'dict' and i != 'message'}
+        self.dict = {i: self.__dict__[i] for i in self.__dict__ if i != 'dict' and i != 'message' and i != 'dst'}
 
     def delete(self, trg, target=None):
         if target:
@@ -25,9 +31,37 @@ class Base():
     def set(self, trg, target=None):
         if target:
             db_set(trg, target=target)
+        else:
+            db_set(trg, target=self.dst)
+
+    def update(self, srctrg=None, dsttrg=None, target=None):
+        if target and dsttrg:
+            if srctrg:
+                db_update(srctrg, target=target, fild=dsttrg)
+            else:
+                db_update(self.dict, target=target, fild=dsttrg)
+        elif dsttrg:
+            if srctrg:
+                db_update(srctrg, target=self.dst, fild=dsttrg)
+            else:
+                db_update(self.dict, target=self.dst, fild=dsttrg)
+
+    def check_dict(self, target_dict):
+        for i in self.dict:
+            if i != '_id' and i != 'old' and i in target_dict:
+                if self.dict[i] != target_dict[i]:
+                    self.old.append({i: target_dict[i], 'time': datetime.datetime.now()})
+
+    def get_dsttrg(self, src, fild):
+        x = db_get(src, target=self.dst, fild=fild)
+        if x:
+            return x
+        else:
+            return False
 
 class Comp(Base):
     def __init__(self, trg, target=None):
+        Base.__init__(self, trg, target=target)
         self.computername = trg['Userinfo']['Computername']
         self.system = trg['Systeminfo']
         self.hard = trg['Harddriveinfo']
@@ -39,10 +73,12 @@ class Comp(Base):
         self.service = trg['Serviceinfo']
         self.task = trg['Tasksinfo']
         self.psversion = trg['Version']
+        self.old = []
         self.dict = self.set_dict()
 
 class User(Base):
     def __init__(self, trg, target=None):
+        Base.__init__(self, trg, target=target)
         self.username = trg['Userinfo']['Username']
         self.domain = trg['Userinfo']['Domainname']
         self.computername = trg['Userinfo']['Computername']
@@ -53,6 +89,10 @@ class User(Base):
             self.grouppolicy = trg['GroupPolicyinfo']
         except:
             pass
+
+    def check_dict(self, target_dict):
+        Comp.check_dict(self, target_dict)
+        self.copmslist.extend(target_dict['copmslist'])
 
 class Route(Base):
     """ Класс обрабатывающий входящие сообщения с роутера. Согласно документации
@@ -82,6 +122,7 @@ class Route(Base):
         Предпологаемое место расположение в базе: 'route' - 'info'.
     """
     def __init__(self, trg, target=None):
+        Base.__init__(self, trg, target=target)
         if trg:
             self.status = True
             self.time = eval(trg['time'])
@@ -101,37 +142,6 @@ class Route(Base):
             return {i.split(sep='=')[0]: i.split(sep='=')[0] for i in x}
         else:
             return False
-
-def edit_json():
-    try:
-        trg = db_get('New', target=['clients', 'json'], fild='Status')
-    except:
-        trg = False
-    if trg:
-        if int(trg['Version']) > 2:
-            trgt = Comp(trg)
-            db_trg = db_get(trg['Userinfo']['Computername'], target=['clients', 'comps'], fild='computername')
-            if not db_trg:
-                db_set(trgt.dict, target=['clients', 'comps'])
-                pass
-            else:
-                for i in list(db_trg):
-                    try:
-                        if i != '_id' and db_trg[i] != trgt.dict[i]:
-                            trgt.computername = db_trg['computername']
-                            db_update(trgt.dict, target=['clients', 'comps'], id=str(db_trg['_id']))
-                            break
-                    except KeyError:
-                        pass
-        usr_trg = db_get(trg['Userinfo']['Username'], target=['clients', 'users'], fild='username')
-        if not usr_trg:
-            db_set(User(trg).dict, target=['clients', 'users'])
-        else:
-            trgt = User(trg)
-            trgt.copmslist = usr_trg['copmslist'].append({trgt.computername: trgt.time})
-            trgt.username = usr_trg['username']
-            db_update(trgt.dict, target=['clients', 'users'], id=str(usr_trg['_id']))
-        db_update({'Status': 'Old'}, target=['clients', 'json'], id=str(trg['_id']))
 
 def delete_old_reqests(target, status='Old'):
     try:
@@ -169,8 +179,38 @@ def check_base(target):
         if name not in i:
             db_del(i, target=target)
 
-def processing_incoming(target, out_target):
-    t = db_get(None, target=target, fild=None)
+def get_database_incoming(target, status=None):
+    try:
+        if status:
+            return db_get(status, target=target, fild='Status')
+        else:
+            return db_get(None, target=target, fild=None)
+    except:
+        print('Something wrong')
+        return False
+
+
+def processing_incoming_json(target, out_target_users, out_target_comps):
+    t = get_database_incoming(target, status='New')
+    if t:
+        if int(t['Version']) > 2:
+            x = Comp(t, target=out_target_comps)
+            y = x.get_dsttrg(t['Userinfo']['Computername'], 'computername')
+            if y:
+                x.check_dict(y)
+                x.update(dsttrg=y)
+            else:
+                x.set()
+        x = User(t, target=out_target_users)
+        y = x.get_dsttrg(t['Userinfo']['Username'], 'username')
+        if y:
+            x.check_dict(y)
+            x.update(dsttrg=y)
+        else:
+            x.set()
+
+def processing_incoming_route(target, out_target):
+    t = get_database_incoming(target, status=None)
     print(t)
     x = Route(t, target=target)
     if x.set_dict():

@@ -3,7 +3,7 @@ import time
 import datetime
 from webapp import app
 from watch import main
-from requests_s import edit_json, delete_old_reqests, check_base, processing_incoming
+from requests_s import delete_old_reqests, check_base, processing_incoming_route, processing_incoming_json
 
 def application():
     app.run(port=5000, host='0.0.0.0')
@@ -13,14 +13,14 @@ def daemon():
 
 def processing_logs():
     while True:
-        if not processing_incoming(['route', 'incoming'], ['route', 'base']):
+        if not processing_incoming_route(['route', 'incoming'], ['route', 'base']):
             time.sleep(5)
 
 def edit_requests():
     x = 0
     y = 0
     while True:
-        edit_json()
+        processing_incoming_json(['clients', 'json'], ['clients', 'users'], ['clients', 'comps'])
         check_base(['clients', 'comps'])
         check_base(['clients', 'users'])
         time.sleep(360)
