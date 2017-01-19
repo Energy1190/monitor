@@ -22,7 +22,7 @@ class Base():
         self.dst = target
 
     def set_dict(self):
-        self.dicts = {i: self.__dict__[i] for i in self.__dict__ if i != 'dict' and i != 'message' and i != 'dst'}
+        self.dicts = {i: self.__dict__[i] for i in self.__dict__ if i != 'dicts' and i != 'message' and i != 'dst'}
 
     def delete(self, trg, target=None):
         if target:
@@ -84,11 +84,11 @@ class User(Base):
         self.computername = trg['Userinfo']['Computername']
         self.time = time.strftime('%d.%m.%Y %H:%M:%S',  time.gmtime(return_nub(trg['Timeinfo'])/1000.))
         self.copmslist = [{self.computername: self.time}]
-        self.dicts = self.set_dict()
         try:
             self.grouppolicy = trg['GroupPolicyinfo']
         except:
             pass
+        self.dicts = self.set_dict()
 
     def check_dict(self, target_dict):
         Comp.check_dict(self, target_dict)
@@ -207,6 +207,8 @@ def processing_incoming_json(target, out_target_users, out_target_comps):
             x.check_dict(y)
             x.update(dsttrg=y)
         else:
+            print(x.dicts)
+            print(type(x.dicts))
             x.set(x.dicts)
 
 def processing_incoming_route(target, out_target):
