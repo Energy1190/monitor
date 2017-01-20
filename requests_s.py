@@ -125,10 +125,12 @@ class Route(Base):
         if trg:
             self.status = True
             Base.__init__(self, trg, target=target)
-            self.time = eval(trg['time'])
+            self.time = eval(str(trg['time']))
             self.message = trg['message']
             self.level = lambda x: target[1] if len(target) > 1 else target[0](target)
             self.set_dict()
+            print(trg['time'])
+            print(type(trg['time']))
             self.dicts['level'] = self.level
             self.dicts['time'] = self.time
         else:
@@ -226,3 +228,4 @@ if __name__ == '__main__':
     x = User({'Userinfo' : {'Username': 1, 'Domainname' : 1, 'Computername' : 1}, 'Timeinfo': '1479477167416'})
     x.set_dict()
     print(x.dicts)
+    print(eval('datetime.datetime(2017, 1, 19, 18, 0, 53)'))
