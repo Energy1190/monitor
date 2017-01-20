@@ -128,7 +128,8 @@ class Route(Base):
             self.time = trg['time']
             self.message = trg['message']
             self.level = lambda x: target[1] if len(target) > 1 else target[0](target)
-            self.set_dict()
+            self.dicts = self.set_dict()
+            self.dicts['name'] = self.name
             self.dicts['level'] = self.level
             self.dicts['time'] = self.time
         else:
@@ -139,7 +140,6 @@ class Route(Base):
         if self.status:
             x = self.message.split(sep=' ')
             self.name = x[0][:-1]
-            self.dicts['name'] = self.name
             x.remove(x[0])
             return {i.split(sep='=')[0]: i.split(sep='=')[0] for i in x}
         else:
