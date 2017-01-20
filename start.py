@@ -17,28 +17,13 @@ def processing_logs():
             time.sleep(5)
 
 def edit_requests():
-    x = 0
-    y = 0
+    delete_old_reqests(['route', 'incoming'], status=None)
+    delete_old_reqests(['clients', 'json'])
     while True:
         processing_incoming_json(['clients', 'json'], ['clients', 'users'], ['clients', 'comps'])
         check_base(['clients', 'comps'])
         check_base(['clients', 'users'])
         time.sleep(360)
-        if datetime.datetime.now().day == 20 and x == 0:
-            delete_old_reqests(['clients', 'json'])
-            x = 1
-        elif datetime.datetime.now().day == 21:
-            x = 0
-        if datetime.datetime.now().hour == 1 and y == 0:
-            delete_old_reqests(['route', 'incoming'], status=None)
-            delete_old_reqests(['route', 'info'], status=None)
-            delete_old_reqests(['route', 'notice'], status=None)
-            delete_old_reqests(['route', 'warn'], status=None)
-            delete_old_reqests(['route', 'err'], status=None)
-            delete_old_reqests(['route', 'over'], status=None)
-            y = 1
-        elif datetime.datetime.now().hour == 2:
-            y = 0
 
 if __name__ == '__main__':
     proc1 = multiprocessing.Process(name='app', target=application)
