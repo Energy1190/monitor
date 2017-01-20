@@ -145,7 +145,7 @@ class Route(Base):
             x = self.message.split(sep=' ')
             self.name = x[0][:-1]
             x.remove(x[0])
-            return {i.split(sep='=')[0]: i.split(sep='=')[0] for i in x}
+            return {i.split(sep='=')[0]: i.split(sep='=')[1] for i in x if i.split(sep='=') > 1}
         else:
             return False
 
