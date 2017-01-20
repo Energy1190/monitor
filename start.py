@@ -17,6 +17,7 @@ def processing_logs():
             time.sleep(5)
 
 def edit_requests():
+    delete_old_reqests(['route', 'over'], status=None)
     delete_old_reqests(['route', 'incoming'], status=None)
     delete_old_reqests(['clients', 'json'], status=None)
     delete_old_reqests(['route', 'base'], status=None)
