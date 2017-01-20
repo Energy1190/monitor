@@ -127,10 +127,10 @@ class Route(Base):
             Base.__init__(self, trg, target=target)
             self.time = trg['time']
             self.message = trg['message']
-            self.level = lambda x: target[1] if len(target) > 1 else target[0](target)
+            self.level = lambda x: target[1] if len(target) > 1 else target[0]
             self.dicts = self.set_dict()
             self.dicts['name'] = self.name
-            self.dicts['level'] = self.level
+            self.dicts['level'] = self.level(target)
             self.dicts['time'] = self.time
         else:
             self.status = False
@@ -227,3 +227,7 @@ if __name__ == '__main__':
     x.set_dict()
     print(x.dicts)
     print(eval('datetime.datetime(2017, 1, 19, 18, 0, 53)'))
+    target = ['clients', 'json']
+    level = lambda x: target[1] if len(target) > 1 else target[0]
+    print(level(target))
+    print(type(level(target)))
