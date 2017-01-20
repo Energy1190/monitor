@@ -122,13 +122,13 @@ class Route(Base):
         Предпологаемое место расположение в базе: 'route' - 'info'.
     """
     def __init__(self, trg, target=None):
-        Base.__init__(self, trg, target=target)
         if trg:
-            self.set_dict()
             self.status = True
+            Base.__init__(self, trg, target=target)
             self.time = eval(trg['time'])
             self.message = trg['message']
             self.level = lambda x: target[1] if len(target) > 1 else target[0](target)
+            self.set_dict()
             self.dicts['level'] = self.level
             self.dicts['time'] = self.time
         else:
