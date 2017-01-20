@@ -127,7 +127,7 @@ class Route(Base):
             Base.__init__(self, trg, target=target)
             self.time = trg['time']
             self.message = trg['message']
-            self.dicts = self.set_dict()
+            self.dicts = Route.set_dict()
             self.dicts['name'] = self.name
             self.dicts['level'] = self.get_level(target)
             self.dicts['time'] = self.time
@@ -237,4 +237,4 @@ if __name__ == '__main__':
     print(level(target))
     print(type(level(target)))
     x = Route({'message': '1=2 3=4 5=6', 'time': '1479477167416'}, target=['clients', 'json'])
-    print(type(x.dicts['level']))
+    print(x.dicts)
