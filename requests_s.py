@@ -32,7 +32,7 @@ class Base():
             self.dicts['time']['year'] = self.time.year
             self.dicts['time']['month'] = self.time.month
             self.dicts['time']['day'] = self.time.day
-            self.dicts['time']['min'] = self.time.min
+            self.dicts['time']['min'] = self.time.minute
             self.dicts['time']['second'] = self.time.second
 
     def set_dict(self):
@@ -251,4 +251,4 @@ if __name__ == '__main__':
     target = ['clients', 'json']
     level = lambda x: target[1] if len(target) > 1 else target[0]
     print(level(target))
-    print(datetime.datetime(2017, 1, 19, 18, 0, 53).date())
+    print(datetime.datetime(2017, 1, 19, 18, 0, 53).minute)
