@@ -235,5 +235,5 @@ if __name__ == '__main__':
     level = lambda x: target[1] if len(target) > 1 else target[0]
     print(level(target))
     print(type(level(target)))
-    x = Route({'message': ' name 1=2 3=4 5=6', 'time': '1479477167416'}, target=['clients', 'json'])
+    x = Route({'message': 'name: 1=2 3=4 5=6', 'time': '1479477167416'}, target=['clients', 'json'])
     print(x.dicts)
