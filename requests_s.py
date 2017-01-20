@@ -127,7 +127,7 @@ class Route(Base):
             Base.__init__(self, trg, target=target)
             self.time = trg['time']
             self.message = trg['message']
-            self.dicts = Route.set_dict(self)
+            self.dicts = self.set_dict()
             self.dicts['name'] = self.name
             self.dicts['level'] = self.get_level(target)
             self.dicts['time'] = self.time
@@ -141,7 +141,6 @@ class Route(Base):
             return x[0]
 
     def set_dict(self):
-        Base.set_dict(self)
         if self.status:
             x = self.message.split(sep=' ')
             self.name = x[0][:-1]
