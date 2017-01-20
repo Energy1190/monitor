@@ -21,6 +21,20 @@ class Base():
         self.dicts = {}
         self.dst = target
 
+    def get_time_dict(self):
+        if 'time' in self.__dict__:
+            self.dicts['time'] = {}
+            if type(self.time) == time.struct_time:
+                self.dicts['time']['time'] = time.strftime('%d.%m.%Y %H:%M:%S', self.time)
+                self.time = datetime.datetime.fromtimestamp(time.mktime(self.time))
+            else:
+                self.dicts['time']['time'] = self.time
+            self.dicts['time']['year'] = self.time.year
+            self.dicts['time']['month'] = self.time.month
+            self.dicts['time']['day'] = self.time.day
+            self.dicts['time']['min'] = self.time.min
+            self.dicts['time']['second'] = self.time.second
+
     def set_dict(self):
         self.dicts = {i: self.__dict__[i] for i in self.__dict__ if i != 'dicts' and i != 'message' and i != 'dst'}
 
@@ -73,6 +87,8 @@ class Comp(Base):
         self.service = trg['Serviceinfo']
         self.task = trg['Tasksinfo']
         self.psversion = trg['Version']
+        self.time = time.gmtime((return_nub(trg['Timeinfo']) + 10800000)/1000.)
+        self.get_time_dict()
         self.old = []
         self.set_dict()
 
@@ -82,8 +98,9 @@ class User(Base):
         self.username = trg['Userinfo']['Username']
         self.domain = trg['Userinfo']['Domainname']
         self.computername = trg['Userinfo']['Computername']
-        self.time = time.strftime('%d.%m.%Y %H:%M:%S',  time.gmtime(return_nub(trg['Timeinfo'])/1000.))
-        self.copmslist = [{self.computername: self.time}]
+        self.time = time.gmtime((return_nub(trg['Timeinfo']) + 10800000)/1000.)
+        self.get_time_dict()
+        self.copmslist = [{self.computername: self.dicts['time']['time']}]
         try:
             self.grouppolicy = trg['GroupPolicyinfo']
         except:
@@ -130,7 +147,7 @@ class Route(Base):
             self.dicts = self.set_dict()
             self.dicts['name'] = self.name
             self.dicts['level'] = self.get_level(target)
-            self.dicts['time'] = self.time
+            self.get_time_dict()
         else:
             self.status = False
 
@@ -234,6 +251,4 @@ if __name__ == '__main__':
     target = ['clients', 'json']
     level = lambda x: target[1] if len(target) > 1 else target[0]
     print(level(target))
-    print(type(level(target)))
-    x = Route({'message': 'name: 1=2 3=4 5=6', 'time': '1479477167416'}, target=['clients', 'json'])
-    print(x.dicts)
+    print(datetime.datetime(2017, 1, 19, 18, 0, 53).date())
