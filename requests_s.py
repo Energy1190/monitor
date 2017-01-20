@@ -125,12 +125,10 @@ class Route(Base):
         if trg:
             self.status = True
             Base.__init__(self, trg, target=target)
-            self.time = eval(str(trg['time']))
+            self.time = trg['time']
             self.message = trg['message']
             self.level = lambda x: target[1] if len(target) > 1 else target[0](target)
             self.set_dict()
-            print(trg['time'])
-            print(type(trg['time']))
             self.dicts['level'] = self.level
             self.dicts['time'] = self.time
         else:
