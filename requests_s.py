@@ -74,7 +74,7 @@ class Comp(Base):
         self.task = trg['Tasksinfo']
         self.psversion = trg['Version']
         self.old = []
-        self.dicts = self.set_dict()
+        self.set_dict()
 
 class User(Base):
     def __init__(self, trg, target=None):
@@ -88,7 +88,7 @@ class User(Base):
             self.grouppolicy = trg['GroupPolicyinfo']
         except:
             pass
-        self.dicts = self.set_dict()
+        self.set_dict()
 
     def check_dict(self, target_dict):
         Comp.check_dict(self, target_dict)
@@ -124,21 +124,23 @@ class Route(Base):
     def __init__(self, trg, target=None):
         Base.__init__(self, trg, target=target)
         if trg:
+            self.set_dict()
             self.status = True
             self.time = eval(trg['time'])
             self.message = trg['message']
             self.level = lambda x: target[1] if len(target) > 1 else target[0](target)
-            self.dicts = self.set_dict()
             self.dicts['level'] = self.level
             self.dicts['time'] = self.time
         else:
             self.status = False
 
     def set_dict(self):
+        Base.set_dict(self)
         if self.status:
             x = self.message.split(sep=' ')
             self.name = x[0][:-1]
             self.dicts['name'] = self.name
+            x.remove(x[0])
             return {i.split(sep='=')[0]: i.split(sep='=')[0] for i in x}
         else:
             return False
@@ -208,8 +210,6 @@ def processing_incoming_json(target, out_target_users, out_target_comps):
             x.check_dict(y)
             x.update(dsttrg=y)
         else:
-            print(x.dicts)
-            print(type(x.dicts))
             x.set(x.dicts)
 
 def processing_incoming_route(target, out_target):
@@ -224,4 +224,6 @@ def processing_incoming_route(target, out_target):
         return False
 
 if __name__ == '__main__':
-    print(help(Route))
+    x = User({'Userinfo' : {'Username': 1, 'Domainname' : 1, 'Computername' : 1}, 'Timeinfo': '1479477167416'})
+    x.set_dict()
+    print(x.dicts)
