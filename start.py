@@ -18,7 +18,8 @@ def processing_logs():
 
 def edit_requests():
     delete_old_reqests(['route', 'incoming'], status=None)
-    delete_old_reqests(['clients', 'json'])
+    delete_old_reqests(['clients', 'json'], status=None)
+    delete_old_reqests(['route', 'base'], status=None)
     while True:
         processing_incoming_json(['clients', 'json'], ['clients', 'users'], ['clients', 'comps'])
         check_base(['clients', 'comps'])
