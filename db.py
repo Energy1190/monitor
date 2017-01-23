@@ -36,9 +36,9 @@ def db_update(dict_db, target=None, fild='_id', id=None):
         return db_path(target).replace_one(fild, dict_db)
 
 def db_find(dict_db=None, target=None, limit=100):
-    if dict_db and len(db_path(target).find(dict_db).count()) < limit:
+    if dict_db and db_path(target).find(dict_db).count() < limit:
         return db_path(target).find(dict_db, limit=limit)
-    elif len(db_path(target).find().count()) < limit:
+    elif db_path(target).find().count() < limit:
         return db_path(target).find(limit=limit)
     else:
         return False

@@ -70,8 +70,9 @@ def get_route_info_database(src_ip=None, dst_ip=None, start_time=None, end_time=
             x.append(i)
     return x
 
-start_time = (2017, 1, 20, 22, 24)
-end_time = (2018, 1, 20, 22, 23)
-print(get_time_requests(start_time,end_time))
+if __name__ == '__main__':
+    start_time = (2017, 1, 20, 22, 24)
+    end_time = (2018, 1, 20, 22, 23)
+    print(get_time_requests(start_time,end_time))
 
 
