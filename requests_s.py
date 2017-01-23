@@ -139,7 +139,7 @@ class Route(Base):
         Предпологаемое место расположение в базе: 'route' - 'info'.
     """
     def __init__(self, trg, target=None):
-        if trg:
+        if trg and 'message' in trg and 'time' in trg:
             self.status = True
             Base.__init__(self, trg, target=target)
             self.time = trg['time']
