@@ -121,7 +121,7 @@ def requests_j():
 def requests_g():
     protocol = request.args.get('protocol')
     database_json = get_route_info_database(protocol=protocol)
-    return protocol
+    return render_template('requests_route.html', data=database_json)
 
 @app.route("/users", methods=['GET'])
 def users_p():
