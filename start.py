@@ -17,7 +17,6 @@ def processing_logs():
             time.sleep(5)
 
 def edit_requests():
-    delete_old_reqests(['route', 'base'], status=None)
     while True:
         processing_incoming_json(['clients', 'json'], ['clients', 'users'], ['clients', 'comps'])
         check_base(['clients', 'comps'])
