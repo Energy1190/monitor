@@ -120,10 +120,8 @@ def requests_j():
 @app.route("/requests/get", methods=['GET'])
 def requests_g():
     protocol = request.args.get('protocol')
-    print('Hello, world!')
-    print(protocol)
     database_json = get_route_info_database(protocol=protocol)
-    return render_template('requests_route.html', data=database_json)
+    return protocol
 
 @app.route("/users", methods=['GET'])
 def users_p():
