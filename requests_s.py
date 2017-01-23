@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
 #  -*- coding: utf-8 -*-
 
+import os
 import time
 import datetime
 from db import db_get, db_find, db_update, db_set, db_del, db_del_all
+
+error_c = 0
 
 def isfloat(value):
     try:
@@ -132,8 +135,8 @@ class Route(Base):
         * connsrcport - Порт отправителя.
         * conndestip - IP-адрес назначения.
         * conndestport - Порт назначения.
-        * origsent - Число байт, отправленных инициатором.
-        * termsent - Число байт, отправленных инициатором.
+        * origsent - Число байт, отправленных инициатором, исходящий трафик.
+        * termsent - Число байт, отправленных инициатором, входящий трафик.
 
         Для подсчета трафика необходимы только логи уровня Info.
         Предпологаемое место расположение в базе: 'route' - 'info'.
@@ -241,8 +244,23 @@ def processing_incoming_route(target, out_target):
         x.delete(t,target=target)
         return True
     else:
-        x.delete(t,target=target)
-        return False
+        try:
+            x.delete(t,target=target)
+            return False
+        except TypeError as err:
+            global error_c
+            error_c = error_c + 1
+            if not os.path.exists('error.log'):
+                file = open('error.log', 'w+')
+            else:
+                file = open('error.log', 'r+')
+            file.write('Error № {0} \n'.format(error_c))
+            file.write('Error time {0} \n'.format(datetime.datetime.now()))
+            file.write('Error sring {0} \n'.format(t))
+            file.write('Trace: \n')
+            file.write(err)
+            file.write('\n \n \n')
+            file.close()
 
 if __name__ == '__main__':
     x = User({'Userinfo' : {'Username': 1, 'Domainname' : 1, 'Computername' : 1}, 'Timeinfo': '1479477167416'})

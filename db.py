@@ -36,10 +36,12 @@ def db_update(dict_db, target=None, fild='_id', id=None):
         return db_path(target).replace_one(fild, dict_db)
 
 def db_find(dict_db=None, target=None, limit=100):
-    if dict_db:
+    if dict_db and len(db_path(target).find(dict_db).count()) < limit:
         return db_path(target).find(dict_db, limit=limit)
-    else:
+    elif len(db_path(target).find().count()) < limit:
         return db_path(target).find(limit=limit)
+    else:
+        return False
 
 def db_del(dict_db, target=None):
     return db_path(target).delete_one(dict_db)
@@ -48,8 +50,6 @@ def db_del_all(target=None):
     return db_path(target).delete_many({})
 
 if __name__ == "__main__":
-    db = pymongo.MongoClient()
+    pass
 #    print(db_get('57aa00e220d9773d3005a235'))
 #    print(db_get('open', target=['database', 'task'], fild='status'))
-    for i in db['database']['task'].find():
-        print(i)
