@@ -234,10 +234,11 @@ def processing_incoming_json(target, out_target_users, out_target_comps):
         x.delete(t, target=target)
 
 def processing_incoming_route(target, out_target):
+    t = get_database_incoming(target, status=None)
     try:
-        t = get_database_incoming(target, status=None)
         x = Route(t, target=target)
     except KeyError:
+        Base.delete(t,target=target)
         return False
     if x.set_dict():
         x.set(x.dicts, target=out_target)
