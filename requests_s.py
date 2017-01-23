@@ -139,7 +139,7 @@ class Route(Base):
         Предпологаемое место расположение в базе: 'route' - 'info'.
     """
     def __init__(self, trg, target=None):
-        if trg:
+        if trg and 'message' in trg and 'time' in trg:
             self.status = True
             Base.__init__(self, trg, target=target)
             self.time = trg['time']
@@ -235,16 +235,13 @@ def processing_incoming_json(target, out_target_users, out_target_comps):
 
 def processing_incoming_route(target, out_target):
     t = get_database_incoming(target, status=None)
-    try:
-        x = Route(t, target=target)
-    except KeyError:
-        Base.delete(t,target=target)
-        return False
+    x = Route(t, target=target)
     if x.set_dict():
         x.set(x.dicts, target=out_target)
         x.delete(t,target=target)
         return True
     else:
+        x.delete(t,target=target)
         return False
 
 if __name__ == '__main__':
