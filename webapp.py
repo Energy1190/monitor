@@ -6,6 +6,7 @@ from flask import Flask, request, render_template
 from db import db_set, db_find
 from jsonschema import validate
 from requests_s import processing_incoming_json
+from reguests_db import get_route_info_database
 import yaml
 import json
 import os
@@ -115,6 +116,12 @@ def requests_a(name):
 def requests_j():
     database_json = db_find(target=['clients', 'json'])
     return render_template('requests.html', data=database_json)
+
+@app.route("/requests/get", methods=['GET'])
+def requests_g():
+    protocol = request.args.get('protocol')
+    database_json = get_route_info_database(protocol=protocol)
+    return render_template('requests_route.html', data=database_json)
 
 @app.route("/users", methods=['GET'])
 def users_p():
