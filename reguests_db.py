@@ -133,11 +133,13 @@ def get_route_info_database(src_ip=None, dst_ip=None, start_time=None, end_time=
             y = db_find(dx, target=target, limit=10000)
             for i in y:
                 if i not in x:
+                    x.append(dx)
                     x.append(i)
     else:
         y = db_find(dx, target=target, limit=10000)
         for i in y:
             if i not in x:
+                x.append(dx)
                 x.append(i)
     return x
 
