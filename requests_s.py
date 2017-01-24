@@ -235,31 +235,32 @@ def processing_incoming_json(target, out_target_users, out_target_comps):
 
 def processing_incoming_route(target, out_target):
     t = get_database_incoming(target, status=None)
-    x = Route(t, target=target)
-    if x.set_dict():
-        x.set(x.dicts, target=out_target)
-        x.delete(t,target=target)
-        return True
-    else:
-        try:
+    if t:
+        x = Route(t, target=target)
+        if x.set_dict():
+            x.set(x.dicts, target=out_target)
             x.delete(t,target=target)
-            return False
-        except TypeError as err:
-            global error_c
-            error_c = error_c + 1
-            if not os.path.exists('error.log'):
-                file = open('error.log', 'w+')
-            else:
-                file = open('error.log', 'a+')
-            file.write('Error № {0} \n'.format(error_c))
-            file.write('Error time {0} \n'.format(datetime.datetime.now()))
-            file.write('Error string {0} \n'.format(t))
-            file.write('Trace: \n')
-            file.write(str(err))
-            file.write('\n \n')
-            file.write('--'*10)
-            file.write('\n \n')
-            file.close()
+            return True
+        else:
+            try:
+                x.delete(t,target=target)
+                return False
+            except TypeError as err:
+                global error_c
+                error_c = error_c + 1
+                if not os.path.exists('error.log'):
+                    file = open('error.log', 'w+')
+                else:
+                    file = open('error.log', 'a+')
+                file.write('Error № {0} \n'.format(error_c))
+                file.write('Error time {0} \n'.format(datetime.datetime.now()))
+                file.write('Error string {0} \n'.format(t))
+                file.write('Trace: \n')
+                file.write(str(err))
+                file.write('\n \n')
+                file.write('--'*10)
+                file.write('\n \n')
+                file.close()
 
 if __name__ == '__main__':
     x = User({'Userinfo' : {'Username': 1, 'Domainname' : 1, 'Computername' : 1}, 'Timeinfo': '1479477167416'})
