@@ -253,7 +253,7 @@ def processing_incoming_route(target, out_target):
             if not os.path.exists('error.log'):
                 file = open('error.log', 'w+')
             else:
-                file = open('error.log', 'r+')
+                file = open('error.log', 'a+')
             file.write('Error № {0} \n'.format(error_c))
             file.write('Error time {0} \n'.format(datetime.datetime.now()))
             file.write('Error string {0} \n'.format(t))

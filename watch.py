@@ -55,4 +55,5 @@ def main():
 if __name__ == '__main__':
 #    print(get_check_list())
     pass
-
+    file = open('ss.txt', 'a+')
+    file.write('Hello')

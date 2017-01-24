@@ -23,12 +23,17 @@ def over(x, y, num, pre=None):
         r.append(years(x, num))
         r.append(years(1, y))
         return r
+def get_time_tuple(time_str):
+    return tuple(time_str.split(sep='_'))
 
 def get_time_requests(start_time, end_time):
     r = []
     n = 0
     s = datetime.datetime(*start_time)
-    e = datetime.datetime(*end_time)
+    try:
+        e = datetime.datetime(*end_time)
+    except:
+        e = end_time
     x = [[int(i), int(j), g] for i, j, g in [(s.year, e.year, 0), (s.month, e.month, 12), (s.day, e.day, 31), (s.hour, e.hour, 60), (s.minute, e.minute, 60)]]
     f = years(*x[0])
     r.append(f)
@@ -46,11 +51,54 @@ def get_time_requests(start_time, end_time):
                 r.append(f)
         except IndexError:
             pass
-    return r
+    rr = []
+    if len(r[-1]) == 1:
+        xx = [(r[-5][0], r[-4][0][0], r[-3][0][0], r[-2][0][0], i) for i in r[-1][0]]
+        rr = xx
+    else:
+        if len(r[-2]) == 1:
+            xx = [(r[-5][0], r[-4][0][0], r[-3][0][0], r[-2][0][0], i) for i in r[-1][0]]
+            yy = [(r[-5][0], r[-4][0][0], r[-3][0][0], i, 0) for i in r[-2][0]]
+            xx2 = [(r[-5][-1], r[-4][-1][-1], r[-3][-1][-1], r[-2][-1][-1], i) for i in r[-1][1]]
+            yy2 = [(r[-5][-1], r[-4][-1][-1], r[-3][-1][-1], i, 0) for i in r[-2][1]]
+            rr = xx + yy + xx2 + yy2
+        else:
+            if len(r[-3]) == 1:
+                xx = [(r[-5][0], r[-4][0][0], r[-3][0][0], r[-2][0][0], i) for i in r[-1][0]]
+                yy = [(r[-5][0], r[-4][0][0], r[-3][0][0], i, 0) for i in r[-2][0]]
+                zz = [(r[-5][0], r[-4][0][0], i, 0, 0) for i in r[-3][0]]
+                xx2 = [(r[-5][-1], r[-4][-1][-1], r[-3][-1][-1], r[-2][-1][-1], i) for i in r[-1][1]]
+                yy2 = [(r[-5][-1], r[-4][-1][-1], r[-3][-1][-1], i, 0) for i in r[-2][1]]
+                zz2 = [(r[-5][-1], r[-4][-1][-1], i, 0, 0) for i in r[-3][1]]
+                rr = xx + yy + zz + xx2 + yy2 + zz2
+            else:
+                if len(r[-4]) == 1:
+                    xx = [(r[-5][0], r[-4][0][0], r[-3][0][0], r[-2][0][0], i) for i in r[-1][0]]
+                    yy = [(r[-5][0], r[-4][0][0], r[-3][0][0], i, 0) for i in r[-2][0]]
+                    zz = [(r[-5][0], r[-4][0][0], i, 0, 0) for i in r[-3][0]]
+                    cc = [(r[-5][0], i, 0, 0, 0) for i in r[-4][0]]
+                    xx2 = [(r[-5][-1], r[-4][-1][-1], r[-3][-1][-1], r[-2][-1][-1], i) for i in r[-1][1]]
+                    yy2 = [(r[-5][-1], r[-4][-1][-1], r[-3][-1][-1], i, 0) for i in r[-2][1]]
+                    zz2 = [(r[-5][-1], r[-4][-1][-1], i, 0, 0) for i in r[-3][1]]
+                    cc2 = [(r[-5][-1], i, 0, 0, 0) for i in r[-4][0]]
+                    rr = xx + yy + zz + cc + xx2 + yy2 + zz2 + cc2
+                else:
+                    xx = [(r[-5][0], r[-4][0][0], r[-3][0][0], r[-2][0][0], i) for i in r[-1][0]]
+                    yy = [(r[-5][0], r[-4][0][0], r[-3][0][0], i, 0) for i in r[-2][0]]
+                    zz = [(r[-5][0], r[-4][0][0], i, 0, 0) for i in r[-3][0]]
+                    cc = [(r[-5][0], i, 0, 0, 0) for i in r[-4][0]]
+                    vv = [(i, 0, 0, 0, 0) for i in r[-5]]
+                    xx2 = [(r[-5][-1], r[-4][-1][-1], r[-3][-1][-1], r[-2][-1][-1], i) for i in r[-1][1]]
+                    yy2 = [(r[-5][-1], r[-4][-1][-1], r[-3][-1][-1], i, 0) for i in r[-2][1]]
+                    zz2 = [(r[-5][-1], r[-4][-1][-1], i, 0, 0) for i in r[-3][1]]
+                    cc2 = [(r[-5][-1], i, 0, 0, 0) for i in r[-4][1]]
+                    rr = xx + yy + zz + cc + vv + xx2 + yy2 + zz2 + cc2
+    return rr
 
 def get_route_info_database(src_ip=None, dst_ip=None, start_time=None, end_time=None, protocol=None, port=None):
     dx = {'name': 'CONN', 'action': 'close'}
     x = []
+    t = []
     target = ['route', 'base']
     if src_ip:
         dx['connsrcip'] = src_ip
@@ -61,18 +109,34 @@ def get_route_info_database(src_ip=None, dst_ip=None, start_time=None, end_time=
     if protocol == "ALL_TO_WAN":
         dx['conndestif'] = 'wan1'
     if start_time and end_time:
-        pass
+        start_time = get_time_tuple(start_time)
+        end_time = get_time_tuple(end_time)
+        t = get_time_requests(start_time, end_time)
     elif start_time:
-        pass
-    y = db_find(dx, target=target, limit=10000)
-    for i in y:
-        if i not in x:
-            x.append(i)
+        start_time = get_time_tuple(start_time)
+        t = get_time_requests(start_time, datetime.datetime.now())
+    if t:
+        dx['time'] = {}
+        for j in t:
+            dx['time']['year'] = j[0]
+            dx['time']['month'] = j[0]
+            dx['time']['day'] = j[0]
+            dx['time']['hour'] = j[0]
+            dx['time']['minute'] = j[0]
+            y = db_find(dx, target=target, limit=10000)
+            for i in y:
+                if i not in x:
+                    x.append(i)
+    else:
+        y = db_find(dx, target=target, limit=10000)
+        for i in y:
+            if i not in x:
+                x.append(i)
     return x
 
 if __name__ == '__main__':
     start_time = (2017, 1, 20, 22, 24)
-    end_time = (2018, 1, 20, 22, 23)
+    end_time = (2017, 1, 20, 22, 28)
     print(get_time_requests(start_time,end_time))
 
 
