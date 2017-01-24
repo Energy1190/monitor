@@ -126,20 +126,20 @@ def get_route_info_database(src_ip=None, dst_ip=None, start_time=None, end_time=
         dx['time'] = {}
         for j in t:
             dx['time']['year'] = j[0]
-            dx['time']['month'] = j[0]
-            dx['time']['day'] = j[0]
-            dx['time']['hour'] = j[0]
-            dx['time']['minute'] = j[0]
+            dx['time']['month'] = j[1]
+            dx['time']['day'] = j[2]
+            dx['time']['hour'] = j[3]
+            dx['time']['minute'] = j[4]
             y = db_find(dx, target=target, limit=10000)
+            x.append(dx)
             for i in y:
                 if i not in x:
-                    x.append(dx)
                     x.append(i)
     else:
         y = db_find(dx, target=target, limit=10000)
+        x.append(dx)
         for i in y:
             if i not in x:
-                x.append(dx)
                 x.append(i)
     return x
 
@@ -147,5 +147,7 @@ if __name__ == '__main__':
     start_time = (2017, 1, 20, 22, 24)
     end_time = (2017, 1, 20, 22, 28)
     print(get_time_requests(start_time,end_time))
+    start_time = datetime.datetime.now() - datetime.timedelta(days=2)
+    print(start_time)
 
 
