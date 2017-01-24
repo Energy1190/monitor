@@ -34,6 +34,7 @@ class Base():
             self.dicts['year'] = self.time.year
             self.dicts['month'] = self.time.month
             self.dicts['day'] = self.time.day
+            self.dicts['hour'] = self.time.hour
             self.dicts['min'] = self.time.minute
             self.dicts['second'] = self.time.second
 

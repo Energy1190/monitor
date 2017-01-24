@@ -123,6 +123,8 @@ def get_route_info_database(src_ip=None, dst_ip=None, start_time=None, end_time=
         start_time = datetime.datetime.now() - datetime.timedelta(days=1)
         end_time = datetime.datetime.now()
     t = get_time_requests(start_time, end_time)
+    x.append(dx)
+    x.append(t)
     if t:
         for j in t:
             if j[0]:
@@ -136,7 +138,6 @@ def get_route_info_database(src_ip=None, dst_ip=None, start_time=None, end_time=
             if j[4]:
                 dx['minute'] = j[4]
             y = db_find(dx, target=target, limit=10000)
-            x.append(dx)
             for i in y:
                 if i not in x:
                     x.append(i)
