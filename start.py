@@ -12,9 +12,10 @@ def daemon():
     main()
 
 def processing_logs():
-    delete_old_reqests(['route', 'base'], status=None)
     while True:
-        if not processing_incoming_route(['route', 'incoming'], ['route', 'base']):
+        processing_incoming_route(['route', 'warn'], ['route', 'base'])
+        processing_incoming_route(['route', 'notice'], ['route', 'base'])
+        if not processing_incoming_route(['route', 'info'], ['route', 'base']):
             time.sleep(5)
 
 def edit_requests():

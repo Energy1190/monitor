@@ -96,11 +96,14 @@ def get_time_requests(start_time, end_time):
                     rr = xx + yy + zz + cc + vv + xx2 + yy2 + zz2 + cc2
     return rr
 
-def get_route_info_database(src_ip=None, dst_ip=None, start_time=None, end_time=None, protocol=None, port=None):
+def get_route_info_database(src_ip=None, dst_ip=None, start_time=None, end_time=None, protocol=None, port=None, level=None):
     dx = {'name': 'CONN', 'action': 'close'}
     x = []
     t = []
     target = ['route', 'base']
+    if level:
+        dx.clear()
+        dx['level'] = level
     if src_ip:
         dx['connsrcip'] = src_ip
     if dst_ip:
@@ -133,6 +136,7 @@ def get_route_info_database(src_ip=None, dst_ip=None, start_time=None, end_time=
             if j[4]:
                 dx['minute'] = j[4]
             y = db_find(dx, target=target, limit=10000)
+            x.append(dx)
             for i in y:
                 if i not in x:
                     x.append(i)
@@ -150,5 +154,6 @@ if __name__ == '__main__':
     print(get_time_requests(start_time,end_time))
     start_time = datetime.datetime.now() - datetime.timedelta(days=2)
     print(start_time)
+    print(help(dict))
 
 
