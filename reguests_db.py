@@ -29,7 +29,10 @@ def get_time_tuple(time_str):
 def get_time_requests(start_time, end_time):
     r = []
     n = 0
-    s = datetime.datetime(*start_time)
+    try:
+        s = datetime.datetime(*start_time)
+    except:
+        s = start_time
     try:
         e = datetime.datetime(*end_time)
     except:
