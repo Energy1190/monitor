@@ -121,21 +121,18 @@ def get_route_info_database(src_ip=None, dst_ip=None, start_time=None, end_time=
         end_time = datetime.datetime.now()
     t = get_time_requests(start_time, end_time)
     if t:
-        dx['time'] = {}
         for j in t:
             if j[0]:
-                dx['time']['year'] = j[0]
+                dx['year'] = j[0]
             if j[1]:
-                dx['time']['month'] = j[1]
+                dx['month'] = j[1]
             if j[2]:
-                dx['time']['day'] = j[2]
+                dx['day'] = j[2]
             if j[3]:
-                dx['time']['hour'] = j[3]
+                dx['hour'] = j[3]
             if j[4]:
-                dx['time']['minute'] = j[4]
+                dx['minute'] = j[4]
             y = db_find(dx, target=target, limit=10000)
-            x.append(t)
-            x.append(dx)
             for i in y:
                 if i not in x:
                     x.append(i)

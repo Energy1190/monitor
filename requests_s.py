@@ -26,17 +26,16 @@ class Base():
 
     def get_time_dict(self):
         if 'time' in self.__dict__:
-            self.dicts['time'] = {}
             if type(self.time) == time.struct_time:
-                self.dicts['time']['time'] = time.strftime('%d.%m.%Y %H:%M:%S', self.time)
+                self.dicts['time'] = time.strftime('%d.%m.%Y %H:%M:%S', self.time)
                 self.time = datetime.datetime.fromtimestamp(time.mktime(self.time))
             else:
-                self.dicts['time']['time'] = self.time
-            self.dicts['time']['year'] = self.time.year
-            self.dicts['time']['month'] = self.time.month
-            self.dicts['time']['day'] = self.time.day
-            self.dicts['time']['min'] = self.time.minute
-            self.dicts['time']['second'] = self.time.second
+                self.dicts['time'] = self.time
+            self.dicts['year'] = self.time.year
+            self.dicts['month'] = self.time.month
+            self.dicts['day'] = self.time.day
+            self.dicts['min'] = self.time.minute
+            self.dicts['second'] = self.time.second
 
     def set_dict(self):
         self.dicts = {i: self.__dict__[i] for i in self.__dict__ if i != 'dicts' and i != 'message' and i != 'dst'}
