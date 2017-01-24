@@ -104,7 +104,7 @@ def config():
 
 @app.route("/requests/route", methods=['GET'])
 def requests_r():
-    database_json = db_find(target=['route', 'incoming'])
+    database_json = db_find(target=['route', 'info'])
     return render_template('requests_route.html', data=database_json)
 
 @app.route("/requests/route/<name>", methods=['GET'])
@@ -125,7 +125,8 @@ def requests_g():
     start_time = request.args.get('start_time')
     end_time = request.args.get('end_time')
     port = request.args.get('port')
-    database_json = get_route_info_database(src_ip=src_ip,dst_ip=dst_ip,start_time=start_time,end_time=end_time,protocol=protocol,port=port)
+    level = request.args.get('level')
+    database_json = get_route_info_database(src_ip=src_ip,dst_ip=dst_ip,start_time=start_time,end_time=end_time,protocol=protocol,port=port,level=level)
     return render_template('requests_route.html', data=database_json)
 
 @app.route("/users", methods=['GET'])
