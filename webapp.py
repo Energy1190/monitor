@@ -120,7 +120,12 @@ def requests_j():
 @app.route("/requests/get", methods=['GET'])
 def requests_g():
     protocol = request.args.get('protocol')
-    database_json = get_route_info_database(protocol=protocol)
+    src_ip  = request.args.get('src_ip')
+    dst_ip = request.args.get('dst_ip')
+    start_time = request.args.get('start_time')
+    end_time = request.args.get('end_time')
+    port = request.args.get('port')
+    database_json = get_route_info_database(src_ip=src_ip,dst_ip=dst_ip,start_time=start_time,end_time=end_time,protocol=protocol,port=port)
     return render_template('requests_route.html', data=database_json)
 
 @app.route("/users", methods=['GET'])

@@ -206,14 +206,11 @@ def check_base(target):
             db_del(i, target=target)
 
 def get_database_incoming(target, status=None):
-    try:
-        if status:
-            return db_get(status, target=target, fild='Status')
-        else:
-            return db_get(None, target=target, fild=None)
-    except:
-        print('Something wrong')
-        return False
+    if status:
+        return db_get(status, target=target, fild='Status')
+    else:
+        return db_get(None, target=target, fild=None)
+
 
 
 def processing_incoming_json(target, out_target_users, out_target_comps):

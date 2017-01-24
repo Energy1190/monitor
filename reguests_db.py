@@ -100,6 +100,8 @@ def get_route_info_database(src_ip=None, dst_ip=None, start_time=None, end_time=
     x = []
     t = []
     target = ['route', 'base']
+    if not start_time:
+        start_time = datetime.datetime.now() - datetime.timedelta(days=1)
     if src_ip:
         dx['connsrcip'] = src_ip
     if dst_ip:
