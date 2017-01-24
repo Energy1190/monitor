@@ -25,7 +25,7 @@ def db_get(id, target=None, fild='_id'):
     if id:
         return db_path(target).find_one({fild: id})
     else:
-        return db_path(target).find_one({fild: id})
+        return db_path(target).find_one()
 
 def db_update(dict_db, target=None, fild='_id', id=None):
     if dict_db:
