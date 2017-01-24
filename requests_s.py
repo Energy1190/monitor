@@ -259,7 +259,9 @@ def processing_incoming_route(target, out_target):
             file.write('Error sring {0} \n'.format(t))
             file.write('Trace: \n')
             file.write(err)
-            file.write('\n \n \n')
+            file.write('\n \n')
+            file.write('--'*10)
+            file.write('\n \n')
             file.close()
 
 if __name__ == '__main__':
