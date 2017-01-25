@@ -16,13 +16,13 @@ def error_log_write(t, err=None):
     else:
         file = open('error.log', 'a+')
     file.write('Error № {0} \n'.format(error_c))
-    file.write('Error time {0} \n'.format(datetime.datetime.now()))
+    file.write('Error time {0} \n'.format(datetime.datetime.now() + datetime.timedelta(hours=3)))
     if err:
         file.write('Error string {0} \n'.format(t))
         file.write('Trace: \n')
         file.write(str(err))
     else:
-        file.write('Received empty response from the baseReceived empty response from the base.')
+        file.write('Received empty response from the base.')
     file.write('\n \n')
     file.write('--'*10)
     file.write('\n \n')

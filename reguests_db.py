@@ -26,7 +26,12 @@ def get_time_requests(start_time, end_time, deep=4):
 
 def get_answer(dx, target):
     x = []
-    y = db_find(dx, target=target, limit=1000000)
+    y = []
+    if type(target[0]) == list:
+        for j in target:
+            y += db_find(dx, target=j, limit=1000000)
+    else:
+        y = db_find(dx, target=target, limit=1000000)
     x.append(dx)
     for i in y:
         if i not in x:
@@ -34,8 +39,9 @@ def get_answer(dx, target):
     return x
 
 def get_route_info_database(*args, start_time=None, end_time=None, deep=4, **kvargs):
-    dx = kvargs
+    x = []
     t = []
+    dx = kvargs
     if 'start_time' in dx.keys():
         del dx['start_time']
     if 'end_time' in dx.keys():
@@ -76,12 +82,9 @@ def get_route_info_database(*args, start_time=None, end_time=None, deep=4, **kva
                 dx['hour'] = j[3]
             if len(j) >= 5:
                 dx['minute'] = j[4]
-    if type(target[0]) == list:
-        x = []
-        for j in target:
-            x += get_answer(dx, j)
+            for i in get_answer(dx, target):
+                x.append(i)
         return x
-    return get_answer(dx, target)
 
 if __name__ == '__main__':
     start_time = (2017, 1, 20, 22, 23)
