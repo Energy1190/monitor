@@ -4,6 +4,7 @@ import datetime
 from webapp import app
 from watch import main
 from requests_s import delete_old_reqests, check_base, processing_incoming_route, processing_incoming_json
+from reguests_db import target_collection
 
 def application():
     app.run(port=5000, host='0.0.0.0')
@@ -13,9 +14,9 @@ def daemon():
 
 def processing_logs():
     while True:
-        processing_incoming_route(['route', 'warn'], ['route', 'base'])
-        processing_incoming_route(['route', 'notice'], ['route', 'base'])
-        if not processing_incoming_route(['route', 'info'], ['route', 'base']):
+        processing_incoming_route(['route', 'warn'], ['route', target_collection])
+        processing_incoming_route(['route', 'notice'], ['route', target_collection])
+        if not processing_incoming_route(['route', 'info'], ['route', target_collection]):
             time.sleep(5)
 
 def edit_requests():
