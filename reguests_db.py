@@ -157,7 +157,7 @@ def get_route_info_database(*args, start_time=None, end_time=None, deep=4, **kva
         for i in y:
             if i not in x:
                 x.append(i)
-    return x
+    return [len(x), x[0], x[-1]]
 
 if __name__ == '__main__':
     start_time = (2017, 1, 20, 22, 23)
