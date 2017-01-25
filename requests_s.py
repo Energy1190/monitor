@@ -123,7 +123,7 @@ class User(Base):
         self.computername = trg['Userinfo']['Computername']
         self.time = time.gmtime((return_nub(trg['Timeinfo']) + 10800000)/1000.)
         self.get_time_dict()
-        self.copmslist = [{self.computername: self.dicts['time']['time']}]
+        self.copmslist = [{self.computername: self.dicts['time']}]
         try:
             self.grouppolicy = trg['GroupPolicyinfo']
         except:
