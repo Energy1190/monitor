@@ -107,9 +107,9 @@ def requests_r():
     database_json = db_find(target=['route', 'info'])
     return render_template('requests_route.html', data=database_json)
 
-@app.route("/requests/route/<name>", methods=['GET'])
-def requests_a(name):
-    database_json = db_find(target=['route', name])
+@app.route("/requests/<f_name>/<name>", methods=['GET'])
+def requests_a(f_name, name):
+    database_json = db_find(target=[f_name, name])
     return render_template('requests_route.html', data=database_json)
 
 @app.route("/requests/json", methods=['GET'])
@@ -119,14 +119,8 @@ def requests_j():
 
 @app.route("/requests/get", methods=['GET'])
 def requests_g():
-    protocol = request.args.get('protocol')
-    src_ip  = request.args.get('src_ip')
-    dst_ip = request.args.get('dst_ip')
-    start_time = request.args.get('start_time')
-    end_time = request.args.get('end_time')
-    port = request.args.get('port')
-    level = request.args.get('level')
-    database_json = get_route_info_database(src_ip=src_ip,dst_ip=dst_ip,start_time=start_time,end_time=end_time,protocol=protocol,port=port,level=level)
+    args_r = {i: request.args.get(i) for i in list(request.args)}
+    database_json = get_route_info_database(**args_r)
     return render_template('requests_route.html', data=database_json)
 
 @app.route("/users", methods=['GET'])
@@ -141,4 +135,6 @@ def comps_p():
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
+
+
 

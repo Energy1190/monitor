@@ -8,6 +8,26 @@ from db import db_get, db_find, db_update, db_set, db_del, db_del_all
 
 error_c = 0
 
+def error_log_write(t, err=None):
+    global error_c
+    error_c += 1
+    if not os.path.exists('error.log'):
+        file = open('error.log', 'w+')
+    else:
+        file = open('error.log', 'a+')
+    file.write('Error № {0} \n'.format(error_c))
+    file.write('Error time {0} \n'.format(datetime.datetime.now()))
+    if err:
+        file.write('Error string {0} \n'.format(t))
+        file.write('Trace: \n')
+        file.write(str(err))
+    else:
+        file.write('Received empty response from the baseReceived empty response from the base.')
+    file.write('\n \n')
+    file.write('--'*10)
+    file.write('\n \n')
+    file.close()
+
 def isfloat(value):
     try:
         float(value)
@@ -232,6 +252,8 @@ def processing_incoming_json(target, out_target_users, out_target_comps):
         else:
             x.set(x.dicts)
         x.delete(t, target=target)
+    else:
+        error_log_write(t)
 
 def processing_incoming_route(target, out_target):
     t = get_database_incoming(target, status=None)
@@ -246,21 +268,9 @@ def processing_incoming_route(target, out_target):
                 x.delete(t,target=target)
                 return False
             except TypeError as err:
-                global error_c
-                error_c = error_c + 1
-                if not os.path.exists('error.log'):
-                    file = open('error.log', 'w+')
-                else:
-                    file = open('error.log', 'a+')
-                file.write('Error № {0} \n'.format(error_c))
-                file.write('Error time {0} \n'.format(datetime.datetime.now()))
-                file.write('Error string {0} \n'.format(t))
-                file.write('Trace: \n')
-                file.write(str(err))
-                file.write('\n \n')
-                file.write('--'*10)
-                file.write('\n \n')
-                file.close()
+                error_log_write(t, err=err)
+    else:
+        error_log_write(t)
 
 if __name__ == '__main__':
     x = User({'Userinfo' : {'Username': 1, 'Domainname' : 1, 'Computername' : 1}, 'Timeinfo': '1479477167416'})
