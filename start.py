@@ -21,7 +21,7 @@ def processing_logs():
 
 def edit_requests():
     while True:
-        processing_incoming_json(['clients', 'json'], ['clients', 'users'], ['clients', 'comps'])
+        processing_incoming_json(['clients', 'json'], ['clients', 'users'], ['clients', 'comps'], ['clients', 'dhcp'])
         check_base(['clients', 'comps'])
         check_base(['clients', 'users'])
         time.sleep(360)

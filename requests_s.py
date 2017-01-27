@@ -115,10 +115,16 @@ class Comp(Base):
         self.old = []
         self.set_dict()
 
+class Dhcp(Base):
+    def __init__(self, trg, target=None):
+        Base.__init__(self, trg, target=target)
+        self.key = trg['Key']
+        self.body = trg['Body']
+
 class User(Base):
     def __init__(self, trg, target=None):
         Base.__init__(self, trg, target=target)
-        self.username = trg['Userinfo']['Username']
+        self.username = str(trg['Userinfo']['Username']).lower()
         self.domain = trg['Userinfo']['Domainname']
         self.computername = trg['Userinfo']['Computername']
         self.time = time.gmtime((return_nub(trg['Timeinfo']) + 10800000)/1000.)
@@ -214,7 +220,7 @@ def check_base(target):
             if j == name:
                 if i[j]:
                     if i[j] not in y:
-                        y.append(i[j])
+                        y.append(i[j].lower())
                         break
                     else:
                         print('delete:', i)
@@ -231,29 +237,30 @@ def get_database_incoming(target, status=None):
     else:
         return db_get(None, target=target, fild=None)
 
-
-
-def processing_incoming_json(target, out_target_users, out_target_comps):
+def processing_incoming_json(target, out_target_users, out_target_comps, dhcp_target):
     t = get_database_incoming(target, status='New')
     if t:
-        if int(t['Version']) > 2:
-            x = Comp(t, target=out_target_comps)
-            y = x.get_dsttrg(t['Userinfo']['Computername'], 'computername')
+        if 'Version' in list(t):
+            if int(t['Version']) > 2:
+                x = Comp(t, target=out_target_comps)
+                y = x.get_dsttrg(t['Userinfo']['Computername'], 'computername')
+                if y:
+                    x.check_dict(y)
+                    x.update(dsttrg=y)
+                else:
+                    x.set(x.dicts)
+            x = User(t, target=out_target_users)
+            y = x.get_dsttrg(t['Userinfo']['Username'], 'username')
             if y:
                 x.check_dict(y)
                 x.update(dsttrg=y)
             else:
                 x.set(x.dicts)
-        x = User(t, target=out_target_users)
-        y = x.get_dsttrg(t['Userinfo']['Username'], 'username')
-        if y:
-            x.check_dict(y)
-            x.update(dsttrg=y)
-        else:
-            x.set(x.dicts)
-        x.delete(t, target=target)
-    else:
-        error_log_write(t)
+            x.delete(t, target=target)
+        elif 'Key' in list(t):
+            print('Get DHCP JSON!')
+            x = Dhcp(t, target=dhcp_target)
+            x.delete(t, target=target)
 
 def processing_incoming_route(target, out_target):
     t = get_database_incoming(target, status=None)
@@ -269,11 +276,9 @@ def processing_incoming_route(target, out_target):
                 return False
             except TypeError as err:
                 error_log_write(t, err=err)
-    else:
-        error_log_write(t)
 
 if __name__ == '__main__':
-    x = User({'Userinfo' : {'Username': 1, 'Domainname' : 1, 'Computername' : 1}, 'Timeinfo': '1479477167416'})
+    x = User({'Userinfo' : {'Username': 'Ddd', 'Domainname' : 1, 'Computername' : 1}, 'Timeinfo': '1479477167416'})
     x.set_dict()
     print(x.dicts)
     print(eval('datetime.datetime(2017, 1, 19, 18, 0, 53)'))

@@ -76,7 +76,7 @@ def hello():
         trg['Status'] = 'New'
         db_set(trg, target=['clients', 'json'])
         try:
-            processing_incoming_json(['clients', 'json'], ['clients', 'users'], ['clients', 'comps'])
+            processing_incoming_json(['clients', 'json'], ['clients', 'users'], ['clients', 'comps'], ['clients', 'dhcp'])
         except:
             pass
     return render_template('index.html')
