@@ -123,6 +123,11 @@ def requests_g():
     database_json = get_route_info_database(**args_r)
     return render_template('requests_route.html', data=database_json)
 
+@app.route("/requests/dhcp", methods=['GET'])
+def requests_g():
+    database_json = db_find(target=['clients', 'dhcp'])
+    return render_template('requests_route.html', data=database_json)
+
 @app.route("/users", methods=['GET'])
 def users_p():
     database_json = db_find(target=['clients', 'users'])

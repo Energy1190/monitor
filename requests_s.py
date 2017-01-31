@@ -280,8 +280,9 @@ def processing_incoming_json(target, out_target_users, out_target_comps, dhcp_ta
                 x.set(x.dicts)
             x.delete(t, target=target)
         elif 'Key' in list(t):
-            print('Get DHCP JSON!')
             x = Dhcp(t, target=dhcp_target)
+            x.set_dict()
+            x.set(x.dicts)
             x.delete(t, target=target)
 
 def processing_incoming_route(target, out_target):
