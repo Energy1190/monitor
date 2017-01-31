@@ -23,6 +23,7 @@ def error_log_write(t, err=None):
     if err:
         file.write('Error string {0} \n'.format(t))
         file.write('Trace: \n')
+        file.write(str(err.__traceback__))
         file.write(str(err))
     else:
         file.write('Received empty response from the base.')
@@ -262,31 +263,28 @@ def get_database_incoming(target, status=None):
 def processing_incoming_json(target, out_target_users, out_target_comps, dhcp_target):
     t = get_database_incoming(target, status='New')
     if t:
-        try:
-            if 'Version' in list(t):
-                if int(t['Version']) > 2:
-                    x = Comp(t, target=out_target_comps)
-                    y = x.get_dsttrg(t['Userinfo']['Computername'], 'computername')
-                    if y:
-                        x.check_dict(y)
-                        x.update(dsttrg=y)
-                    else:
-                        x.set(x.dicts)
-                x = User(t, target=out_target_users)
-                y = x.get_dsttrg(t['Userinfo']['Username'], 'username')
+        if 'Version' in list(t):
+            if int(t['Version']) > 2:
+                x = Comp(t, target=out_target_comps)
+                y = x.get_dsttrg(t['Userinfo']['Computername'], 'computername')
                 if y:
                     x.check_dict(y)
                     x.update(dsttrg=y)
                 else:
                     x.set(x.dicts)
-                x.delete(t, target=target)
-            elif 'Key' in list(t):
-                x = Dhcp(t, target=dhcp_target)
-                x.set_dict()
+            x = User(t, target=out_target_users)
+            y = x.get_dsttrg(t['Userinfo']['Username'], 'username')
+            if y:
+                x.check_dict(y)
+                x.update(dsttrg=y)
+            else:
                 x.set(x.dicts)
-                x.delete(t, target=target)
-        except Exception as err:
-            error_log_write(t, err=err)
+            x.delete(t, target=target)
+        elif 'Key' in list(t):
+            x = Dhcp(t, target=dhcp_target)
+            x.set_dict()
+            x.set(x.dicts)
+            x.delete(t, target=target)
 
 def processing_incoming_route(target, out_target):
     t = get_database_incoming(target, status=None)
