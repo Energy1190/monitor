@@ -262,28 +262,31 @@ def get_database_incoming(target, status=None):
 def processing_incoming_json(target, out_target_users, out_target_comps, dhcp_target):
     t = get_database_incoming(target, status='New')
     if t:
-        if 'Version' in list(t):
-            if int(t['Version']) > 2:
-                x = Comp(t, target=out_target_comps)
-                y = x.get_dsttrg(t['Userinfo']['Computername'], 'computername')
+        try:
+            if 'Version' in list(t):
+                if int(t['Version']) > 2:
+                    x = Comp(t, target=out_target_comps)
+                    y = x.get_dsttrg(t['Userinfo']['Computername'], 'computername')
+                    if y:
+                        x.check_dict(y)
+                        x.update(dsttrg=y)
+                    else:
+                        x.set(x.dicts)
+                x = User(t, target=out_target_users)
+                y = x.get_dsttrg(t['Userinfo']['Username'], 'username')
                 if y:
                     x.check_dict(y)
                     x.update(dsttrg=y)
                 else:
                     x.set(x.dicts)
-            x = User(t, target=out_target_users)
-            y = x.get_dsttrg(t['Userinfo']['Username'], 'username')
-            if y:
-                x.check_dict(y)
-                x.update(dsttrg=y)
-            else:
+                x.delete(t, target=target)
+            elif 'Key' in list(t):
+                x = Dhcp(t, target=dhcp_target)
+                x.set_dict()
                 x.set(x.dicts)
-            x.delete(t, target=target)
-        elif 'Key' in list(t):
-            x = Dhcp(t, target=dhcp_target)
-            x.set_dict()
-            x.set(x.dicts)
-            x.delete(t, target=target)
+                x.delete(t, target=target)
+        except Exception as err:
+            error_log_write(t, err=err)
 
 def processing_incoming_route(target, out_target):
     t = get_database_incoming(target, status=None)
@@ -297,7 +300,7 @@ def processing_incoming_route(target, out_target):
             try:
                 x.delete(t,target=target)
                 return False
-            except TypeError as err:
+            except Exception as err:
                 error_log_write(t, err=err)
 
 if __name__ == '__main__':
