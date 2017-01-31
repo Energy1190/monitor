@@ -7,6 +7,7 @@ from requests_s import delete_old_reqests, check_base, processing_incoming_route
 from reguests_db import target_collection
 
 def application():
+    delete_old_reqests(['clients', 'dhcp'])
     app.run(port=5000, host='0.0.0.0')
 
 def daemon():
@@ -20,7 +21,6 @@ def processing_logs():
             time.sleep(5)
 
 def edit_requests():
-    delete_old_reqests(['clients', 'dhcp'])
     while True:
         processing_incoming_json(['clients', 'json'], ['clients', 'users'], ['clients', 'comps'], ['clients', 'dhcp'])
         check_base(['clients', 'comps'])
