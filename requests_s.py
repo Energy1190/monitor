@@ -39,8 +39,11 @@ def error_log_write(t, err=None):
     file.write('Error № {0} \n'.format(error_c))
     file.write('Error time {0} \n'.format(datetime.datetime.now() + datetime.timedelta(hours=3)))
     if err:
-        if len(t) > 500:
-            t = t[0:499] + '\n...part of the text omittedpart of the text omitted...\n'
+        try:
+            if len(t) > 500:
+                t = t[0:499] + '\n...part of the text omittedpart of the text omitted...\n'
+        except TypeError:
+            pass
         file.write('Error string {0} \n'.format(t))
         file.write('Trace: \n')
         file.write(str(err))
