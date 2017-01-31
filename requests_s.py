@@ -147,17 +147,14 @@ class Dhcp(Base):
         self.key = base64.b64decode(trg['Key'])
         self.body = trg['Body']
         self.text = self.decrypt(self.body)
-        self.type = type(self.text)
+        self.type = str(type(self.text))
 
     def set_dict(self):
         Base.set_dict(self)
         del self.dicts['key']
         del self.dicts['body']
         for i in self.dicts:
-            try:
-                str(self.dicts[i], 'utf-8')
-            except TypeError:
-                rec_to_str(self.dicts[i])
+            rec_to_str(self.dicts[i])
 
     def encrypt( self, raw ):
         iv = Random.new().read( AES.block_size )
