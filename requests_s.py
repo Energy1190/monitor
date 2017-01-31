@@ -3,7 +3,10 @@
 
 import os
 import time
+import base64
 import datetime
+from Crypto.Cipher import AES
+from Crypto import Random
 from db import db_get, db_find, db_update, db_set, db_del, db_del_all
 
 error_c = 0
@@ -118,8 +121,27 @@ class Comp(Base):
 class Dhcp(Base):
     def __init__(self, trg, target=None):
         Base.__init__(self, trg, target=target)
-        self.key = trg['Key']
+        self.key = base64.b64decode(trg['Key'])
         self.body = trg['Body']
+        self.text = self.decrypt(self.body)
+        self.type = type(self.text)
+
+    def set_dict(self):
+        Base.set_dict(self)
+        del self.dicts['key']
+        del self.dicts['body']
+
+    def encrypt( self, raw ):
+        iv = Random.new().read( AES.block_size )
+        cipher = AES.new( self.key, AES.MODE_CBC, iv )
+        return base64.b64encode( iv + cipher.encrypt( raw ) )
+
+    def decrypt( self, enc ):
+        enc = base64.b64decode(enc)
+        iv = enc[:16]
+        cipher = AES.new(self.key, AES.MODE_CBC, iv )
+        return cipher.decrypt( enc[16:] )
+
 
 class User(Base):
     def __init__(self, trg, target=None):
@@ -219,7 +241,7 @@ def check_base(target):
         for j in i:
             if j == name:
                 if i[j]:
-                    if i[j] not in y:
+                    if i[j].lower() not in y:
                         y.append(i[j].lower())
                         break
                     else:
