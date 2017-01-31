@@ -10,6 +10,7 @@ from Crypto import Random
 from db import db_get, db_find, db_update, db_set, db_del, db_del_all
 
 error_c = 0
+
 def rec_to_str(x):
     if type(x) == list:
         for i in x:
@@ -23,8 +24,10 @@ def rec_to_str(x):
                 str(x[i], 'utf-8')
         except TypeError:
             rec_to_str(x[i])
-    else:
+    elif type(x) == bytes:
         str(x, 'utf-8')
+    else:
+        error_log_write(x, err=type(x))
 
 def error_log_write(t, err=None):
     global error_c
@@ -36,9 +39,10 @@ def error_log_write(t, err=None):
     file.write('Error № {0} \n'.format(error_c))
     file.write('Error time {0} \n'.format(datetime.datetime.now() + datetime.timedelta(hours=3)))
     if err:
+        if len(t) > 500:
+            t = t[0:499] + '\n...part of the text omittedpart of the text omitted...\n'
         file.write('Error string {0} \n'.format(t))
         file.write('Trace: \n')
-        file.write(str(err.__traceback__))
         file.write(str(err))
     else:
         file.write('Received empty response from the base.')
