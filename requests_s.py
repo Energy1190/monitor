@@ -132,7 +132,10 @@ class Dhcp(Base):
         del self.dicts['key']
         del self.dicts['body']
         for i in self.dicts:
-            str(self.dicts[i], 'utf-8')
+            try:
+                str(self.dicts[i], 'utf-8')
+            except TypeError:
+                pass
 
     def encrypt( self, raw ):
         iv = Random.new().read( AES.block_size )
