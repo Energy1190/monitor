@@ -10,6 +10,21 @@ from Crypto import Random
 from db import db_get, db_find, db_update, db_set, db_del, db_del_all
 
 error_c = 0
+def rec_to_str(x):
+    if type(x) == list:
+        for i in x:
+            try:
+                str(i, 'utf-8')
+            except TypeError:
+                rec_to_str(i)
+    elif type(x) == dict:
+        try:
+            for i in x:
+                str(x[i], 'utf-8')
+        except TypeError:
+            rec_to_str(x[i])
+    else:
+        str(x, 'utf-8')
 
 def error_log_write(t, err=None):
     global error_c
@@ -135,7 +150,7 @@ class Dhcp(Base):
             try:
                 str(self.dicts[i], 'utf-8')
             except TypeError:
-                pass
+                rec_to_str(self.dicts[i])
 
     def encrypt( self, raw ):
         iv = Random.new().read( AES.block_size )
