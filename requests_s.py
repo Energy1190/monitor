@@ -132,7 +132,7 @@ class Dhcp(Base):
         n = 1
         while True:
             try:
-                self.dhcpinfo = json.loads(str(self.decrypt(self.body)[2:-n]))
+                self.dhcpinfo = json.loads(str(self.decrypt(self.body)[1:-n]))
                 break
             except:
                 n += 1
