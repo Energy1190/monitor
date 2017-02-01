@@ -29,7 +29,7 @@ def error_log_write(t, err=None):
             pass
         file.write('Error string {0} \n'.format(t))
         file.write('Trace: \n')
-        file.write(err)
+        file.write(str(err))
     else:
         file.write('Received empty response from the base.')
     file.write('\n \n')
@@ -135,7 +135,7 @@ class Dhcp(Base):
                 self.dhcpinfo = json.loads(str(self.decrypt(self.body)[:-n]))
                 break
             except Exception as err:
-                error_log_write(str(self.decrypt(self.body)[:-n], err))
+                error_log_write(str(self.decrypt(self.body)[:-n]), err)
                 n += 1
                 if n == 50:
                     break
