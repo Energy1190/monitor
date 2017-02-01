@@ -132,6 +132,7 @@ class Dhcp(Base):
         n = 1
         while True:
             try:
+                error_log_write(json.loads(str(self.decrypt(self.body)[1:-n])), n)
                 self.dhcpinfo = json.loads(str(self.decrypt(self.body)[1:-n]))
                 break
             except:
