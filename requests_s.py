@@ -24,7 +24,7 @@ def error_log_write(t, err=None):
     if err:
         try:
             if len(t) > 500:
-                t = t[0:499] + '\n...part of the text omitted...\n'
+#                t = t[0:499] + '\n...part of the text omitted...\n'
                 t = t[499:]
         except TypeError:
             pass
