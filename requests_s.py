@@ -132,10 +132,10 @@ class Dhcp(Base):
         n = 1
         while True:
             try:
-                self.dhcpinfo = json.loads(str(self.decrypt(self.body)[:-n]))
+                self.dhcpinfo = json.loads(str(self.decrypt(self.body))[2:-n])
                 break
             except Exception as err:
-                error_log_write(str(self.decrypt(self.body)[:-n]), err)
+                error_log_write(str(self.decrypt(self.body))[2:-n], n)
                 n += 1
                 if n == 50:
                     break
