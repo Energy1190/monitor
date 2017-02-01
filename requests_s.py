@@ -129,14 +129,8 @@ class Dhcp(Base):
         Base.__init__(self, trg, target=target)
         self.key = base64.b64decode(trg['Key'])
         self.body = trg['Body']
-        n = 1
-        while True:
-            try:
-                error_log_write(json.loads(str(self.decrypt(self.body)[1:-n])), n)
-                self.dhcpinfo = json.loads(str(self.decrypt(self.body)[1:-n]))
-                break
-            except:
-                n += 1
+        error_log_write(str(self.decrypt(self.body)[1:]), str(self.decrypt(self.body)[2:]))
+        self.dhcpinfo = json.loads(str(self.decrypt(self.body)))
         self.timeinfo = self.dhcpinfo["Timeinfo"]
         self.dhcpinfo = self.dhcpinfo["Dhcpinfo"]
 
