@@ -157,8 +157,6 @@ class Dhcp(Base):
                  'endtime': self.check_time(x['timeend'][i]),
                  'rezervation': x['rezervation'][i]} for i in range(0, len(x['name']))], key=lambda y: y['ip'])
 
-    def check_dict(self, target_dict):
-
     def set_dict(self):
         Base.set_dict(self)
         del self.dicts['key']
