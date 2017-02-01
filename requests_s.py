@@ -135,7 +135,7 @@ class Dhcp(Base):
                 self.dhcpinfo = json.loads(str(self.decrypt(self.body))[2:-n])
                 break
             except Exception as err:
-                error_log_write(str(self.decrypt(self.body))[2:-n], err)
+                error_log_write(str(self.decrypt(self.body))[2:-n].replace('\r\n', '').replace('\n', ''), err)
                 n += 1
                 if n == 50:
                     break
