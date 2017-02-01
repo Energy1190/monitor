@@ -53,6 +53,17 @@ class Base():
         self.dicts = {}
         self.dst = target
 
+    def encrypt( self, raw ):
+        iv = Random.new().read( AES.block_size )
+        cipher = AES.new( self.key, AES.MODE_CBC, iv )
+        return base64.b64encode( iv + cipher.encrypt( raw ) )
+
+    def decrypt( self, enc ):
+        enc = base64.b64decode(enc)
+        iv = enc[:16]
+        cipher = AES.new(self.key, AES.MODE_CBC, iv )
+        return cipher.decrypt( enc[16:] )
+
     def get_time_dict(self):
         if 'time' in self.__dict__:
             if type(self.time) == time.struct_time:
@@ -130,26 +141,29 @@ class Dhcp(Base):
         self.key = base64.b64decode(trg['Key'])
         self.body = trg['Body']
         self.dhcpinfo = json.loads(str(self.decrypt(self.body)[:-8], 'utf-8'))
-        self.timeinfo = self.dhcpinfo["Timeinfo"]
+        self.timeinfo = time.gmtime((return_nub(self.dhcpinfo["Timeinfo"]) + 10800000)/1000.)
         self.dhcpinfo = self.dhcpinfo["Dhcpinfo"]
+        self.dhcpinfo = self.generate_dict(self.dhcpinfo)
+    def check_time(self, x):
+        if x:
+            return time.gmtime((return_nub(x) + 10800000)/1000.)
+        else:
+            return x
+
+    def generate_dict(self, x):
+        return sorted([{'name': x['name'][i],
+                 'ip': x['ip'][i]['IPAddressToString'],
+                 'mac': x['mac'][i],
+                 'endtime': self.check_time(x['timeend'][i]),
+                 'rezervation': x['rezervation'][i]} for i in range(0, len(x['name']))], key=lambda y: y['ip'])
+
+    def check_dict(self, target_dict):
 
     def set_dict(self):
         Base.set_dict(self)
         del self.dicts['key']
         del self.dicts['body']
         del self.dicts['old']
-
-    def encrypt( self, raw ):
-        iv = Random.new().read( AES.block_size )
-        cipher = AES.new( self.key, AES.MODE_CBC, iv )
-        return base64.b64encode( iv + cipher.encrypt( raw ) )
-
-    def decrypt( self, enc ):
-        enc = base64.b64decode(enc)
-        iv = enc[:16]
-        cipher = AES.new(self.key, AES.MODE_CBC, iv )
-        return cipher.decrypt( enc[16:] )
-
 
 class User(Base):
     def __init__(self, trg, target=None):
@@ -290,7 +304,12 @@ def processing_incoming_json(target, out_target_users, out_target_comps, dhcp_ta
         elif 'Key' in list(t):
             x = Dhcp(t, target=dhcp_target)
             x.set_dict()
-            x.set(x.dicts)
+            for i in x.dicts:
+                y = x.get_dsttrg(i['name'])
+                if y and y['ip'] != i['ip']:
+                    x.update(srctrg=i, dsttrg=y)
+                else:
+                    x.set(i)
             x.delete(t, target=target)
 
 def processing_incoming_route(target, out_target):

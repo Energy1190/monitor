@@ -128,15 +128,12 @@ def requests_d():
     database_json = db_find(target=['clients', 'dhcp'])
     return render_template('requests_route.html', data=database_json)
 
-@app.route("/users", methods=['GET'])
-def users_p():
-    database_json = db_find(target=['clients', 'users'])
-    return render_template('users.html', data=database_json)
-
-@app.route("/comps", methods=['GET'])
-def comps_p():
-    database_json = db_find(target=['clients', 'comps'])
-    return render_template('comps.html', data=database_json)
+@app.route("/<name>", methods=['GET'])
+def users_p(name):
+    if name == 'requests':
+        return "Not Found", 404
+    database_json = db_find(target=['clients', name])
+    return render_template(str(name + '.html'), data=database_json)
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)

@@ -1,0 +1,32 @@
+{% extends "index.html" %}
+{% block title %}DHCP{% endblock %}
+{% block content %}
+<div class="row">
+<div class="col-xs-12 col-md-8">
+<div class="panel panel-default">
+  <div class="panel-heading">DHCP</div>
+<table class="table">
+    <thead>
+    <tr>
+        <th>Name</th>
+        <th>Mac</th>
+        <th>Ip</th>
+        <th>Rezervation</th>
+        <th>End Time</th>
+    </tr>
+    </thead>
+    <tbody>
+{% for i in data %}
+    <tr>
+        <td>{{ i['name'] }}</td>
+        <td>{{ i['mac'] }}</td>
+        <td>{{ i['ip'] }}</td>
+        <td>{% if i['rezervation'] %}{{ i['rezervation'] }}{% endif %}</td>
+        <td>{% if i['endtime'] %}{{ i['endtime'] }}{% endif %}</td>
+    </tr>
+{% endfor %}
+</table>
+</div>
+</div>
+</div>
+{% endblock %}
