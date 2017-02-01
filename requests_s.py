@@ -29,7 +29,7 @@ def error_log_write(t, err=None):
             pass
         file.write('Error string {0} \n'.format(t))
         file.write('Trace: \n')
-        file.write(str(err))
+        file.write(err)
     else:
         file.write('Received empty response from the base.')
     file.write('\n \n')
