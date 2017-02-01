@@ -130,7 +130,6 @@ class Dhcp(Base):
         self.key = base64.b64decode(trg['Key'])
         self.body = trg['Body']
         self.dhcpinfo = json.loads(str(self.decrypt(self.body)[:-8], 'utf-8'))
-        self.dhcpinfo = json.loads(str(self.decrypt(self.body)))
         self.timeinfo = self.dhcpinfo["Timeinfo"]
         self.dhcpinfo = self.dhcpinfo["Dhcpinfo"]
 
