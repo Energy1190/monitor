@@ -8,6 +8,7 @@ import base64
 import datetime
 from Crypto.Cipher import AES
 from Crypto import Random
+from watch import send_mail
 from db import db_get, db_find, db_update, db_set, db_del, db_del_all
 
 error_c = 0
@@ -431,15 +432,20 @@ def processing_incoming_json(target, out_target_users, out_target_comps, dhcp_ta
                 x.set(x.dicts)
             x.delete(t, target=target)
         elif 'Key' in list(t):
-            x = Dhcp(t, target=dhcp_target)
-            x.set_dict()
-            for i in x.dicts['dhcpinfo']:
-                y = x.get_dsttrg(i['name'], 'name')
-                if y and y['ip'] != i['ip']:
-                    x.update(srctrg=i, dsttrg=y)
-                else:
-                    x.set(i)
-            x.delete(t, target=target)
+            try:
+                x = Dhcp(t, target=dhcp_target)
+                x.set_dict()
+                for i in x.dicts['dhcpinfo']:
+                    y = x.get_dsttrg(i['name'], 'name')
+                    if y and y['ip'] != i['ip']:
+                        x.update(srctrg=i, dsttrg=y)
+                    else:
+                        x.set(i)
+                x.delete(t, target=target)
+            except Exception as err:
+                error_log_write(t, err=err)
+                send_mail(t, host='local error')
+                x.delete(t, target=target)
 
 def processing_incoming_route(target, out_target):
     t = get_database_incoming(target, status=None)
