@@ -185,6 +185,8 @@ class Dhcp(Base):
     * mac - mac-адрес компьютера получившего ip-адрес.
     * endtime - время истечения аренды ip-адреса.
     * rezervation - статус резервирования ip-адреса.
+    * time - время получения данных (может быть использовано, как
+    время начала подсчета трафика).
 
     На данный момент содержит объекты для шифрования/дешифрования входящих JSON-объектов, т.к.
     на данный момент только они шифруются. В переспективе эти объекты будут перенесены в класс Base.
@@ -390,7 +392,7 @@ def processing_incoming_json(target, out_target_users, out_target_comps, dhcp_ta
         elif 'Key' in list(t):
             x = Dhcp(t, target=dhcp_target)
             x.set_dict()
-            for i in x.dicts:
+            for i in x.dicts['dhcpinfo']:
                 y = x.get_dsttrg(i['name'], 'name')
                 if y and y['ip'] != i['ip']:
                     x.update(srctrg=i, dsttrg=y)
