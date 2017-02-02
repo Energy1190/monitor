@@ -444,7 +444,7 @@ def processing_incoming_json(target, out_target_users, out_target_comps, dhcp_ta
                 x.delete(t, target=target)
             except Exception as err:
                 error_log_write(t, err=err)
-                send_mail(t, host='local error')
+                send_mail(str(t), host='local error')
                 x.delete(t, target=target)
 
 def processing_incoming_route(target, out_target):
