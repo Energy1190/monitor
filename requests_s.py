@@ -214,6 +214,7 @@ class Dhcp(Base):
                  'ip': x['ip'][i]['IPAddressToString'],
                  'mac': x['mac'][i],
                  'endtime': self.check_time(x['timeend'][i]),
+                 'time': self.timeinfo,
                  'rezervation': x['rezervation'][i]} for i in range(0, len(x['name']))], key=lambda y: y['ip'])
 
     def set_dict(self):
