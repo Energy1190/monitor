@@ -445,7 +445,7 @@ def processing_incoming_json(target, out_target_users, out_target_comps, dhcp_ta
             except Exception as err:
                 error_log_write(t, err=err)
                 send_mail(str(t), host='local error')
-                Base.delete(t, target=target)
+                db_del(t, target=target)
 
 def processing_incoming_route(target, out_target):
     t = get_database_incoming(target, status=None)
