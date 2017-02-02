@@ -2,8 +2,10 @@ import multiprocessing
 import time
 import datetime
 from webapp import app
-from watch import main
-from requests_s import delete_old_reqests, check_base, processing_incoming_route, processing_incoming_json
+from watch import main, send_mail
+from traceback import format_exc
+from processing import processing_statistics_route
+from requests_s import delete_old_reqests, check_base, processing_incoming_route, processing_incoming_json, error_log_write, error_c
 from reguests_db import target_collection
 
 def application():
@@ -14,18 +16,41 @@ def daemon():
     main()
 
 def processing_logs():
-    while True:
-        processing_incoming_route(['route', 'warn'], ['route', target_collection])
-        processing_incoming_route(['route', 'notice'], ['route', target_collection])
-        if not processing_incoming_route(['route', 'info'], ['route', target_collection]):
-            time.sleep(5)
+    try:
+        while True:
+            processing_incoming_route(['route', 'warn'], ['route', target_collection])
+            processing_incoming_route(['route', 'notice'], ['route', target_collection])
+            if not processing_incoming_route(['route', 'info'], ['route', target_collection]):
+                time.sleep(5)
+    except Exception as err:
+        error_log_write(format_exc(), err)
+        text = 'Fail router logs work\n' + str(format_exc()) + '\n' + str(err)
+        send_mail(text)
 
 def edit_requests():
-    while True:
-        processing_incoming_json(['clients', 'json'], ['clients', 'users'], ['clients', 'comps'], ['clients', 'dhcp'])
-        check_base(['clients', 'comps'])
-        check_base(['clients', 'users'])
-        time.sleep(360)
+    try:
+        while True:
+            processing_incoming_json(['clients', 'json'], ['clients', 'users'], ['clients', 'comps'], ['clients', 'dhcp'])
+            check_base(['clients', 'comps'])
+            check_base(['clients', 'users'])
+            time.sleep(360)
+    except Exception as err:
+        error_log_write(format_exc(), err)
+        text = 'Fail JSON work\n' + str(format_exc()) + '\n' + str(err)
+        send_mail(text)
+
+def get_dally_statistics():
+    try:
+        while True:
+            for i in range(24):
+                time.sleep(3600)
+                processing_statistics_route(['clients', 'dhcp'],['clients', 'stat'],time='hour')
+            processing_statistics_route(['clients', 'dhcp'],['clients', 'stat'],time='day')
+    except Exception as err:
+        error_log_write(format_exc(), err)
+        text = 'Fail daily statistics work\n' + str(format_exc()) + '\n' + str(err)
+        send_mail(text)
+
 
 if __name__ == '__main__':
     proc1 = multiprocessing.Process(name='app', target=application)

@@ -4,6 +4,7 @@ import datetime
 target_collection ='base-{0}-{1}-{2}'.format((datetime.datetime.now() + datetime.timedelta(hours=3)).timetuple()[0],
                                              (datetime.datetime.now() + datetime.timedelta(hours=3)).timetuple()[1],
                                              (datetime.datetime.now() + datetime.timedelta(hours=3)).timetuple()[2])
+
 def get_time_tuple(time_str):
     try:
         return datetime.datetime(*tuple(map(lambda x: int(x), time_str.split(sep='_'))))
@@ -68,7 +69,6 @@ def get_route_info_database(*args, start_time=None, end_time=None, deep=4, **kva
     else:
         ss = start_time.timetuple()
         target = ['route', 'base-{0}-{1}-{2}'.format(ss[0],ss[1],ss[2])]
-    print(target, start_time, end_time)
     t = get_time_requests(start_time, end_time, deep=deep)
     if t:
         for j in t:
@@ -89,4 +89,4 @@ def get_route_info_database(*args, start_time=None, end_time=None, deep=4, **kva
 if __name__ == '__main__':
     start_time = (2017, 1, 20, 22, 23)
     end_time = (2017, 1, 22, 22, 23)
-    print(get_route_info_database(**{'blle':'dsfsdf', 'flll':'sfadsf', 'start_time': '2017_1_23_01_56'}))
+

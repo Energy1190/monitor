@@ -19,7 +19,7 @@
         {% for i in data %}
             <tr>
                 <td>{{ i['name'] }}</td>
-                <td nowrap>{{ i['mac'] }}</td>
+                <td>{{ i['mac'] }}</td>
                 <td nowrap>{{ i['ip'] }}</td>
                 <td nowrap>{% if i['rezervation'] %}{{ i['rezervation'] }}{% endif %}</td>
                 <td nowrap>{% if i['endtime'] %}{{ i['endtime'] }}{% endif %}</td>

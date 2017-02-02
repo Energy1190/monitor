@@ -252,6 +252,46 @@ class User(Base):
         Comp.check_dict(self, target_dict)
         self.copmslist.extend(target_dict['copmslist'])
 
+class Statistic(Base):
+    def __init__(self, trg, target=None):
+        Base.__init__(self, trg, target=target)
+        self.trg = trg
+        self.time = datetime.datetime.now() + datetime.timedelta(hours=3)
+        self.data = self.summ_trafic()
+        self.counts = 0
+
+    def set_dict(self):
+        Base.set_dict(self)
+        del self.dicts['old']
+        del self.dicts['trg']
+
+    def sizeof_fmt(num, suffix='B'):
+        for unit in ['','Ki','Mi','Gi','Ti','Pi','Ei','Zi']:
+            if abs(num) < 1024.0:
+                return "%3.1f%s%s" % (num, unit, suffix)
+            num /= 1024.0
+        return "%.1f%s%s" % (num, 'Yi', suffix)
+
+    def summ_trafic(self):
+        out_t = 0
+        in_t = 0
+        for i in self.trg:
+            self.counts += 1
+            if i.get('origsent'):
+                out_t += float(i['origsent'])
+            if i.get('termsent'):
+                in_t += float(i['termsent'])
+        return {'in': self.sizeof_fmt(in_t), 'out': self.sizeof_fmt(out_t)}
+
+    def __add__(self, other):
+        if type(other) == Statistic:
+            x = []
+            x.append(self.dicts)
+            x.append(other.dicts)
+            return x
+        elif type(other) == list:
+            other.append(self.dicts)
+
 class Route(Base):
     """ Класс обрабатывающий входящие сообщения с роутера. Согласно документации
         возможны следующие переменные:
