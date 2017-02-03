@@ -409,11 +409,12 @@ def check_base(target):
                     if i[j].lower() not in y and name != 'ip':
                         y.append(i[j].lower())
                         break
-                    elif name == 'ip' and i[j].lower() not in list(y):
-                        if y.get(i[j].lower()) and i['time'] < y.get(i[j].lower()):
+                    elif name == 'ip' and str(i[j]).lower() not in list(y):
+                        if y.get(str(i[j]).lower()) and i['time'] < y.get(str(i[j]).lower()):
+                            print('delete:', i)
                             db_del(i, target=target)
                         else:
-                            y[i[j].lower()] = i['time']
+                            y[str(i[j]).lower()] = i['time']
                     else:
                         print('delete:', i)
                         db_del(i, target=target)
@@ -422,6 +423,7 @@ def check_base(target):
                     db_del(i, target=target)
         if name not in i:
             db_del(i, target=target)
+    error_log_write(' '.join(list(y)))
 
 def get_database_incoming(target, status=None):
     if status:
@@ -455,13 +457,13 @@ def processing_incoming_json(target, out_target_users, out_target_comps, dhcp_ta
                 x.set_dict()
                 for i in x.dicts['dhcpinfo']:
                     y = x.get_dsttrg(i['name'], 'name')
-                    error_log_write(str(i['name'] + " = " + y['name']))
-                    error_log_write(str(i['ip'] + " = " + y['ip']))
+                    error_log_write(str(y), str(i['name'] + " = " + y['name']))
+                    error_log_write(str(y), str(i['ip'] + " = " + y['ip']))
                     if y and y['ip'] != i['ip']:
-                        error_log_write("Detect ip=ip")
+                        error_log_write(str(i), "Detect ip=ip")
                         x.update(srctrg=i, dsttrg=y)
                     else:
-                        error_log_write("Detect ip!=ip")
+                        error_log_write(str(i), "Detect ip!=ip")
                         x.set(i)
                 x.delete(t, target=target)
             except Exception as err:
