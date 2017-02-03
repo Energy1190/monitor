@@ -10,43 +10,7 @@ from Crypto.Cipher import AES
 from Crypto import Random
 from watch import send_mail
 from db import db_get, db_find, db_update, db_set, db_del, db_del_all
-
-error_c = 0
-
-def error_log_write(t, err=None):
-    global error_c
-    error_c += 1
-    if not os.path.exists('error.log'):
-        file = open('error.log', 'w+')
-    else:
-        file = open('error.log', 'a+')
-    file.write('Error № {0} \n'.format(error_c))
-    file.write('Error time {0} \n'.format(datetime.datetime.now() + datetime.timedelta(hours=3)))
-    if err:
-        try:
-            if len(t) > 500:
-                t = t[0:499] + '\n...part of the text omitted...\n' + t[-500:] + '\n'
-        except TypeError:
-            pass
-        file.write('Error string {0} \n'.format(t))
-        file.write('Trace: \n')
-        file.write(str(err))
-    else:
-        file.write('Received empty response from the base.')
-    file.write('\n \n')
-    file.write('--'*10)
-    file.write('\n \n')
-    file.close()
-
-def isfloat(value):
-    try:
-        float(value)
-        return True
-    except ValueError:
-        return False
-
-def return_nub(x):
-    return int(''.join([i for i in x if isfloat(i)]))
+from system import error_log_write, return_nub, time_now
 
 class Base():
     """ Базовый класс для обработки входящих JSON-объектов. Включает в себя необходимые объекты:
@@ -140,7 +104,7 @@ class Base():
         for i in self.dicts:
             if i != '_id' and i != 'old' and i in target_dict:
                 if self.dicts[i] != target_dict[i]:
-                    self.old.append({i: target_dict[i], 'time': datetime.datetime.now()})
+                    self.old.append({i: target_dict[i], 'time': time_now})
 
     def get_dsttrg(self, src, fild):
         """
@@ -266,7 +230,7 @@ class Statistic(Base):
         Base.__init__(self, trg, target=target)
         self.ip = ip
         self.trg = trg
-        self.time = datetime.datetime.now() + datetime.timedelta(hours=3)
+        self.time = time_now
         self.data = self.summ_trafic()
         self.counts = 0
 

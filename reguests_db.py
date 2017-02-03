@@ -1,15 +1,12 @@
 from db import db_find
+from system import target_collection, time_now
 import datetime
-
-target_collection ='base-{0}-{1}-{2}'.format((datetime.datetime.now() + datetime.timedelta(hours=3)).timetuple()[0],
-                                             (datetime.datetime.now() + datetime.timedelta(hours=3)).timetuple()[1],
-                                             (datetime.datetime.now() + datetime.timedelta(hours=3)).timetuple()[2])
 
 def get_time_tuple(time_str):
     try:
         return datetime.datetime(*tuple(map(lambda x: int(x), time_str.split(sep='_'))))
     except ValueError:
-        return datetime.datetime.now() + datetime.timedelta(hours=3)
+        return time_now
     except AttributeError:
         return datetime.datetime(*time_str)
 
@@ -54,10 +51,10 @@ def get_route_info_database(*args, start_time=None, end_time=None, deep=4, **kva
         end_time = get_time_tuple(end_time)
     elif start_time:
         start_time = get_time_tuple(start_time)
-        end_time = datetime.datetime.now() + datetime.timedelta(hours=3)
+        end_time = time_now
     else:
-        start_time = datetime.datetime.now() - datetime.timedelta(days=1) + datetime.timedelta(hours=3)
-        end_time = datetime.datetime.now() + datetime.timedelta(hours=3)
+        start_time = time_now - datetime.timedelta(days=1)
+        end_time = time_now
     if start_time.timetuple()[2] != end_time.timetuple()[2]:
         ee = end_time.timetuple()
         ss = start_time.timetuple()

@@ -2,19 +2,9 @@
 #  -*- coding: utf-8 -*-
 
 import requests
-import smtplib
 import time
-from email.mime.text import MIMEText
 from configuration import get_section
-
-def send_mail(text, host='site'):
-    msg = MIMEText(text)
-    msg['Subject'] = 'Can not connect to {0}'.format(host)
-    msg['From'] = 'daemon-check-site@intersoftlab.ru'
-    msg['To'] = 'energyneo0@gmail.com'
-    s = smtplib.SMTP('172.16.0.4')
-    s.send_message(msg)
-    s.quit()
+from system import send_mail
 
 def get_db_connect(http, flag='url'):
     try:

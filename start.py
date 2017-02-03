@@ -1,19 +1,23 @@
 import multiprocessing
 import time
-import datetime
 from webapp import app
-from watch import main, send_mail
+from watch import main
 from traceback import format_exc
+from system import target_collection, error_log_write, send_mail, error_c
 from processing import processing_statistics_route
-from requests_s import delete_old_reqests, check_base, processing_incoming_route, processing_incoming_json, error_log_write, error_c
-from reguests_db import target_collection
+from requests_s import delete_old_reqests, check_base, processing_incoming_route, processing_incoming_json
 
 def application():
     app.debug = True
     app.run(port=5000, host='0.0.0.0')
 
 def daemon():
-    main()
+    try:
+        main()
+    except Exception as err:
+        error_log_write(format_exc(), err)
+        text = 'Fail daemon watch\n' + str(format_exc()) + '\n' + str(err)
+        send_mail(text, subject='Fail daemon works')
 
 def processing_logs():
     try:
@@ -25,7 +29,7 @@ def processing_logs():
     except Exception as err:
         error_log_write(format_exc(), err)
         text = 'Fail router logs work\n' + str(format_exc()) + '\n' + str(err)
-        send_mail(text)
+        send_mail(text, subject='Fail logs works')
 
 def edit_requests():
     try:
@@ -38,7 +42,7 @@ def edit_requests():
     except Exception as err:
         error_log_write(format_exc(), err)
         text = 'Fail JSON work\n' + str(format_exc()) + '\n' + str(err)
-        send_mail(text)
+        send_mail(text, subject='Fail JSON works')
 
 def get_dally_statistics():
     try:
@@ -50,7 +54,7 @@ def get_dally_statistics():
     except Exception as err:
         error_log_write(format_exc(), err)
         text = 'Fail daily statistics work\n' + str(format_exc()) + '\n' + str(err)
-        send_mail(text)
+        send_mail(text, subject='Fail statistics works')
 
 
 if __name__ == '__main__':
