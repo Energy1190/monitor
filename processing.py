@@ -10,7 +10,7 @@ def processing_statistics_route(target_dhcp, target_stat, times='hour'):
     dx['conndestif'] = 'wan1'
     dx['connrecvif'] = 'lan'
     if times == 'hour':
-        dx['start_time'] = datetime.datetime.now().timetuple()[0:4] + datetime.timedelta(hours=2)
+        dx['start_time'] = (datetime.datetime.now() + datetime.timedelta(hours=2)).timetuple()[0:4]
         dx['deep'] = 4
     elif times == 'day':
         dx['start_time'] = datetime.datetime.now()

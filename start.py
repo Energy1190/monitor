@@ -45,8 +45,8 @@ def get_dally_statistics():
         while True:
             for i in range(24):
                 time.sleep(3600)
-                processing_statistics_route(['clients', 'dhcp'],['clients', 'stat'],time='hour')
-            processing_statistics_route(['clients', 'dhcp'],['clients', 'stat'],time='day')
+                processing_statistics_route(['clients', 'dhcp'],['clients', 'stat'],times='hour')
+            processing_statistics_route(['clients', 'dhcp'],['clients', 'stat'],times='day')
     except Exception as err:
         error_log_write(format_exc(), err)
         text = 'Fail daily statistics work\n' + str(format_exc()) + '\n' + str(err)
