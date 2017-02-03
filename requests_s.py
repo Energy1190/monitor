@@ -433,42 +433,39 @@ def get_database_incoming(target, status=None):
 def processing_incoming_json(target, out_target_users, out_target_comps, dhcp_target):
     t = get_database_incoming(target, status='New')
     if t:
-        if 'Version' in list(t):
-            if int(t['Version']) > 2:
-                x = Comp(t, target=out_target_comps)
-                y = x.get_dsttrg(t['Userinfo']['Computername'], 'computername')
+        try:
+            if 'Version' in list(t):
+                if int(t['Version']) > 2:
+                    x = Comp(t, target=out_target_comps)
+                    y = x.get_dsttrg(t['Userinfo']['Computername'], 'computername')
+                    if y:
+                        x.check_dict(y)
+                        x.update(dsttrg=y)
+                    else:
+                        x.set(x.dicts)
+                x = User(t, target=out_target_users)
+                y = x.get_dsttrg(t['Userinfo']['Username'], 'username')
                 if y:
                     x.check_dict(y)
                     x.update(dsttrg=y)
                 else:
                     x.set(x.dicts)
-            x = User(t, target=out_target_users)
-            y = x.get_dsttrg(t['Userinfo']['Username'], 'username')
-            if y:
-                x.check_dict(y)
-                x.update(dsttrg=y)
-            else:
-                x.set(x.dicts)
-            x.delete(t, target=target)
-        elif 'Key' in list(t):
-            try:
-                x = Dhcp(t, target=dhcp_target)
-                x.set_dict()
-                for i in x.dicts['dhcpinfo']:
-                    y = x.get_dsttrg(i['name'], 'name')
-                    error_log_write(str(y), str(i['name'] + " = " + y['name']))
-                    error_log_write(str(y), str(i['ip'] + " = " + y['ip']))
-                    if y and str(y['ip']) != str(i['ip']):
-                        error_log_write(str(i), "Detect ip=ip")
-                        x.update(srctrg=i, dsttrg=y)
-                    else:
-                        error_log_write(str(i), "Detect ip!=ip")
-                        x.set(i)
                 x.delete(t, target=target)
-            except Exception as err:
-                error_log_write(t, err=err)
-                send_mail(str(t), host='local error')
-                db_del(t, target=target)
+            elif 'Key' in list(t):
+                    x = Dhcp(t, target=dhcp_target)
+                    x.set_dict()
+                    for i in x.dicts['dhcpinfo']:
+                        y = x.get_dsttrg(i['name'], 'name')
+                        if y:
+                            if str(y['ip']) != str(i['ip']):
+                                x.update(srctrg=i, dsttrg=y)
+                        else:
+                            x.set(i)
+                    x.delete(t, target=target)
+        except Exception as err:
+            error_log_write(t, err=err)
+            send_mail(str(t), host='local error')
+            db_del(t, target=target)
 
 def processing_incoming_route(target, out_target):
     t = get_database_incoming(target, status=None)
