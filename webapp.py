@@ -7,12 +7,14 @@ from db import db_set, db_find
 from jsonschema import validate
 from requests_s import processing_incoming_json
 from reguests_db import get_route_info_database
+import datetime
 import yaml
 import json
 import os
 import sys
 
 app = Flask(__name__)
+times = (datetime.datetime.now() + datetime.timedelta(hours=3)).timetuple()[0:4]
 
 def open_config(conf, path, path_t):
     try:
@@ -79,7 +81,7 @@ def hello():
             processing_incoming_json(['clients', 'json'], ['clients', 'users'], ['clients', 'comps'], ['clients', 'dhcp'])
         except:
             pass
-    return render_template('index.html')
+    return render_template('index.html', time=times)
 
 @app.route("/config", methods=['POST', 'GET'])
 def config():
@@ -100,40 +102,28 @@ def config():
         valid = 0
         if not write_config(conf, path, path_t, path_old):
             valid = 2
-    return render_template('config.html', conf=conf, valid=valid)
-
-@app.route("/requests/route", methods=['GET'])
-def requests_r():
-    database_json = db_find(target=['route', 'info'])
-    return render_template('requests_route.html', data=database_json)
+    return render_template('config.html', conf=conf, valid=valid, time=times)
 
 @app.route("/requests/<f_name>/<name>", methods=['GET'])
 def requests_a(f_name, name):
-    database_json = db_find(target=[f_name, name])
-    return render_template('requests_route.html', data=database_json)
-
-@app.route("/requests/json", methods=['GET'])
-def requests_j():
-    database_json = db_find(target=['clients', 'json'])
-    return render_template('requests.html', data=database_json)
+    args_r = {i: request.args.get(i) for i in list(request.args)}
+    database_json = db_find(args_r, target=[f_name, name])
+    return render_template('requests_route.html', data=database_json, time=times)
 
 @app.route("/requests/get", methods=['GET'])
 def requests_g():
     args_r = {i: request.args.get(i) for i in list(request.args)}
     database_json = get_route_info_database(**args_r)
-    return render_template('requests_route.html', data=database_json)
-
-@app.route("/requests/dhcp", methods=['GET'])
-def requests_d():
-    database_json = db_find(target=['clients', 'dhcp'])
-    return render_template('requests_route.html', data=database_json)
+    return render_template('requests_route.html', data=database_json, time=times)
 
 @app.route("/<name>", methods=['GET'])
 def users_p(name):
-    if name == 'requests':
-        return "Not Found", 404
-    database_json = db_find(target=['clients', name])
-    return render_template(str(name + '.html'), data=database_json)
+    if name in ['comps', 'users', 'dhcp', 'stat']:
+        args_r = {i: request.args.get(i) for i in list(request.args)}
+        database_json = db_find(args_r, target=['clients', name], limit=500)
+        return render_template(str(name + '.html'), data=database_json, time=times)
+    else:
+        return "Not Found 404", 404
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)

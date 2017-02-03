@@ -10,17 +10,17 @@ def processing_statistics_route(target_dhcp, target_stat, times='hour'):
     dx['conndestif'] = 'wan1'
     dx['connrecvif'] = 'lan'
     if times == 'hour':
-        dx['start_time'] = datetime.datetime.now().timetuple()[0:4] - datetime.timedelta(hours=1)
+        dx['start_time'] = datetime.datetime.now().timetuple()[0:4] + datetime.timedelta(hours=2)
         dx['deep'] = 4
     elif times == 'day':
         dx['start_time'] = datetime.datetime.now()
         dx['deep'] = 3
     for i in x:
         dx['connsrcip'] = i['ip']
-        y = Statistic(get_route_info_database(**dx), target=target_stat)
+        y = Statistic(get_route_info_database(**dx), i['ip'], target=target_stat)
         y.set_dict()
         r.append(y.dicts)
-    y.set({'stat': r, 'time': datetime.datetime.now().timetuple()[0:3], 'inter': times})
+    y.set({'stat': r, 'time': datetime.datetime.now().timetuple()[0:dx['deep']], 'inter': times})
 
 if __name__ == '__main__':
     pass

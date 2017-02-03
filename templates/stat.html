@@ -1,0 +1,28 @@
+{% extends "index.html" %}
+{% block title %}Statistics{% endblock %}
+{% block content %}
+<div class="row">
+<div class="panel panel-default">
+  <div class="panel-heading">DHCP</div>
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+            <tr>
+                <th>Ip</th>
+                <th>Incoming traffic</th>
+                <th>Outbound traffic</th>
+            </tr>
+            </thead>
+            <tbody>
+        {% for i in data %}
+            <tr>
+                <td>{{ i['stat']['ip'] }}</td>
+                <td>{{ i['stat']['data']['in'] }}</td>
+                <td>{{ i['stat']['data']['out'] }}</td>
+            </tr>
+        {% endfor %}
+        </table>
+    </div>
+</div>
+</div>
+{% endblock %}

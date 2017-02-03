@@ -196,10 +196,18 @@ class Dhcp(Base):
         Base.__init__(self, trg, target=target)
         self.key = base64.b64decode(trg['Key'])
         self.body = trg['Body']
-        self.dhcpinfo = json.loads(str(self.decrypt(self.body)[:-8], 'utf-8'))
+        self.dhcpinfo = self.remove_end(self.body)
         self.timeinfo = time.gmtime((return_nub(self.dhcpinfo["Timeinfo"]) + 10800000)/1000.)
         self.dhcpinfo = self.dhcpinfo["Dhcpinfo"]
         self.dhcpinfo = self.generate_dict(self.dhcpinfo)
+
+    def remove_end(self, x):
+        for i in range(100):
+            try:
+                return json.loads(str(self.decrypt(x)[:-i], 'utf-8'))
+            except:
+                pass
+        return False
 
     def check_time(self, x):
         if x:
@@ -254,8 +262,9 @@ class User(Base):
         self.copmslist.extend(target_dict['copmslist'])
 
 class Statistic(Base):
-    def __init__(self, trg, target=None):
+    def __init__(self, trg, ip, target=None):
         Base.__init__(self, trg, target=target)
+        self.ip = ip
         self.trg = trg
         self.time = datetime.datetime.now() + datetime.timedelta(hours=3)
         self.data = self.summ_trafic()
