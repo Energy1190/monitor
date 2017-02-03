@@ -392,7 +392,7 @@ def check_base(target):
     элемент удаляется из коллекции.
     """
     y = []
-    x = db_find(target=target)
+    x = db_find(target=target, limit=10000)
     if target[1] == 'comps':
         name = 'computername'
     elif target[1] == 'users':
@@ -423,7 +423,6 @@ def check_base(target):
                     db_del(i, target=target)
         if name not in i:
             db_del(i, target=target)
-    error_log_write(' '.join(list(y)))
 
 def get_database_incoming(target, status=None):
     if status:
@@ -459,7 +458,7 @@ def processing_incoming_json(target, out_target_users, out_target_comps, dhcp_ta
                     y = x.get_dsttrg(i['name'], 'name')
                     error_log_write(str(y), str(i['name'] + " = " + y['name']))
                     error_log_write(str(y), str(i['ip'] + " = " + y['ip']))
-                    if y and y['ip'] != i['ip']:
+                    if y and str(y['ip']) != str(i['ip']):
                         error_log_write(str(i), "Detect ip=ip")
                         x.update(srctrg=i, dsttrg=y)
                     else:
