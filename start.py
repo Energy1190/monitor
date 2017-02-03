@@ -33,6 +33,7 @@ def edit_requests():
             processing_incoming_json(['clients', 'json'], ['clients', 'users'], ['clients', 'comps'], ['clients', 'dhcp'])
             check_base(['clients', 'comps'])
             check_base(['clients', 'users'])
+            check_base(['clients', 'dhcp'])
             time.sleep(360)
     except Exception as err:
         error_log_write(format_exc(), err)
