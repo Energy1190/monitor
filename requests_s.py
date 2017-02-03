@@ -406,7 +406,7 @@ def check_base(target):
         for j in i:
             if j == name:
                 if i[j]:
-                    if i[j].lower() not in y:
+                    if i[j].lower() not in y and name != 'ip':
                         y.append(i[j].lower())
                         break
                     elif name == 'ip' and i[j].lower() not in list(y):
