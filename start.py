@@ -1,9 +1,10 @@
 import multiprocessing
 import time
+import datetime
 from webapp import app
 from watch import main
 from traceback import format_exc
-from system import target_collection, error_log_write, send_mail, error_c
+from system import target_collection, error_log_write, send_mail, error_c, time_now
 from processing import processing_statistics_route
 from requests_s import delete_old_reqests, check_base, processing_incoming_route, processing_incoming_json
 
@@ -46,11 +47,15 @@ def edit_requests():
 
 def get_dally_statistics():
     try:
-        while True:
-            for i in range(24):
-                time.sleep(3600)
-                processing_statistics_route(['clients', 'dhcp'],['clients', 'stat'],times='hour')
-            processing_statistics_route(['clients', 'dhcp'],['clients', 'stat'],times='day')
+        for i in range(60):
+            if datetime.datetime.now().minute == 0:
+                while True:
+                    for i in range(24):
+                        time.sleep(3600)
+                        processing_statistics_route(['clients', 'dhcp'],['clients', 'stat'],times='hour')
+                        if time_now.hour == 0:
+                            processing_statistics_route(['clients', 'dhcp'],['clients', 'stat'],times='day')
+            time.sleep(60)
     except Exception as err:
         error_log_write(format_exc(), err)
         text = 'Fail daily statistics work\n' + str(format_exc()) + '\n' + str(err)
@@ -62,7 +67,9 @@ if __name__ == '__main__':
     proc2 = multiprocessing.Process(name='daemon', target=daemon)
     proc3 = multiprocessing.Process(name='editor', target=edit_requests)
     proc4 = multiprocessing.Process(name='logs', target=processing_logs)
+    proc5 = multiprocessing.Process(name='dally', target=get_dally_statistics)
     proc1.start()
     proc2.start()
     proc3.start()
     proc4.start()
+    proc5.start()
