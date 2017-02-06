@@ -239,7 +239,7 @@ class Statistic(Base):
         del self.dicts['old']
         del self.dicts['trg']
 
-    def sizeof_fmt(num, suffix='B'):
+    def sizeof_fmt(self, num, suffix='B'):
         for unit in ['','Ki','Mi','Gi','Ti','Pi','Ei','Zi']:
             if abs(num) < 1024.0:
                 return "%3.1f%s%s" % (num, unit, suffix)
