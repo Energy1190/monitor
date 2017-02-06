@@ -24,6 +24,8 @@ def db_get(id, target=None, fild='_id'):
         id = id_test(id)
     if id:
         return db_path(target).find_one({fild: id})
+    elif not fild:
+        return db_path(target).find_one(id)
     else:
         return db_path(target).find_one()
 
