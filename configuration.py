@@ -66,6 +66,7 @@ def get_val(section):
     for i in range(0, len(x)+1):
         if i == len(x)+1:
             r.append(d)
+            break
         if x[i][0:2] == '{{':
             if d.get('name'):
                 r.append(d)
