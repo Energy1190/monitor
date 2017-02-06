@@ -58,12 +58,15 @@ def users_p(name):
     if name in ['comps', 'users', 'dhcp', 'stat']:
         args_r = {i: request.args.get(i) for i in list(request.args)}
         database_json = db_find(args_r, target=['clients', name], limit=500)
+        if 'time' in args_r:
+            args_r['time'] = list(map(int, args_r['time'].replace('(', '').replace(')', '').split(sep=', ')))
+        print(args_r)
         return render_template(str(name + '.html'), data=database_json, time=times)
     else:
         return "Not Found 404", 404
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+    app.run(host="0.0.0.0", port=5001)
 
 
 
