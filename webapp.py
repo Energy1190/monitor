@@ -1,14 +1,55 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import os
+from shutil import copyfile
 from flask import Flask, request, render_template
 from db import db_set, db_find, db_get
 from requests_s import processing_incoming_json
 from reguests_db import get_route_info_database
-from configuration import write_config, open_config, validate_yaml
+from configuration import validate_yaml
 from system import time_now_tuple as times
 
 app = Flask(__name__)
+
+def write_config(conf, path, path_t, path_old):
+    if request.__dict__['environ']['REQUEST_METHOD'] == 'POST':
+        try:
+            return validate_yaml(request.form['config'])
+        except:
+            if os.path.exists(path):
+                if os.path.exists(path_old):
+                  os.remove(path_old)
+                copyfile(path, path_old)
+            try:
+                if validate_yaml(request.form['config']):
+                    file = open(path_t, 'w+')
+                    file.writelines(request.form['config'])
+                    file.close()
+                    copyfile(path_t, path)
+                    os.remove(path_t)
+                else:
+                    return validate_yaml(request.form['config'])
+            except:
+                if os.path.exists(path):
+                    if os.path.exists(path_old):
+                      os.remove(path)
+                    copyfile(path_old, path)
+                    os.remove(path_old)
+    return True
+
+def open_config(conf, path, path_t):
+    try:
+        request.form['validate']
+        return request.form['config']
+    except:
+        if os.path.exists(path):
+            copyfile(path, path_t)
+            file = open(path_t, 'r')
+            conf = file.read()
+            file.close()
+            os.remove(path_t)
+        return conf
 
 @app.route("/", methods=['POST', 'GET'])
 def hello():

@@ -2,6 +2,7 @@ import os
 import smtplib
 import datetime
 from email.mime.text import MIMEText
+from configuration import get_val
 
 error_c = 0
 time_now = (datetime.datetime.now() + datetime.timedelta(hours=3))
@@ -45,13 +46,14 @@ def error_log_write(t, err=None):
     file.close()
 
 def send_mail(text, host='site', subject=None):
-    msg = MIMEText(text)
-    if not subject:
-        msg['Subject'] = 'Can not connect to {0}'.format(host)
-    else:
-        msg['Subject'] = subject
-    msg['From'] = 'daemon-check-site@intersoftlab.ru'
-    msg['To'] = 'energyneo0@gmail.com'
-    s = smtplib.SMTP('172.16.0.4')
-    s.send_message(msg)
-    s.quit()
+    for i in get_val('[Mail]'):
+        msg = MIMEText(text)
+        if not subject:
+            msg['Subject'] = 'Can not connect to {0}'.format(host)
+        else:
+            msg['Subject'] = subject
+        msg['From'] = 'daemon-check-site@intersoftlab.ru'
+        msg['To'] = i['name']
+        s = smtplib.SMTP(get_val('[Mail server]')[0]['ip'])
+        s.send_message(msg)
+        s.quit()

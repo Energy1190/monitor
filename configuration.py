@@ -1,21 +1,7 @@
 import os
 import yaml
-from flask import request
-from shutil import copyfile
 from jsonschema import validate
 
-def open_config(conf, path, path_t):
-    try:
-        request.form['validate']
-        return request.form['config']
-    except:
-        if os.path.exists(path):
-            copyfile(path, path_t)
-            file = open(path_t, 'r')
-            conf = file.read()
-            file.close()
-            os.remove(path_t)
-        return conf
 
 def validate_yaml(loads):
     schema = """
@@ -31,32 +17,6 @@ def validate_yaml(loads):
         return True
     except:
         return False
-
-def write_config(conf, path, path_t, path_old):
-    if request.__dict__['environ']['REQUEST_METHOD'] == 'POST':
-        try:
-            return validate_yaml(request.form['config'])
-        except:
-            if os.path.exists(path):
-                if os.path.exists(path_old):
-                  os.remove(path_old)
-                copyfile(path, path_old)
-            try:
-                if validate_yaml(request.form['config']):
-                    file = open(path_t, 'w+')
-                    file.writelines(request.form['config'])
-                    file.close()
-                    copyfile(path_t, path)
-                    os.remove(path_t)
-                else:
-                    return validate_yaml(request.form['config'])
-            except:
-                if os.path.exists(path):
-                    if os.path.exists(path_old):
-                      os.remove(path)
-                    copyfile(path_old, path)
-                    os.remove(path_old)
-    return True
 
 def get_conf(path=None):
     x = []
@@ -99,5 +59,20 @@ def get_section(section, path='/data/config'):
                 pass
     return r
 
+def get_val(section):
+    x = get_section(section)
+    r = []
+    d = {}
+    for i in range(0, len(x)):
+        if x[i][0:2] == '{{':
+            if d.get('name'):
+                r.append(d)
+                d = {}
+            y = True
+            d['name'] = x[i].replace('{{', '').replace('}}', '')
+            continue
+        d[x[i].split(sep='=')[0]] = x[i].split(sep='=')[0]
+    return r
+
 if __name__ == "__main__":
-    print(get_section('[Check HTTP]'))
+    print('{{ddd'[0:2])
