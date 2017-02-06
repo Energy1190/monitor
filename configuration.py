@@ -67,13 +67,13 @@ def get_val(section):
         if i == len(x)+1:
             r.append(d)
             break
-        if x[i][0:2] == '{{':
-            if d.get('name'):
-                r.append(d)
-                d = {}
-            d['name'] = x[i].replace('{{', '').replace('}}', '')
-            continue
         try:
+            if x[i][0:2] == '{{':
+                if d.get('name'):
+                    r.append(d)
+                    d = {}
+                d['name'] = x[i].replace('{{', '').replace('}}', '')
+                continue
             d[x[i].split(sep='=')[0]] = x[i].split(sep='=')[1]
         except IndexError:
             pass
