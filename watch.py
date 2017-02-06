@@ -41,16 +41,16 @@ def checks_server(i, flag=None):
             send_mail('Fail connect to {0} as {1}'.format(i['target'], i['flag']), host=i['target'])
 
 def main():
-    send_mail(str('Start work. Checks: {0}'.format([str(i['target'] + ' as ' + i['flag']) for i in get_check_list()])),
-              subject='Daemon start work')
     try:
+        target = get_check_list('[Checks]')
+        send_mail(str('Start work. Checks: {0}'.format([str(i['target'] + ' as ' + i['flag']) for i in get_check_list('[Checks]')])),
+                  subject='Daemon start work')
         while True:
-            target = get_check_list('[Checks]')
             for i in target:
                 threading.Thread(target=checks_server, args=(i), kwargs={'flag' : i['flag']}).start()
             time.sleep(3600)
     finally:
-        send_mail('End work')
+        send_mail('Daemon end work', subject='Daemon end work')
 
 if __name__ == '__main__':
 #    print(get_check_list())
