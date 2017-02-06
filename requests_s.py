@@ -228,11 +228,11 @@ class User(Base):
 class Statistic(Base):
     def __init__(self, trg, ip, target=None):
         Base.__init__(self, trg, target=target)
+        self.counts = 0
         self.ip = ip
         self.trg = trg
         self.time = time_now
         self.data = self.summ_trafic()
-        self.counts = 0
 
     def set_dict(self):
         Base.set_dict(self)
