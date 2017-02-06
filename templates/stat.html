@@ -14,11 +14,11 @@
             </tr>
             </thead>
             <tbody>
-        {% for i in data %}
+        {% for i in data['stat'] %}
             <tr>
-                <td>{{ i['stat']['ip'] }}</td>
-                <td>{{ i['stat']['data']['in'] }}</td>
-                <td>{{ i['stat']['data']['out'] }}</td>
+                <td>{{ i['ip'] }}</td>
+                <td>{{ i['data']['in'] }}</td>
+                <td>{{ i['data']['out'] }}</td>
             </tr>
         {% endfor %}
         </table>
