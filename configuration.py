@@ -63,15 +63,19 @@ def get_val(section):
     x = get_section(section)
     r = []
     d = {}
-    for i in range(0, len(x)):
+    for i in range(0, len(x)+1):
+        if i == len(x)+1:
+            r.append(d)
         if x[i][0:2] == '{{':
             if d.get('name'):
                 r.append(d)
                 d = {}
-            y = True
             d['name'] = x[i].replace('{{', '').replace('}}', '')
             continue
-        d[x[i].split(sep='=')[0]] = x[i].split(sep='=')[0]
+        try:
+            d[x[i].split(sep='=')[0]] = x[i].split(sep='=')[1]
+        except IndexError:
+            pass
     return r
 
 if __name__ == "__main__":
