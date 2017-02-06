@@ -1,6 +1,7 @@
 import multiprocessing
 import time
 import datetime
+import threading
 from webapp import app
 from watch import main
 from traceback import format_exc
@@ -52,9 +53,11 @@ def get_dally_statistics():
                 while True:
                     for i in range(24):
                         time.sleep(3600)
-                        processing_statistics_route(['clients', 'dhcp'],['clients', 'stat'],times='hour')
+                        threading.Thread(target=processing_statistics_route, args=(['clients', 'dhcp'],['clients', 'stat']),
+                                         kwargs={'times' : 'hour'}).start()
                         if time_now.hour == 0:
-                            processing_statistics_route(['clients', 'dhcp'],['clients', 'stat'],times='day')
+                            threading.Thread(target=processing_statistics_route(['clients', 'dhcp'],['clients', 'stat']),
+                                             kwargs={'times' : 'day'}).start()
             time.sleep(60)
     except Exception as err:
         error_log_write(format_exc(), err)
