@@ -14,12 +14,7 @@ def application():
     app.run(port=5000, host='0.0.0.0')
 
 def daemon():
-    try:
-        main()
-    except Exception as err:
-        error_log_write(format_exc(), err)
-        text = 'Fail daemon watch\n' + str(format_exc()) + '\n' + str(err)
-        send_mail(text, subject='Fail daemon works')
+    main()
 
 def processing_logs():
     try:

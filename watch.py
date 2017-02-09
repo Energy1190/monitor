@@ -34,12 +34,16 @@ def get_check_list(name):
 def checks_server(i, flag=None):
     if flag == 'ping':
         x = os.system("ping -c 1 " + i['target'])
+        if x:
+            time.sleep(300)
+            if x:
+                send_mail('Fail connect to {0} as {1}'.format(i['target'], i['flag']), host=i['target'])
     else:
         x = get_db_connect(i['target'], flag=i['flag'])
-    if not x:
-        time.sleep(300)
         if not x:
-            send_mail('Fail connect to {0} as {1}'.format(i['target'], i['flag']), host=i['target'])
+            time.sleep(300)
+            if not x:
+                send_mail('Fail connect to {0} as {1}'.format(i['target'], i['flag']), host=i['target'])
 
 def main():
     try:
