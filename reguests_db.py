@@ -51,10 +51,10 @@ def get_route_info_database(*args, start_time=None, end_time=None, deep=4, **kva
         end_time = get_time_tuple(end_time)
     elif start_time:
         start_time = get_time_tuple(start_time)
-        end_time = time_now
+        end_time = (datetime.datetime.now() + datetime.timedelta(hours=3))
     else:
-        start_time = time_now - datetime.timedelta(days=1)
-        end_time = time_now
+        start_time = (datetime.datetime.now() + datetime.timedelta(hours=3)) - datetime.timedelta(days=1)
+        end_time = (datetime.datetime.now() + datetime.timedelta(hours=3))
     if start_time.timetuple()[2] != end_time.timetuple()[2]:
         ee = end_time.timetuple()
         ss = start_time.timetuple()

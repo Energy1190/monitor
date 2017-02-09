@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import os
+import datetime
 from shutil import copyfile
 from flask import Flask, request, render_template
 from db import db_set, db_find, db_get
@@ -61,7 +62,7 @@ def hello():
             processing_incoming_json(['clients', 'json'], ['clients', 'users'], ['clients', 'comps'], ['clients', 'dhcp'])
         except:
             pass
-    return render_template('index.html', time=times)
+    return render_template('index.html', time=(datetime.datetime.now() + datetime.timedelta(hours=3)))
 
 @app.route("/config", methods=['POST', 'GET'])
 def config():
@@ -80,19 +81,19 @@ def config():
         valid = 0
         if not write_config(conf, path, path_t, path_old):
             valid = 2
-    return render_template('config.html', conf=conf, valid=valid, time=times)
+    return render_template('config.html', conf=conf, valid=valid, time=(datetime.datetime.now() + datetime.timedelta(hours=3)))
 
 @app.route("/requests/<f_name>/<name>", methods=['GET'])
 def requests_a(f_name, name):
     args_r = {i: request.args.get(i) for i in list(request.args)}
     database_json = db_find(args_r, target=[f_name, name])
-    return render_template('requests_route.html', data=database_json, time=times)
+    return render_template('requests_route.html', data=database_json, time=(datetime.datetime.now() + datetime.timedelta(hours=3)))
 
 @app.route("/requests/get", methods=['GET'])
 def requests_g():
     args_r = {i: request.args.get(i) for i in list(request.args)}
     database_json = get_route_info_database(**args_r)
-    return render_template('requests_route.html', data=database_json, time=times)
+    return render_template('requests_route.html', data=database_json, time=(datetime.datetime.now() + datetime.timedelta(hours=3)))
 
 @app.route("/<name>", methods=['GET'])
 def users_p(name):
@@ -104,7 +105,7 @@ def users_p(name):
             database_json = db_get(args_r, target=['clients', name], fild=None)
         else:
             database_json = db_find(args_r, target=['clients', name], limit=500)
-        return render_template(str(name + '.html'), data=database_json, time=times)
+        return render_template(str(name + '.html'), data=database_json, time=(datetime.datetime.now() + datetime.timedelta(hours=3)))
     else:
         return "Not Found 404", 404
 

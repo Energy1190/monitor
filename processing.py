@@ -13,7 +13,7 @@ def processing_statistics_route(target_dhcp, target_stat, times='hour'):
         dx['start_time'] = (datetime.datetime.now() + datetime.timedelta(hours=2)).timetuple()[0:4]
         dx['deep'] = 4
     elif times == 'day':
-        dx['start_time'] = datetime.datetime.now()
+        dx['start_time'] = (datetime.datetime.now() + datetime.timedelta(hours=3))
         dx['deep'] = 3
     for i in x:
         dx['connsrcip'] = i['ip']
