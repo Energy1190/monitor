@@ -52,7 +52,7 @@ def main():
                 try:
                     n += 1
                     name = "watch-" + str(n)
-                    proc = multiprocessing.Process(name=name, target=checks_server, args=(i), kwargs={'flag' : i['flag']})
+                    proc = multiprocessing.Process(name=name, target=checks_server, args=[i], kwargs={'flag' : i['flag']})
                     proc.start()
                 except Exception as err:
                     error_proc(body=format_exc(), log=True, mail=True, subject='Local error in watch-daemon', error=err)
