@@ -4,9 +4,10 @@
 import os
 import requests
 import time
-import threading
+import multiprocessing
+from traceback import format_exc
 from configuration import get_val
-from system import send_mail
+from system import send_mail, error_proc
 
 def get_db_connect(http, flag='url'):
     try:
@@ -46,8 +47,15 @@ def main():
         send_mail(str('Start work. Checks: {0}'.format([str(i['target'] + ' as ' + i['flag']) for i in get_check_list('[Checks]')])),
                   subject='Daemon start work')
         while True:
+            n = 0
             for i in target:
-                threading.Thread(target=checks_server, args=(i), kwargs={'flag' : i['flag']}).start()
+                try:
+                    n += 1
+                    name = "watch-" + str(n)
+                    proc = multiprocessing.Process(name=name, target=checks_server, args=(i), kwargs={'flag' : i['flag']})
+                    proc.start()
+                except Exception as err:
+                    error_proc(body=format_exc(), log=True, mail=True, subject='Local error in watch-daemon', error=err)
             time.sleep(3600)
     finally:
         send_mail('Daemon end work', subject='Daemon end work')

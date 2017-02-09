@@ -29,7 +29,7 @@ def error_log_write(t, err=None):
         file = open('error.log', 'a+')
     file.write('Error № {0} \n'.format(error_c))
     file.write('Error time {0} \n'.format(datetime.datetime.now() + datetime.timedelta(hours=3)))
-    if err:
+    if err and t:
         try:
             if len(t) > 500:
                 t = t[0:499] + '\n...part of the text omitted...\n' + t[-500:] + '\n'
@@ -44,6 +44,13 @@ def error_log_write(t, err=None):
     file.write('--'*10)
     file.write('\n \n')
     file.close()
+
+def error_proc(**kwargs):
+    if kwargs.get('body'):
+        if kwargs.get('log'):
+            error_log_write(kwargs.get('body'), err=kwargs.get('error'))
+        if kwargs.get('mail'):
+            send_mail(kwargs.get('body'), subject=kwargs.get('subject'))
 
 def send_mail(text, host='site', subject=None):
     for i in get_val('[Mail]'):

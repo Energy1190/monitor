@@ -53,11 +53,17 @@ def get_dally_statistics():
                 while True:
                     for i in range(24):
                         time.sleep(3600)
-                        threading.Thread(target=processing_statistics_route, args=(['clients', 'dhcp'],['clients', 'stat']),
-                                         kwargs={'times' : 'hour'}).start()
+                        name = "dally-" + str(i)
+                        subproc = multiprocessing.Process(name=name, target=processing_statistics_route,
+                                                          args=(['clients', 'dhcp'],['clients', 'stat']),
+                                                          kwargs={'times' : 'hour'}).start()
+                        subproc.start()
                         if time_now.hour == 0:
-                            threading.Thread(target=processing_statistics_route(['clients', 'dhcp'],['clients', 'stat']),
-                                             kwargs={'times' : 'day'}).start()
+                            name = 'dally-full'
+                            subproc = multiprocessing.Process(name=name, target=processing_statistics_route,
+                                                              args=(['clients', 'dhcp'], ['clients', 'stat']),
+                                                              kwargs={'times': 'day'}).start()
+                            subproc.start()
             time.sleep(60)
     except Exception as err:
         error_log_write(format_exc(), err)
