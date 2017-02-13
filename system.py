@@ -1,6 +1,7 @@
 import os
 import smtplib
 import datetime
+import logging
 from email.mime.text import MIMEText
 from configuration import get_val
 
@@ -19,6 +20,23 @@ def isfloat(value):
 
 def return_nub(x):
     return int(''.join([i for i in x if isfloat(i)]))
+
+def consol_log(mess, trace=None, level='info'):
+    logging.basicConfig(format='%(asctime)-15s [%(level)s] %(message)s \n %(trace)s', datefmt='%Y.%m.%d %I:%M:%S %p')
+    if level == 'info':
+        logging.info(str(mess), **{'trace': trace, 'level': level})
+    elif level == 'warn':
+        logging.warning(str(mess),**{'trace': trace, 'level': level})
+    elif level ==  'error':
+        logging.error(str(mess), **{'trace': trace, 'level': level})
+        error_log_write(mess, trace)
+    elif level == 'crit':
+        logging.critical(str(mess), **{'trace': trace, 'level': level})
+        error_log_write(mess, trace)
+        if trace:
+            send_mail(str(trace), subject=mess)
+    elif level == 'debug':
+        logging.debug(str(mess), trace)
 
 def error_log_write(t, err=None):
     global error_c
