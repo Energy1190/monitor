@@ -25,10 +25,10 @@ def return_nub(x):
     return int(''.join([i for i in x if isfloat(i)]))
 
 def get_logs():
+    global log_lock
     consol_log('All process started. Now watch from log file', level='info')
     while True:
         if os.path.exists('logging.log') and not log_lock:
-            global log_lock
             log_lock = True
             for i in open('logging.log', 'r'):
                 print(i)
@@ -37,9 +37,9 @@ def get_logs():
         time.sleep(60)
 
 def consol_log(mess, trace=None, level='info'):
+    global log_lock
     if not log_lock:
         out = sys.stdout
-        global log_lock
         log_lock = True
         if not os.path.exists('logging.log'):
             sys.stdout = open('logging.log', 'w+')
