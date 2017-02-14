@@ -9,7 +9,7 @@ from system import target_collection, consol_log, get_logs
 from processing import processing_statistics_route
 from requests_s import delete_old_reqests, check_base, processing_incoming_route, processing_incoming_json
 
-def application(q):
+def application():
     app.debug = True
     app.run(port=5000, host='0.0.0.0')
 
