@@ -1,4 +1,6 @@
 import os
+import sys
+import time
 import smtplib
 import datetime
 import logging
@@ -6,6 +8,7 @@ from email.mime.text import MIMEText
 from configuration import get_val
 
 error_c = 0
+log_lock = False
 time_now = (datetime.datetime.now() + datetime.timedelta(hours=3))
 time_now_tuple = time_now.timetuple()[0:4]
 target_collection ='base-{0}-{1}-{2}'.format(time_now.timetuple()[0],
@@ -21,22 +24,46 @@ def isfloat(value):
 def return_nub(x):
     return int(''.join([i for i in x if isfloat(i)]))
 
+def get_logs():
+    while True:
+        if os.path.exists('logging.log') and not log_lock:
+            global log_lock
+            log_lock = True
+            for i in open('logging.log', 'r'):
+                print(i)
+            open('logging.log', 'w')
+            log_lock = False
+        time.sleep(60)
+
 def consol_log(mess, trace=None, level='info'):
-    logging.basicConfig(format='%(asctime)-15s [%(level)s] %(message)s \n %(trace)s', datefmt='%Y.%m.%d %I:%M:%S %p')
-    if level == 'info':
-        logging.info(str(mess), **{'trace': trace, 'level': level})
-    elif level == 'warn':
-        logging.warning(str(mess),**{'trace': trace, 'level': level})
-    elif level ==  'error':
-        logging.error(str(mess), **{'trace': trace, 'level': level})
-        error_log_write(mess, trace)
-    elif level == 'crit':
-        logging.critical(str(mess), **{'trace': trace, 'level': level})
-        error_log_write(mess, trace)
-        if trace:
-            send_mail(str(trace), subject=mess)
-    elif level == 'debug':
-        logging.debug(str(mess), trace)
+    if not log_lock:
+        out = sys.stdout
+        global log_lock
+        log_lock = True
+        if not os.path.exists('logging.log'):
+            sys.stdout = open('logging.log', 'w+')
+        else:
+            sys.stdout = open('logging.log', 'a+')
+        logging.basicConfig(format='%(asctime)-15s [%(level)s] %(message)s \n %(trace)s', datefmt='%Y.%m.%d %I:%M:%S %p')
+        if level == 'info':
+            logging.info(str(mess), **{'trace': trace, 'level': level})
+        elif level == 'warn':
+            logging.warning(str(mess),**{'trace': trace, 'level': level})
+        elif level == 'error':
+            logging.error(str(mess), **{'trace': trace, 'level': level})
+            error_log_write(mess, str(trace))
+        elif level == 'crit':
+            logging.critical(str(mess), **{'trace': trace, 'level': level})
+            error_log_write(mess, str(trace))
+            if trace:
+                send_mail(str(trace), subject=mess)
+        elif level == 'debug':
+            logging.debug(str(mess), str(trace))
+        sys.stdout = out
+        log_lock = False
+    elif log_lock:
+        time.sleep(5)
+        consol_log(mess, trace=trace, level=level)
 
 def error_log_write(t, err=None):
     global error_c

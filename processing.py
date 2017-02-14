@@ -5,11 +5,11 @@ from system import consol_log
 from requests_s import Statistic
 from reguests_db import get_route_info_database
 
-def processing_statistics_route(target_dhcp, target_stat, times='hour', queue=False):
+def processing_statistics_route(target_dhcp, target_stat, times='hour'):
     try:
-        queue.put(consol_log('Start generate statistics from router base per {0}'.format(times), level='info'))
+        consol_log('Start generate statistics from router base per {0}'.format(times), level='info')
         x = db_find(target=target_dhcp, limit=1000)
-        queue.put(consol_log('Get data from collection {0}. Example data: \n {1}'.format(target_dhcp, x[0]), level='debug'))
+        consol_log('Get data from collection {0}. Example data: \n {1}'.format(target_dhcp, x[0]), level='debug')
         r = []
         dx = {}
         dx['conndestif'] = 'wan1'
@@ -25,12 +25,12 @@ def processing_statistics_route(target_dhcp, target_stat, times='hour', queue=Fa
             y = Statistic(get_route_info_database(**dx), i['ip'], target=target_stat)
             y.set_dict()
             r.append(y.dicts)
-        queue.put(consol_log('Complete generate result. Example data: \n {0}'.format(r[0]), level='debug'))
+        consol_log('Complete generate result. Example data: \n {0}'.format(r[0]), level='debug')
         y.set({'stat': r, 'time': datetime.datetime.now().timetuple()[0:dx['deep']], 'inter': times})
-        queue.put(consol_log('Successful set result in {0}'.format(target_stat), level='debug'))
-        queue.put(consol_log('Successful end generate statistics from router base per {0}'.format(times), level='info'))
+        consol_log('Successful set result in {0}'.format(target_stat), level='debug')
+        consol_log('Successful end generate statistics from router base per {0}'.format(times), level='info')
     except Exception as err:
-        queue.put(consol_log('Fail processing generate statistics from router base per {0}. Error : {1}'.format(times, str(err)),
-                   trace=str(format_exc()), level='error'))
+        consol_log('Fail processing generate statistics from router base per {0}. Error : {1}'.format(times, str(err)),
+                   trace=format_exc(), level='error')
 if __name__ == '__main__':
     pass
