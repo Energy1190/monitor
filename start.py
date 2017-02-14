@@ -5,7 +5,7 @@ import datetime
 from webapp import app
 from watch import main
 from traceback import format_exc
-from system import target_collection, send_mail, consol_log
+from system import target_collection, consol_log, get_logs
 from processing import processing_statistics_route
 from requests_s import delete_old_reqests, check_base, processing_incoming_route, processing_incoming_json
 
@@ -75,3 +75,4 @@ if __name__ == '__main__':
     proc3.start()
     proc4.start()
     proc5.start()
+    get_logs()
