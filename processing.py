@@ -1,15 +1,15 @@
 import datetime
 from db import db_find
 from traceback import format_exc
-from system import consol_log
+from logmodule import logger
 from requests_s import Statistic
 from reguests_db import get_route_info_database
 
 def processing_statistics_route(target_dhcp, target_stat, times='hour'):
     try:
-        consol_log('Start generate statistics from router base per {0}'.format(times), level='info')
+        logger.info('Start generate statistics from router base per {0}'.format(times))
         x = db_find(target=target_dhcp, limit=1000)
-        consol_log('Get data from collection {0}. Example data: \n {1}'.format(target_dhcp, x[0]), level='debug')
+        logger.debug('Get data from collection {0}. Example data: \n {1}'.format(target_dhcp, x[0]))
         r = []
         dx = {}
         dx['conndestif'] = 'wan1'
@@ -25,12 +25,12 @@ def processing_statistics_route(target_dhcp, target_stat, times='hour'):
             y = Statistic(get_route_info_database(**dx), i['ip'], target=target_stat)
             y.set_dict()
             r.append(y.dicts)
-        consol_log('Complete generate result. Example data: \n {0}'.format(r[0]), level='debug')
+        logger.debug('Complete generate result. Example data: \n {0}'.format(r[0]))
         y.set({'stat': r, 'time': datetime.datetime.now().timetuple()[0:dx['deep']], 'inter': times})
-        consol_log('Successful set result in {0}'.format(target_stat), level='debug')
-        consol_log('Successful end generate statistics from router base per {0}'.format(times), level='info')
+        logger.debug('Successful set result in {0}'.format(target_stat))
+        logger.info('Successful end generate statistics from router base per {0}'.format(times))
     except Exception as err:
-        consol_log('Fail processing generate statistics from router base per {0}. Error : {1}'.format(times, str(err)),
-                   trace=format_exc(), level='error')
+        logger.error('Fail processing generate statistics from router base per {0}. Error : {1}'.format(times, str(err)))
+        logger.error('Trace: {0}'.format(str(format_exc())))
 if __name__ == '__main__':
     pass

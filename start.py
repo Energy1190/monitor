@@ -1,3 +1,4 @@
+import subprocess
 import multiprocessing
 import os
 import time
@@ -5,7 +6,8 @@ import datetime
 from webapp import app
 from watch import main
 from traceback import format_exc
-from system import target_collection, consol_log, get_logs
+from logmodule import logger
+from system import target_collection, detect_crit
 from processing import processing_statistics_route
 from requests_s import delete_old_reqests, check_base, processing_incoming_route, processing_incoming_json
 
@@ -15,6 +17,9 @@ def application():
 
 def daemon():
     main()
+
+def critical_detect():
+    detect_crit()
 
 def processing_logs():
     try:
@@ -26,7 +31,7 @@ def processing_logs():
                 time.sleep(5)
     except Exception as err:
         text = 'Fail router logs work\n' + str(format_exc()) + '\n' + str(err)
-        consol_log(text, trace=format_exc(), level='crit')
+        logger.critical(text)
 
 def edit_requests():
     try:
@@ -38,7 +43,7 @@ def edit_requests():
             time.sleep(360)
     except Exception as err:
         text = 'Fail JSON work\n' + str(format_exc()) + '\n' + str(err)
-        consol_log(text, trace=format_exc(), level='crit')
+        logger.critical(text)
 
 def get_dally_statistics():
     try:
@@ -61,18 +66,19 @@ def get_dally_statistics():
             time.sleep(60)
     except Exception as err:
         text = 'Fail daily statistics work\n' + str(format_exc()) + '\n' + str(err)
-        consol_log(text, trace=format_exc(), level='crit')
+        logger.critical(text)
 
 
 if __name__ == '__main__':
-    proc1 = multiprocessing.Process(name='app', target=application)
-    proc2 = multiprocessing.Process(name='daemon', target=daemon)
-    proc3 = multiprocessing.Process(name='editor', target=edit_requests)
-    proc4 = multiprocessing.Process(name='logs', target=processing_logs)
-    proc5 = multiprocessing.Process(name='dally', target=get_dally_statistics)
-    proc1.start()
-    proc2.start()
-    proc3.start()
-    proc4.start()
-    proc5.start()
-    get_logs()
+    if not subprocess.getstatusoutput(['python3, selftest.py']):
+        proc1 = multiprocessing.Process(name='app', target=application)
+        proc2 = multiprocessing.Process(name='daemon', target=daemon)
+        proc3 = multiprocessing.Process(name='editor', target=edit_requests)
+        proc4 = multiprocessing.Process(name='logs', target=processing_logs)
+        proc5 = multiprocessing.Process(name='dally', target=get_dally_statistics)
+        proc6 = multiprocessing.Process(name='critical', target=critical_detect)
+        proc1.start()
+        proc2.start()
+        proc3.start()
+        proc4.start()
+        proc5.start()

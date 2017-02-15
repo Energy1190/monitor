@@ -3,7 +3,6 @@ import sys
 import time
 import smtplib
 import datetime
-import logging
 from email.mime.text import MIMEText
 from configuration import get_val
 
@@ -14,6 +13,21 @@ time_now_tuple = time_now.timetuple()[0:4]
 target_collection ='base-{0}-{1}-{2}'.format(time_now.timetuple()[0],
                                              time_now.timetuple()[1],
                                              time_now.timetuple()[2])
+def detect_crit():
+    err = []
+    e = False
+    mess = None
+    while True:
+        for i in open('logging.log', 'r'):
+            if 'CRITICAL' in i and i not in err:
+                err.append(i)
+                mess += i + '\n'
+                e = True
+            elif 'CRITICAL' not in i and e:
+                send_mail(mess, subject='CRITICAL error')
+                mess = None
+                e = False
+
 def isfloat(value):
     try:
         float(value)
@@ -23,48 +37,6 @@ def isfloat(value):
 
 def return_nub(x):
     return int(''.join([i for i in x if isfloat(i)]))
-
-def get_logs():
-    global log_lock
-    consol_log('All process started. Now watch from log file', level='info')
-    while True:
-        if os.path.exists('logging.log') and not log_lock:
-            log_lock = True
-            for i in open('logging.log', 'r'):
-                print(i)
-            open('logging.log', 'w')
-            log_lock = False
-        time.sleep(60)
-
-def consol_log(mess, trace=None, level='info'):
-    global log_lock
-    if not log_lock:
-        out = sys.stdout
-        log_lock = True
-        if not os.path.exists('logging.log'):
-            sys.stdout = open('logging.log', 'w+')
-        else:
-            sys.stdout = open('logging.log', 'a+')
-        logging.basicConfig(format='%(asctime)-15s [%(level)s] %(message)s \n %(trace)s', datefmt='%Y.%m.%d %I:%M:%S %p')
-        if level == 'info':
-            logging.info(str(mess), **{'trace': trace, 'level': level})
-        elif level == 'warn':
-            logging.warning(str(mess),**{'trace': trace, 'level': level})
-        elif level == 'error':
-            logging.error(str(mess), **{'trace': trace, 'level': level})
-            error_log_write(mess, str(trace))
-        elif level == 'crit':
-            logging.critical(str(mess), **{'trace': trace, 'level': level})
-            error_log_write(mess, str(trace))
-            if trace:
-                send_mail(str(trace), subject=mess)
-        elif level == 'debug':
-            logging.debug(str(mess), str(trace))
-        sys.stdout = out
-        log_lock = False
-    elif log_lock:
-        time.sleep(5)
-        consol_log(mess, trace=trace, level=level)
 
 def error_log_write(t, err=None):
     global error_c
@@ -84,8 +56,15 @@ def error_log_write(t, err=None):
         file.write('Error string {0} \n'.format(t))
         file.write('Trace: \n')
         file.write(str(err))
+    elif t:
+        try:
+            if len(t) > 500:
+                t = t[0:499] + '\n...part of the text omitted...\n' + t[-500:] + '\n'
+        except TypeError:
+            pass
+        file.write('Error string {0} \n'.format(t))
     else:
-        file.write('Received empty response from the base.')
+        file.write('Empty error')
     file.write('\n \n')
     file.write('--'*10)
     file.write('\n \n')
@@ -99,14 +78,21 @@ def error_proc(**kwargs):
             send_mail(kwargs.get('body'), subject=kwargs.get('subject'))
 
 def send_mail(text, host='site', subject=None):
+    r = []
     for i in get_val('[Mail]'):
-        msg = MIMEText(text)
-        if not subject:
-            msg['Subject'] = 'Can not connect to {0}'.format(host)
-        else:
-            msg['Subject'] = subject
-        msg['From'] = 'daemon-check-site@intersoftlab.ru'
-        msg['To'] = i['name']
-        s = smtplib.SMTP(get_val('[Mail server]')[0]['ip'])
-        s.send_message(msg)
-        s.quit()
+        if i not in r:
+            r.append(i)
+            msg = MIMEText(text)
+            if not subject:
+                msg['Subject'] = 'Can not connect to {0}'.format(host)
+            else:
+                msg['Subject'] = subject
+            msg['From'] = 'daemon-check-site@intersoftlab.ru'
+            msg['To'] = i['name']
+            s = smtplib.SMTP(get_val('[Mail server]')[0]['ip'])
+            s.send_message(msg)
+            s.quit()
+    return r
+
+if __name__ == '__main__':
+    pass

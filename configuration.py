@@ -59,8 +59,8 @@ def get_section(section, path='/data/config'):
                 pass
     return r
 
-def get_val(section):
-    x = get_section(section)
+def get_val(section, path='/data/config'):
+    x = get_section(section, path=path)
     r = []
     d = {}
     for i in range(0, len(x)+1):

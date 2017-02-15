@@ -1,6 +1,7 @@
 from db import db_find
 from traceback import format_exc
-from system import target_collection, consol_log
+from system import target_collection
+from logmodule import logger
 import datetime
 
 def get_time_tuple(time_str):
@@ -13,7 +14,7 @@ def get_time_tuple(time_str):
 
 def get_time_requests(start_time, end_time, deep=4):
     try:
-        consol_log('Generate time', level='debug')
+        logger.debug('Generate time')
         r = []
         x = start_time.timetuple()[0:deep]
         y = end_time.timetuple()[0:deep]
@@ -24,10 +25,11 @@ def get_time_requests(start_time, end_time, deep=4):
             start_time = start_time + datetime.timedelta(minutes=1)
             x = start_time.timetuple()[0:deep]
         r.append(x)
-        consol_log('Successful generate time. Example data: {0}'.format(r[0]), level='debug')
+        logger.debug('Successful generate time. Example data: {0}'.format(r[0]))
         return r
     except Exception as err:
-        consol_log('Fail generate time. Error: {0}'.format(str(err)), trace=format_exc(), level='error')
+        logger.error('Fail generate time. Error: {0}'.format(str(err)))
+        logger.error('Trace: {0}'.format(str(format_exc())))
 
 def get_answer(dx, target):
     x = []
@@ -45,7 +47,7 @@ def get_answer(dx, target):
 
 def get_route_info_database(*args, start_time=None, end_time=None, deep=4, **kvargs):
     try:
-        consol_log('Start search in the database log', level='debug')
+        logger.debug('Start search in the database log')
         x = []
         t = []
         dx = kvargs
@@ -75,8 +77,8 @@ def get_route_info_database(*args, start_time=None, end_time=None, deep=4, **kva
         else:
             ss = start_time.timetuple()
             target = ['route', 'base-{0}-{1}-{2}'.format(ss[0],ss[1],ss[2])]
-        consol_log('Search options: start-time: {0}, end-time{1}'.format(str(start_time),str(end_time)), level='debug')
-        consol_log('Search base(s): {0}'.format(str(target)), level='debug')
+        logger.debug('Search options: start-time: {0}, end-time{1}'.format(str(start_time),str(end_time)))
+        logger.debug('Search base(s): {0}'.format(str(target)))
         t = get_time_requests(start_time, end_time, deep=deep)
         if t:
             for j in t:
@@ -92,10 +94,11 @@ def get_route_info_database(*args, start_time=None, end_time=None, deep=4, **kva
                     dx['minute'] = j[4]
                 for i in get_answer(dx, target):
                     x.append(i)
-            consol_log('Successful search in the database log', level='debug')
+            logger.debug('Successful search in the database log')
             return x
     except Exception as err:
-        consol_log('Fail search in the database log. Error: {0}'.format(str(err)), trace=str(format_exc()), level='error')
+        logger.error('Fail search in the database log. Error: {0}'.format(str(err)))
+        logger.error('Trace: {0}'.format(str(format_exc())))
 
 if __name__ == '__main__':
     start_time = (2017, 1, 20, 22, 23)
