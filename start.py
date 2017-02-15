@@ -70,7 +70,7 @@ def get_dally_statistics():
 
 
 if __name__ == '__main__':
-    if not subprocess.getstatusoutput(['python3, selftest.py']):
+    if not subprocess.getstatusoutput(['python, /data/monitor/selftest.py'])[0]:
         proc1 = multiprocessing.Process(name='app', target=application)
         proc2 = multiprocessing.Process(name='daemon', target=daemon)
         proc3 = multiprocessing.Process(name='editor', target=edit_requests)

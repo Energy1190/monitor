@@ -18,15 +18,17 @@ def detect_crit():
     e = False
     mess = None
     while True:
-        for i in open('logging.log', 'r'):
-            if 'CRITICAL' in i and i not in err:
-                err.append(i)
-                mess += i + '\n'
-                e = True
-            elif 'CRITICAL' not in i and e:
-                send_mail(mess, subject='CRITICAL error')
-                mess = None
-                e = False
+        if os.path.exists('logging.log'):
+            for i in open('logging.log', 'r'):
+                if 'CRITICAL' in i and i not in err:
+                    err.append(i)
+                    mess += i + '\n'
+                    e = True
+                elif 'CRITICAL' not in i and e:
+                    send_mail(mess, subject='CRITICAL error')
+                    mess = None
+                    e = False
+            time.sleep(60)
 
 def isfloat(value):
     try:
