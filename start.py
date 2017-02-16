@@ -7,7 +7,7 @@ from webapp import app
 from watch import main
 from traceback import format_exc
 from logmodule import logger
-from system import target_collection, detect_crit
+from system import detect_crit
 from processing import processing_statistics_route
 from requests_s import delete_old_reqests, check_base, processing_incoming_route, processing_incoming_json
 
@@ -24,6 +24,10 @@ def critical_detect():
 def processing_logs():
     try:
         while True:
+            time_now = (datetime.datetime.now() + datetime.timedelta(hours=3))
+            target_collection = 'base-{0}-{1}-{2}'.format(time_now.timetuple()[0],
+                                                          time_now.timetuple()[1],
+                                                          time_now.timetuple()[2])
             processing_incoming_route(['route', 'warn'], ['route', target_collection])
             processing_incoming_route(['route', 'notice'], ['route', target_collection])
             x = processing_incoming_route(['route', 'info'], ['route', target_collection])
@@ -70,17 +74,13 @@ def get_dally_statistics():
 
 
 if __name__ == '__main__':
-    print(subprocess.getstatusoutput(['python, /data/monitor/selftest.py']))
-    proc1 = multiprocessing.Process(name='app', target=application)
-    proc2 = multiprocessing.Process(name='daemon', target=daemon)
-    proc3 = multiprocessing.Process(name='editor', target=edit_requests)
-    proc4 = multiprocessing.Process(name='logs', target=processing_logs)
-    proc5 = multiprocessing.Process(name='dally', target=get_dally_statistics)
-    proc6 = multiprocessing.Process(name='critical', target=critical_detect)
-    proc1.start()
-    proc2.start()
-    proc3.start()
-    proc4.start()
-    proc5.start()
-    proc6.start()
-    print('All proc started')
+    logger.info(str('--' * 20))
+    logger.info('Start program. I begin to run processes')
+    print(subprocess.getstatusoutput(['/bin/bash/', '-c', 'python', '/data/monitor/selftest.py']))
+    multiprocessing.Process(name='app', target=application).start()
+    multiprocessing.Process(name='daemon', target=daemon).start()
+    multiprocessing.Process(name='editor', target=edit_requests).start()
+    multiprocessing.Process(name='logs', target=processing_logs).start()
+    multiprocessing.Process(name='dally', target=get_dally_statistics).start()
+    multiprocessing.Process(name='critical', target=critical_detect).start()
+    logger.info('All processes started')

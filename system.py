@@ -25,9 +25,10 @@ def detect_crit():
                     mess += i + '\n'
                     e = True
                 elif 'CRITICAL' not in i and e:
-                    send_mail(mess, subject='CRITICAL error')
-                    mess = None
-                    e = False
+                    if 'INFO' in i or 'ERROR' in i or 'DEBUG' in i or 'WARNING' in i:
+                        send_mail(mess, subject='CRITICAL error')
+                        mess = None
+                        e = False
             time.sleep(60)
 
 def isfloat(value):

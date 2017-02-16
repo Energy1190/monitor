@@ -1,6 +1,5 @@
 from db import db_find
 from traceback import format_exc
-from system import target_collection
 from logmodule import logger
 import datetime
 
@@ -18,7 +17,7 @@ def get_time_requests(start_time, end_time, deep=4):
         r = []
         x = start_time.timetuple()[0:deep]
         y = end_time.timetuple()[0:deep]
-        consol_log('The initial values: {0} and {1}'.format(str(x), str(y)), level='debug')
+        logger.debug('The initial values: {0} and {1}'.format(str(x), str(y)))
         while x != y:
             if x not in r:
                 r.append(x)
@@ -73,6 +72,10 @@ def get_route_info_database(*args, start_time=None, end_time=None, deep=4, **kva
                       for h in range(ss[1],ee[1]+1)
                       for j in range(ss[0],ee[0]+1)]
         elif start_time.timetuple()[0:2] == datetime.datetime.now().timetuple()[0:2]:
+            time_now = (datetime.datetime.now() + datetime.timedelta(hours=3))
+            target_collection = 'base-{0}-{1}-{2}'.format(time_now.timetuple()[0],
+                                                          time_now.timetuple()[1],
+                                                          time_now.timetuple()[2])
             target = ['route', target_collection]
         else:
             ss = start_time.timetuple()
