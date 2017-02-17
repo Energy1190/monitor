@@ -4,7 +4,7 @@
 import os
 import requests
 import time
-import multiprocessing
+import threading
 from logmodule import logger
 from traceback import format_exc
 from configuration import get_val
@@ -60,8 +60,7 @@ def watch_main():
                 try:
                     n += 1
                     name = "watch-" + str(n)
-                    proc = multiprocessing.Process(name=name, target=checks_server, args=[i], kwargs={'flag' : i['flag']})
-                    proc.start()
+                    threading.Thread(name=name, target=checks_server, args=[i], kwargs={'flag' : i['flag']}).start()
                 except Exception as err:
                     logger.error('Local error in watch-daemon')
                     logger.error(str(format_exc()))
