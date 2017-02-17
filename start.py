@@ -74,15 +74,13 @@ def get_dally_statistics():
 
 
 if __name__ == '__main__':
-    x = os.getpid()
-    if os.getpid() == x:
-        logger.info(str('--' * 20))
-        logger.info('Start program. I begin to run processes')
-        if not subprocess.getstatusoutput(['/bin/bash', '-c', 'python', '/data/monitor/selftest.py']):
-            multiprocessing.Process(name='app', target=application).start()
-            multiprocessing.Process(name='daemon', target=daemon).start()
-            multiprocessing.Process(name='editor', target=edit_requests).start()
-            multiprocessing.Process(name='logs', target=processing_logs).start()
-            multiprocessing.Process(name='dally', target=get_dally_statistics).start()
-            multiprocessing.Process(name='critical', target=critical_detect).start()
-            logger.info('All processes started')
+    logger.info(str('--' * 20))
+    logger.info('Start program. I begin to run processes')
+    if not subprocess.getstatusoutput(['/bin/bash', '-c', 'python', '/data/monitor/selftest.py'])[0]:
+        multiprocessing.Process(name='app', target=application).start()
+        multiprocessing.Process(name='daemon', target=daemon).start()
+        multiprocessing.Process(name='editor', target=edit_requests).start()
+        multiprocessing.Process(name='logs', target=processing_logs).start()
+        multiprocessing.Process(name='dally', target=get_dally_statistics).start()
+        multiprocessing.Process(name='critical', target=critical_detect).start()
+        logger.info('All processes started')
