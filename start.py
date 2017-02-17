@@ -76,6 +76,7 @@ def get_dally_statistics():
 if __name__ == '__main__':
     logger.info(str('--' * 20))
     logger.info('Start program. I begin to run processes')
+    logger.debug('Program pid: {0}'.format(str(os.getpid())))
     if not subprocess.getstatusoutput(['/bin/bash', '-c', 'python', '/data/monitor/selftest.py'])[0]:
         multiprocessing.Process(name='app', target=application).start()
         multiprocessing.Process(name='daemon', target=daemon).start()
