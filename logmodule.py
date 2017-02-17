@@ -1,6 +1,6 @@
 import logging
 
-logger = logging.getLogger('spam_application')
+logger = logging.getLogger('main_logs')
 logger.setLevel(logging.DEBUG)
 fh = logging.FileHandler('logging.log')
 fh.setLevel(logging.DEBUG)

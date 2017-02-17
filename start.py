@@ -4,7 +4,7 @@ import os
 import time
 import datetime
 from webapp import app
-from watch import main
+from watch import watch_main
 from traceback import format_exc
 from logmodule import logger
 from system import detect_crit
@@ -16,7 +16,7 @@ def application():
     app.run(port=5000, host='0.0.0.0')
 
 def daemon():
-    main()
+    watch_main()
 
 def critical_detect():
     detect_crit()
@@ -63,10 +63,10 @@ def get_dally_statistics():
                         subproc.start()
                         if (datetime.datetime.now() - datetime.timedelta(hours=3)).hour == 0:
                             name = 'dally-full'
-                            subproc = multiprocessing.Process(name=name, target=processing_statistics_route,
+                            subprocday = multiprocessing.Process(name=name, target=processing_statistics_route,
                                                               args=[['clients', 'dhcp'], ['clients', 'stat']],
                                                               kwargs={'times': 'day'})
-                            subproc.start()
+                            subprocday.start()
             time.sleep(60)
     except Exception as err:
         text = 'Fail daily statistics work\n' + str(format_exc()) + '\n' + str(err)
@@ -76,7 +76,7 @@ def get_dally_statistics():
 if __name__ == '__main__':
     logger.info(str('--' * 20))
     logger.info('Start program. I begin to run processes')
-    print(subprocess.getstatusoutput(['/bin/bash/', '-c', 'python', '/data/monitor/selftest.py']))
+    print(subprocess.getstatusoutput(['/bin/bash', '-c', 'python', '/data/monitor/selftest.py']))
     multiprocessing.Process(name='app', target=application).start()
     multiprocessing.Process(name='daemon', target=daemon).start()
     multiprocessing.Process(name='editor', target=edit_requests).start()

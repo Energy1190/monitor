@@ -21,12 +21,13 @@ def processing_statistics_route(target_dhcp, target_stat, times='hour'):
             dx['start_time'] = (datetime.datetime.now() + datetime.timedelta(hours=3))
             dx['deep'] = 3
         for i in x:
+            logger.debug('Start generate statistics for {0}'.format(i['ip']))
             dx['connsrcip'] = i['ip']
             y = Statistic(get_route_info_database(**dx), i['ip'], target=target_stat)
             y.set_dict()
             r.append(y.dicts)
         logger.debug('Complete generate result. Example data: \n {0}'.format(r[0]))
-        y.set({'stat': r, 'time': datetime.datetime.now().timetuple()[0:dx['deep']], 'inter': times})
+        y.set({'stat': r, 'time': (datetime.datetime.now() + datetime.timedelta(hours=3)).timetuple()[0:dx['deep']], 'inter': times})
         logger.debug('Successful set result in {0}'.format(target_stat))
         logger.info('Successful end generate statistics from router base per {0}'.format(times))
     except Exception as err:

@@ -12,8 +12,8 @@ from configuration import validate_yaml
 
 app = Flask(__name__)
 
-def write_config(conf, path, path_t, path_old):
-    if request.__dict__['environ']['REQUEST_METHOD'] == 'POST':
+def write_config(x, conf, path, path_t, path_old):
+    if x.__dict__['environ']['REQUEST_METHOD'] == 'POST':
         try:
             return validate_yaml(request.form['config'])
         except:
@@ -38,10 +38,10 @@ def write_config(conf, path, path_t, path_old):
                     os.remove(path_old)
     return True
 
-def open_config(conf, path, path_t):
+def open_config(x, conf, path, path_t):
     try:
-        request.form['validate']
-        return request.form['config']
+        x['validate']
+        return x['config']
     except:
         if os.path.exists(path):
             copyfile(path, path_t)
@@ -61,7 +61,7 @@ def hello():
             processing_incoming_json(['clients', 'json'], ['clients', 'users'], ['clients', 'comps'], ['clients', 'dhcp'])
         except:
             pass
-    return render_template('index.html', time=(datetime.datetime.now() + datetime.timedelta(hours=2)).timetuple())
+    return render_template('index.html', time=(datetime.datetime.now() + datetime.timedelta(hours=3)).timetuple())
 
 @app.route("/config", methods=['POST', 'GET'])
 def config():
@@ -69,8 +69,8 @@ def config():
     path_t = '/data/config/conf.tmp'
     path_old = '/data/config/conf.old'
     conf = ''
-    write_config(conf, path, path_t, path_old)
-    conf = open_config(conf, path, path_t)
+    write_config(request, conf, path, path_t, path_old)
+    conf = open_config(request.form, conf, path, path_t)
     try:
         if validate_yaml(request.form['config']):
             valid = 1
@@ -80,19 +80,19 @@ def config():
         valid = 0
         if not write_config(conf, path, path_t, path_old):
             valid = 2
-    return render_template('config.html', conf=conf, valid=valid, time=(datetime.datetime.now() + datetime.timedelta(hours=2)).timetuple())
+    return render_template('config.html', conf=conf, valid=valid, time=(datetime.datetime.now() + datetime.timedelta(hours=3)).timetuple())
 
 @app.route("/requests/<f_name>/<name>", methods=['GET'])
 def requests_a(f_name, name):
     args_r = {i: request.args.get(i) for i in list(request.args)}
     database_json = db_find(args_r, target=[f_name, name])
-    return render_template('requests_route.html', data=database_json, time=(datetime.datetime.now() + datetime.timedelta(hours=2)).timetuple())
+    return render_template('requests_route.html', data=database_json, time=(datetime.datetime.now() + datetime.timedelta(hours=3)).timetuple())
 
 @app.route("/requests/get", methods=['GET'])
 def requests_g():
     args_r = {i: request.args.get(i) for i in list(request.args)}
     database_json = get_route_info_database(**args_r)
-    return render_template('requests_route.html', data=database_json, time=(datetime.datetime.now() + datetime.timedelta(hours=2)).timetuple())
+    return render_template('requests_route.html', data=database_json, time=(datetime.datetime.now() + datetime.timedelta(hours=3)).timetuple())
 
 @app.route("/<name>", methods=['GET'])
 def users_p(name):

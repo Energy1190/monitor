@@ -8,7 +8,7 @@ import multiprocessing
 from logmodule import logger
 from traceback import format_exc
 from configuration import get_val
-from system import send_mail, error_proc
+from system import send_mail
 
 def get_db_connect(http, flag='url'):
     try:
@@ -47,7 +47,7 @@ def checks_server(i, flag=None):
             if not x:
                 send_mail('Fail connect to {0} as {1}'.format(i['target'], i['flag']), host=i['target'])
 
-def main():
+def watch_main():
     logger.info('begin to follow...')
     try:
         logger.info('Start watch to servers')
