@@ -71,6 +71,7 @@ def sizeof_fmt(num, suffix='B'):
     return "%.1f%s%s" % (num, 'Yi', suffix)
 
 def detect_crit():
+    logger.info('Start watch to CRITICAL error')
     err = []
     e = False
     mess = None
@@ -152,6 +153,7 @@ def send_mail(text, host='site', subject=None):
             s = smtplib.SMTP(get_val('[Mail server]')[0]['ip'])
             s.send_message(msg)
             s.quit()
+            logger.info('Send mail to {0} about subject - {1}. Successful.'.format(i['name'], subject))
     return r
 
 if __name__ == '__main__':

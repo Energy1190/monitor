@@ -6,7 +6,7 @@ import datetime
 def get_time_tuple(time_str):
     try:
         return datetime.datetime(*tuple(map(lambda x: int(x), time_str.split(sep='_'))))
-    except ValueError:
+    except:
         try:
             return (datetime.datetime.now() + datetime.timedelta(hours=3))
         except AttributeError:
