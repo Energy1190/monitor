@@ -7,7 +7,7 @@ from webapp import app
 from watch import watch_main
 from traceback import format_exc
 from logmodule import logger
-from system import detect_crit
+from system import detect_crit, write_pid, get_pid, detect_fail_pid
 from processing import processing_statistics_route
 from requests_s import delete_old_reqests, check_base, processing_incoming_route, processing_incoming_json
 
@@ -61,12 +61,14 @@ def get_dally_statistics():
                                                           args=[['clients', 'dhcp'],['clients', 'stat']],
                                                           kwargs={'times' : 'hour'})
                         subproc.start()
+                        write_pid(subproc.pid)
                         if (datetime.datetime.now() - datetime.timedelta(hours=3)).hour == 0:
                             name = 'dally-full'
                             subprocday = multiprocessing.Process(name=name, target=processing_statistics_route,
                                                               args=[['clients', 'dhcp'], ['clients', 'stat']],
                                                               kwargs={'times': 'day'})
                             subprocday.start()
+                            write_pid(subprocday.pid)
             time.sleep(60)
     except Exception as err:
         text = 'Fail daily statistics work\n' + str(format_exc()) + '\n' + str(err)
@@ -77,20 +79,31 @@ if __name__ == '__main__':
     pid = os.getpid()
     if not os.path.exists('pid.num'):
         f = open('pid.num', 'w+')
-        f.write(str(pid))
+        f.write(str(pid) + '\n')
         f.close()
+    else:
+        logger.warning('More than one workflow')
+        logger.warning('Process {0} exit!'.format(os.getpid()))
+        os._exit(1)
+    if get_pid(os.getpid()):
         logger.info(str('--' * 20))
         logger.info('Start program. I begin to run processes')
         logger.debug('Program pid: {0}'.format(str(pid)))
         x = subprocess.getstatusoutput(['/bin/bash', '-c', 'python', '/data/monitor/selftest.py'])[0]
         logger.info('Selftest complete. Exit code: {0}'.format(x))
-        multiprocessing.Process(name='app', target=application).start()
-        multiprocessing.Process(name='daemon', target=daemon).start()
-        multiprocessing.Process(name='editor', target=edit_requests).start()
-        multiprocessing.Process(name='logs', target=processing_logs).start()
-        multiprocessing.Process(name='dally', target=get_dally_statistics).start()
-        multiprocessing.Process(name='critical', target=critical_detect).start()
+        proc1 = multiprocessing.Process(name='app', target=application)
+        proc2 = multiprocessing.Process(name='daemon', target=daemon)
+        proc3 = multiprocessing.Process(name='editor', target=edit_requests)
+        proc4 = multiprocessing.Process(name='logs', target=processing_logs)
+        proc5 = multiprocessing.Process(name='dally', target=get_dally_statistics)
+        proc6 = multiprocessing.Process(name='critical', target=critical_detect)
+        for i in [proc1, proc2, proc3, proc4, proc5, proc6]:
+            i.start()
+            write_pid(i.pid)
         logger.info('All processes started')
     else:
         logger.warning('More than one workflow')
+        logger.warning('Process {0} exit!'.format(os.getpid()))
         os._exit(1)
+    logger.info('Start detect's pid')
+    detect_fail_pid()

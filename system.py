@@ -3,6 +3,7 @@ import sys
 import time
 import smtplib
 import datetime
+from logmodule import logger
 from email.mime.text import MIMEText
 from configuration import get_val
 
@@ -13,6 +14,54 @@ time_now_tuple = time_now.timetuple()[0:4]
 target_collection ='base-{0}-{1}-{2}'.format(time_now.timetuple()[0],
                                              time_now.timetuple()[1],
                                              time_now.timetuple()[2])
+
+def write_pid(pid):
+    if os.path.exists('pid.num'):
+        f = open('pid.num', 'a+')
+        f.write(pid + '\n')
+        f.close()
+
+def get_pid(pid, alls=False):
+    if os.path.exists('pid.num'):
+        f = open('pid.num', 'r')
+        try:
+            if alls:
+                return [i.replace('\n', '') for i in f]
+            else:
+                for i in f:
+                    if i.replace('\n', '') == str(pid):
+                        return True
+                    else:
+                        return False
+        finally:
+            f.close()
+
+def check_pid(pid):
+    try:
+        os.kill(pid, 0)
+    except OSError:
+        logger.debug('Subprocess - pid {0} not detect. Pid delete from list'.format(str(pid)))
+        return False
+    else:
+        return True
+
+def remove_pid(pid):
+    if os.path.exists('pid.num'):
+        r = get_pid(0, alls=True)
+        if str(pid) in r:
+            r.remove(str(pid))
+        with open('pid.num', 'w+') as f:
+            for i in r:
+                f.write(str(i + '\n'))
+            f.close()
+
+def detect_fail_pid():
+    while True:
+        if os.path.exists('pid.num'):
+            for i in get_pid(0, alls=True):
+                if not check_pid(int(i)):
+                    remove_pid(i)
+        time.sleep(3400)
 
 def sizeof_fmt(num, suffix='B'):
     for unit in ['', 'Ki', 'Mi', 'Gi', 'Ti', 'Pi', 'Ei', 'Zi']:
