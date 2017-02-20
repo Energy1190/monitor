@@ -104,7 +104,7 @@ def users_p(name):
             args_r['time'] = list(map(int, args_r['time'].replace('(', '').replace(')', '').split(sep=', ')))
         if name == 'stat':
             database_json = db_get(args_r, target=['clients', name], fild=None)
-            if database_json.get('stat'):
+            if database_json:
                 for i in database_json.get('stat'):
                     if i.get('name'):
                         names = True
