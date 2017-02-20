@@ -77,7 +77,7 @@ if __name__ == '__main__':
     pid = os.getpid()
     if not os.path.exists('pid.num'):
         f = open('pid.num', 'w+')
-        f.write(pid)
+        f.write(str(pid))
         f.close()
         logger.info(str('--' * 20))
         logger.info('Start program. I begin to run processes')
