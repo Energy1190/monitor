@@ -62,6 +62,7 @@ def get_dally_statistics():
                                                           kwargs={'times' : 'hour'})
                         subproc.start()
                         write_pid(subproc.pid)
+                        logger.debug('Start subprocess - pid {0} - dally statistic'.format(subproc.pid))
                         if (datetime.datetime.now() - datetime.timedelta(hours=3)).hour == 0:
                             name = 'dally-full'
                             subprocday = multiprocessing.Process(name=name, target=processing_statistics_route,
@@ -69,6 +70,7 @@ def get_dally_statistics():
                                                               kwargs={'times': 'day'})
                             subprocday.start()
                             write_pid(subprocday.pid)
+                            logger.debug('Start subprocess - pid {0} - dally statistic'.format(subprocday.pid))
             time.sleep(60)
     except Exception as err:
         text = 'Fail daily statistics work\n' + str(format_exc()) + '\n' + str(err)

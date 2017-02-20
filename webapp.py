@@ -104,11 +104,12 @@ def users_p(name):
             args_r['time'] = list(map(int, args_r['time'].replace('(', '').replace(')', '').split(sep=', ')))
         if name == 'stat':
             database_json = db_get(args_r, target=['clients', name], fild=None)
-            for i in database_json:
-                if i.get('name'):
-                    names = True
-                if i.get('user'):
-                    users = True
+            if database_json.get('stat'):
+                for i in database_json.get('stat'):
+                    if i.get('name'):
+                        names = True
+                    if i.get('user'):
+                        users = True
         else:
             database_json = db_find(args_r, target=['clients', name], limit=500)
         return render_template(str(name + '.html'), data=database_json, time=(datetime.datetime.now() + datetime.timedelta(hours=2)).timetuple(),
