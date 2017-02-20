@@ -76,6 +76,8 @@ def get_dally_statistics():
 
 
 if __name__ == '__main__':
+    proc1 = multiprocessing.Process(name='app', target=application)
+    proc1.start()
     pid = os.getpid()
     if not os.path.exists('pid.num'):
         f = open('pid.num', 'w+')
@@ -91,13 +93,12 @@ if __name__ == '__main__':
         logger.debug('Program pid: {0}'.format(str(pid)))
         x = subprocess.getstatusoutput(['/bin/bash', '-c', 'python', '/data/monitor/selftest.py'])[0]
         logger.info('Selftest complete. Exit code: {0}'.format(x))
-        proc1 = multiprocessing.Process(name='app', target=application)
         proc2 = multiprocessing.Process(name='daemon', target=daemon)
         proc3 = multiprocessing.Process(name='editor', target=edit_requests)
         proc4 = multiprocessing.Process(name='logs', target=processing_logs)
         proc5 = multiprocessing.Process(name='dally', target=get_dally_statistics)
         proc6 = multiprocessing.Process(name='critical', target=critical_detect)
-        for i in [proc1, proc2, proc3, proc4, proc5, proc6]:
+        for i in [proc2, proc3, proc4, proc5, proc6]:
             i.start()
             write_pid(i.pid)
         logger.info('All processes started')
