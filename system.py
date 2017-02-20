@@ -18,7 +18,7 @@ target_collection ='base-{0}-{1}-{2}'.format(time_now.timetuple()[0],
 def write_pid(pid):
     if os.path.exists('pid.num'):
         f = open('pid.num', 'a+')
-        f.write(pid + '\n')
+        f.write(str(pid) + '\n')
         f.close()
 
 def get_pid(pid, alls=False):
