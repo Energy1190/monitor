@@ -21,6 +21,8 @@ def processing_statistics_route(target_dhcp, target_stat, times='hour'):
         elif times == 'day':
             dx['start_time'] = (datetime.datetime.now() + datetime.timedelta(hours=3))
             dx['deep'] = 3
+            processing_statistics_route_per_day(target_stat)
+            return True
         dx['end_time'] = (datetime.datetime(*(datetime.datetime.now() + datetime.timedelta(hours=3)).timetuple()[0:4]) - datetime.timedelta(minutes=1))
         for i in x:
             logger.debug('Start generate statistics for {0}'.format(i['ip']))
