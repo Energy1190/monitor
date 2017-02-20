@@ -13,6 +13,14 @@ time_now_tuple = time_now.timetuple()[0:4]
 target_collection ='base-{0}-{1}-{2}'.format(time_now.timetuple()[0],
                                              time_now.timetuple()[1],
                                              time_now.timetuple()[2])
+
+def sizeof_fmt(num, suffix='B'):
+    for unit in ['', 'Ki', 'Mi', 'Gi', 'Ti', 'Pi', 'Ei', 'Zi']:
+        if abs(num) < 1024.0:
+            return "%3.1f%s%s" % (num, unit, suffix)
+        num /= 1024.0
+    return "%.1f%s%s" % (num, 'Yi', suffix)
+
 def detect_crit():
     err = []
     e = False

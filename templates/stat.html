@@ -9,6 +9,12 @@
             <thead>
             <tr>
                 <th>Ip</th>
+                {% if names %}
+                <th>Name</th>
+                {% endif %}
+                {% if users %}
+                <th>User</th>>
+                {% endif %}
                 <th>Incoming traffic</th>
                 <th>Outbound traffic</th>
             </tr>
@@ -16,9 +22,15 @@
             <tbody>
         {% for i in data['stat'] %}
             <tr>
-                <td>{{ i['ip'] }}</td>
-                <td>{{ i['data']['in'] }}</td>
-                <td>{{ i['data']['out'] }}</td>
+                <td nowrap>{{ i['ip'] }}</td>
+                {% if names %}
+                <td nowrap>{% if i['name'] %}{{ i['name'] }}{% endif %}</td>
+                {% endif %}
+                {% if users %}
+                <td nowrap>{% if i['user'] %}{{ i['user'] }}{% endif %}</td>
+                {% endif %}
+                <td nowrap>{{ i['data']['in'] }}</td>
+                <td nowrap>{{ i['data']['out'] }}</td>
             </tr>
         {% endfor %}
         </table>

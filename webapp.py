@@ -96,15 +96,24 @@ def requests_g():
 
 @app.route("/<name>", methods=['GET'])
 def users_p(name):
+    names = False
+    users = False
     if name in ['comps', 'users', 'dhcp', 'stat']:
         args_r = {i: request.args.get(i) for i in list(request.args)}
         if 'time' in args_r:
             args_r['time'] = list(map(int, args_r['time'].replace('(', '').replace(')', '').split(sep=', ')))
         if name == 'stat':
             database_json = db_get(args_r, target=['clients', name], fild=None)
+            for i in database_json:
+                if i.get('name'):
+                    names = True
+                if i.get('user'):
+                    users = True
         else:
             database_json = db_find(args_r, target=['clients', name], limit=500)
-        return render_template(str(name + '.html'), data=database_json, time=(datetime.datetime.now() + datetime.timedelta(hours=2)).timetuple())
+        return render_template(str(name + '.html'), data=database_json, time=(datetime.datetime.now() + datetime.timedelta(hours=2)).timetuple(),
+                               names=names,
+                               users=users)
     else:
         return "Not Found 404", 404
 

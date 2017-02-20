@@ -1,5 +1,6 @@
 import datetime
-from db import db_find
+from db import db_find, db_get, db_set
+from system import sizeof_fmt
 from traceback import format_exc
 from logmodule import logger
 from requests_s import Statistic
@@ -20,10 +21,11 @@ def processing_statistics_route(target_dhcp, target_stat, times='hour'):
         elif times == 'day':
             dx['start_time'] = (datetime.datetime.now() + datetime.timedelta(hours=3))
             dx['deep'] = 3
+        dx['end_time'] = (datetime.datetime(*(datetime.datetime.now() + datetime.timedelta(hours=3)).timetuple()[0:4]) - datetime.timedelta(minutes=1))
         for i in x:
             logger.debug('Start generate statistics for {0}'.format(i['ip']))
             dx['connsrcip'] = i['ip']
-            y = Statistic(get_route_info_database(**dx), i['ip'], target=target_stat)
+            y = Statistic(get_route_info_database(**dx), i['ip'], i['name'], target=target_stat)
             y.set_dict()
             r.append(y.dicts)
         logger.debug('Complete generate result. Example data: \n {0}'.format(r[0]))
@@ -33,5 +35,34 @@ def processing_statistics_route(target_dhcp, target_stat, times='hour'):
     except Exception as err:
         logger.error('Fail processing generate statistics from router base per {0}. Error : {1}'.format(times, str(err)))
         logger.error('Trace: {0}'.format(str(format_exc())))
+
+def processing_statistics_route_per_day(target_stat):
+    try:
+        day = (datetime.datetime.now() + datetime.timedelta(hours=3) - datetime.timedelta(minutes=1)).timetuple()[0:3]
+        logger.info('Start generate statistics from router base per day: {0}'.format(str(day)))
+        r = []
+        for i in range(24):
+            x = list(day)
+            x.append(i)
+            r.append(db_get(tuple(x), target=target_stat, fild='time'))
+        x = [{'in': j['data']['in_bytes'], 'out': j['data']['out_bytes'], 'ip': j['ip']} for i in r for j in i['stat']
+             if j['data'].get('in_bytes') and j['data'].get('out_bytes')]
+        r = {}
+        for i in x:
+            if i['ip'] not in r:
+                r[i['ip']] = {'out':i['out'], 'in': i['in']}
+            elif i['ip'] in r:
+                r[i['ip']]['out'] = r[i['ip']]['out'] + i['out']
+                r[i['ip']]['in'] = r[i['ip']]['in'] + i['in']
+        for i in r:
+            r[i]['in'] = sizeof_fmt(r[i]['in'])
+            r[i]['out'] = sizeof_fmt(r[i]['out'])
+        x = [{'ip': i, 'data': {'in': sizeof_fmt(r[i]['in']), 'out': sizeof_fmt(r[i]['out'])}} for i in r]
+        db_set({'stat': r, 'time': day, 'inter': 'day'}, target=target_stat)
+        logger.info('Successful end generate statistics from router base per day: {0}'.format(str(day)))
+    except Exception as err:
+        logger.error('Fail processing generate statistics from router base per day. Error : {0}'.format(str(err)))
+        logger.error('Trace: {0}'.format(str(format_exc())))
+
 if __name__ == '__main__':
     pass

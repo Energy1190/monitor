@@ -226,10 +226,12 @@ class User(Base):
         self.copmslist.extend(target_dict['copmslist'])
 
 class Statistic(Base):
-    def __init__(self, trg, ip, target=None):
+    def __init__(self, trg, ip, name, target=None):
         Base.__init__(self, trg, target=target)
         self.counts = 0
         self.ip = ip
+        self.name = name
+        self.get_user()
         self.trg = trg
         self.time = time_now
         self.data = self.summ_trafic()
@@ -255,16 +257,14 @@ class Statistic(Base):
                 out_t += float(i['origsent'])
             if i.get('termsent'):
                 in_t += float(i['termsent'])
-        return {'in': self.sizeof_fmt(in_t), 'out': self.sizeof_fmt(out_t)}
+        return {'in': self.sizeof_fmt(in_t), 'out': self.sizeof_fmt(out_t), 'in_bytes': in_t, 'out_bytes': out_t}
 
-    def __add__(self, other):
-        if type(other) == Statistic:
-            x = []
-            x.append(self.dicts)
-            x.append(other.dicts)
-            return x
-        elif type(other) == list:
-            other.append(self.dicts)
+    def get_user(self):
+        x = db_get({'computername': self.name}, target=['clients', 'users'], fild=None)
+        if x:
+            self.user = x['username']
+        else:
+            self.user = None
 
 class Route(Base):
     """ Класс обрабатывающий входящие сообщения с роутера. Согласно документации

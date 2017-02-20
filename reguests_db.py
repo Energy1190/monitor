@@ -104,6 +104,6 @@ def get_route_info_database(*args, start_time=None, end_time=None, deep=4, **kva
         logger.error('Trace: {0}'.format(str(format_exc())))
 
 if __name__ == '__main__':
-    start_time = (2017, 1, 20, 22, 23)
-    end_time = (2017, 1, 22, 22, 23)
+    print(get_time_requests(datetime.datetime(*(datetime.datetime.now() + datetime.timedelta(hours=3)).timetuple()[0:4]) - datetime.timedelta(hours=1),
+                      datetime.datetime(*(datetime.datetime.now() + datetime.timedelta(hours=3)).timetuple()[0:4]) - datetime.timedelta(minutes=1), deep=4))
 
