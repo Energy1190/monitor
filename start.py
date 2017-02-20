@@ -85,6 +85,7 @@ if __name__ == '__main__':
         logger.warning('More than one workflow')
         logger.warning('Process {0} exit!'.format(os.getpid()))
         os._exit(1)
+    if get_pid(os.getpid()):
         logger.info(str('--' * 20))
         logger.info('Start program. I begin to run processes')
         logger.debug('Program pid: {0}'.format(str(pid)))
@@ -96,5 +97,13 @@ if __name__ == '__main__':
         proc4 = multiprocessing.Process(name='logs', target=processing_logs)
         proc5 = multiprocessing.Process(name='dally', target=get_dally_statistics)
         proc6 = multiprocessing.Process(name='critical', target=critical_detect)
+        for i in [proc1, proc2, proc3, proc4, proc5, proc6]:
+            i.start()
+            write_pid(i.pid)
         logger.info('All processes started')
-
+    else:
+        logger.warning('More than one workflow')
+        logger.warning('Process {0} exit!'.format(os.getpid()))
+        os._exit(1)
+    logger.info('Start detects pid')
+    detect_fail_pid()
