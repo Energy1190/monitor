@@ -74,15 +74,23 @@ def get_dally_statistics():
 
 
 if __name__ == '__main__':
-    logger.info(str('--' * 20))
-    logger.info('Start program. I begin to run processes')
-    logger.debug('Program pid: {0}'.format(str(os.getpid())))
-    x = subprocess.getstatusoutput(['/bin/bash', '-c', 'python', '/data/monitor/selftest.py'])[0]
-    logger.info('Selftest complete. Exit code: {0}'.format(x))
-    multiprocessing.Process(name='app', target=application).start()
-    multiprocessing.Process(name='daemon', target=daemon).start()
-    multiprocessing.Process(name='editor', target=edit_requests).start()
-    multiprocessing.Process(name='logs', target=processing_logs).start()
-    multiprocessing.Process(name='dally', target=get_dally_statistics).start()
-    multiprocessing.Process(name='critical', target=critical_detect).start()
-    logger.info('All processes started')
+    pid = os.getpid()
+    if not os.path.exists('pid.num'):
+        f = open('pid.num', 'w+')
+        f.write(pid)
+        f.close()
+        logger.info(str('--' * 20))
+        logger.info('Start program. I begin to run processes')
+        logger.debug('Program pid: {0}'.format(str(pid)))
+        x = subprocess.getstatusoutput(['/bin/bash', '-c', 'python', '/data/monitor/selftest.py'])[0]
+        logger.info('Selftest complete. Exit code: {0}'.format(x))
+        multiprocessing.Process(name='app', target=application).start()
+        multiprocessing.Process(name='daemon', target=daemon).start()
+        multiprocessing.Process(name='editor', target=edit_requests).start()
+        multiprocessing.Process(name='logs', target=processing_logs).start()
+        multiprocessing.Process(name='dally', target=get_dally_statistics).start()
+        multiprocessing.Process(name='critical', target=critical_detect).start()
+        logger.info('All processes started')
+    else:
+        logger.warning('More than one workflow')
+        os._exit(1)
