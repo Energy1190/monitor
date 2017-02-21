@@ -8,7 +8,7 @@ from watch import watch_main
 from traceback import format_exc
 from logmodule import logger
 from system import detect_crit, write_pid, get_pid, detect_fail_pid
-from processing import processing_statistics_route
+from processing import processing_statistics_route, processing_statistics_route_per_day
 from requests_s import delete_old_reqests, check_base, processing_incoming_route, processing_incoming_json
 
 def application():
@@ -50,28 +50,20 @@ def edit_requests():
         logger.critical(text)
 
 def get_dally_statistics():
+    x = False
     try:
-        for i in range(60):
-            if datetime.datetime.now().minute == 0:
-                while True:
-                    for i in range(24):
-                        time.sleep(3600)
-                        name = "dally-" + str(i)
-                        subproc = multiprocessing.Process(name=name, target=processing_statistics_route,
-                                                          args=[['clients', 'dhcp'],['clients', 'stat']],
-                                                          kwargs={'times' : 'hour'})
-                        subproc.start()
-                        write_pid(subproc.pid)
-                        logger.debug('Start subprocess - pid {0} - dally statistic'.format(subproc.pid))
-                        if (datetime.datetime.now() - datetime.timedelta(hours=3)).hour == 0:
-                            name = 'dally-full'
-                            subprocday = multiprocessing.Process(name=name, target=processing_statistics_route,
-                                                              args=[['clients', 'dhcp'], ['clients', 'stat']],
-                                                              kwargs={'times': 'day'})
-                            subprocday.start()
-                            write_pid(subprocday.pid)
-                            logger.debug('Start subprocess - pid {0} - dally statistic'.format(subprocday.pid))
-            time.sleep(60)
+        while True:
+            if datetime.datetime.now().minute == 0 and not x:
+                subproc = multiprocessing.Process(name='get_statistic', target=processing_statistics_route,
+                                                  args=[['clients', 'dhcp'],['clients', 'stat']])
+                subproc.start()
+                write_pid(subproc.pid)
+                logger.debug('Start subprocess - pid {0} - dally statistic'.format(subproc.pid))
+                x = True
+            elif datetime.datetime.now().minute == 1 and x:
+                x = False
+                time.sleep(3400)
+            time.sleep(59)
     except Exception as err:
         text = 'Fail daily statistics work\n' + str(format_exc()) + '\n' + str(err)
         logger.critical(text)

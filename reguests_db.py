@@ -8,9 +8,9 @@ def get_time_tuple(time_str):
         return datetime.datetime(*tuple(map(lambda x: int(x), time_str.split(sep='_'))))
     except:
         try:
-            return (datetime.datetime.now() + datetime.timedelta(hours=3))
-        except AttributeError:
             return datetime.datetime(*time_str)
+        except:
+            return (datetime.datetime.now() + datetime.timedelta(hours=3))
 
 def get_time_requests(start_time, end_time, deep=4):
     try:

@@ -6,23 +6,17 @@ from logmodule import logger
 from requests_s import Statistic
 from reguests_db import get_route_info_database
 
-def processing_statistics_route(target_dhcp, target_stat, times='hour'):
+def processing_statistics_route(target_dhcp, target_stat):
     try:
-        logger.info('Start generate statistics from router base per {0}'.format(times))
+        logger.info('Start generate statistics from router base per {0}'.format((datetime.datetime.now() + datetime.timedelta(hours=2))))
         x = db_find(target=target_dhcp, limit=1000)
         logger.debug('Get data from collection {0}. Example data: \n {1}'.format(target_dhcp, x[0]))
         r = []
         dx = {}
         dx['conndestif'] = 'wan1'
         dx['connrecvif'] = 'lan'
-        if times == 'hour':
-            dx['start_time'] = (datetime.datetime.now() + datetime.timedelta(hours=2)).timetuple()[0:4]
-            dx['deep'] = 4
-        elif times == 'day':
-            dx['start_time'] = (datetime.datetime.now() + datetime.timedelta(hours=3))
-            dx['deep'] = 3
-            processing_statistics_route_per_day(target_stat)
-            return True
+        dx['start_time'] = (datetime.datetime.now() + datetime.timedelta(hours=2)).timetuple()[0:4]
+        dx['deep'] = 4
         dx['end_time'] = (datetime.datetime(*(datetime.datetime.now() + datetime.timedelta(hours=3)).timetuple()[0:4]) - datetime.timedelta(minutes=1))
         for i in x:
             logger.debug('Start generate statistics for {0}'.format(i['ip']))
@@ -31,11 +25,13 @@ def processing_statistics_route(target_dhcp, target_stat, times='hour'):
             y.set_dict()
             r.append(y.dicts)
         logger.debug('Complete generate result. Example data: \n {0}'.format(r[0]))
-        y.set({'stat': r, 'time': (datetime.datetime.now() + datetime.timedelta(hours=3)).timetuple()[0:dx['deep']], 'inter': times})
+        y.set({'stat': r, 'time': (datetime.datetime.now() + datetime.timedelta(hours=3)).timetuple()[0:dx['deep']], 'inter': 'hour'})
         logger.debug('Successful set result in {0}'.format(target_stat))
-        logger.info('Successful end generate statistics from router base per {0}'.format(times))
+        logger.info('Successful end generate statistics from router base per {0}'.format((datetime.datetime.now() + datetime.timedelta(hours=2))))
+        if (datetime.datetime.now() + datetime.timedelta(hours=3)).hour == 0:
+            processing_statistics_route_per_day(target_stat)
     except Exception as err:
-        logger.error('Fail processing generate statistics from router base per {0}. Error : {1}'.format(times, str(err)))
+        logger.error('Fail processing generate statistics from router base per {0}. Error : {1}'.format(datetime.datetime.now() + datetime.timedelta(hours=2), str(err)))
         logger.error('Trace: {0}'.format(str(format_exc())))
 
 def processing_statistics_route_per_day(target_stat):
