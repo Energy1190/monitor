@@ -16,8 +16,8 @@ def processing_statistics_route(target_dhcp, target_stat):
         dx['conndestif'] = 'wan1'
         dx['connrecvif'] = 'lan'
         dx['start_time'] = (datetime.datetime.now() + datetime.timedelta(hours=2)).timetuple()[0:4]
+        dx['end_time'] = dx['start_time']
         dx['deep'] = 4
-        dx['end_time'] = (datetime.datetime(*(datetime.datetime.now() + datetime.timedelta(hours=3)).timetuple()[0:4]) - datetime.timedelta(minutes=1))
         for i in x:
             logger.debug('Start generate statistics for {0}'.format(i['ip']))
             dx['connsrcip'] = i['ip']
@@ -36,15 +36,14 @@ def processing_statistics_route(target_dhcp, target_stat):
 
 def processing_statistics_route_per_day(target_stat):
     try:
-        day = (datetime.datetime.now() + datetime.timedelta(hours=3) - datetime.timedelta(minutes=1)).timetuple()[0:3]
+        day = (datetime.datetime.now() + datetime.timedelta(hours=3) - datetime.timedelta(hours=1)).timetuple()[0:3]
         logger.info('Start generate statistics from router base per day: {0}'.format(str(day)))
         r = []
         for i in range(24):
             x = list(day)
             x.append(i)
             r.append(db_get(tuple(x), target=target_stat, fild='time'))
-        x = [{'in': j['data']['in_bytes'], 'out': j['data']['out_bytes'], 'ip': j['ip']} for i in r for j in i['stat']
-             if j['data'].get('in_bytes') and j['data'].get('out_bytes')]
+        x = [{'in': j['data']['in_bytes'], 'out': j['data']['out_bytes'], 'ip': j['ip']} for i in r for j in i['stat'] if i and j['data'].get('in_bytes') and j['data'].get('out_bytes')]
         r = {}
         for i in x:
             if i['ip'] not in r:
