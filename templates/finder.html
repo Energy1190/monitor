@@ -1,0 +1,65 @@
+{% extends "index.html" %}
+{% block title %}{{ name }}{% endblock %}
+{% block content %}
+<div class="row">
+     <div class="panel-heading">Form</div>
+    <form class="form-inline">
+        <div class="table-responsive">
+            <table class="table table-condensed">
+                {% if name == 'router'%}
+                    {% for i in form_r.var %}
+                        {% if loop.index % 2 %}
+                        <tr>
+                        {% endif %}
+                                <td><label for="{{ i }}">{{ i }}</label></td>
+                                <td><input class="form-control" id="{{ i }}"></td>
+                        {% if not loop.index % 2 %}
+                        </tr>
+                        {% endif %}
+                    {% endfor %}
+                        <tr>
+                            <td>
+                                <button type="button" class="btn btn-default">Add</button>
+                                <button type="submit" class="btn btn-default">Submit</button>
+                            </td>
+                        </tr>
+                {% endif %}
+            </table>
+        </div>
+    </form>
+</div>
+<div class="row">
+    <div class="panel panel-default">
+        <div class="panel-heading">Result</div>
+        <table class="table">
+            <thead>
+            {% if name == 'router'%}
+            <tr>
+                <th>Data</th>
+            </tr>
+            {% endif %}
+            <tbody>
+        {% for i in data %}
+            <tr>
+                <td>{{ i }}</td>
+            </tr>
+        {% endfor %}
+        </table>
+        <span id="result">?</span>
+    </div>
+</div>
+<script type=text/javascript>
+$(function() {
+  $('a#getbase').bind('click', function() {
+    $.getJSON('/request/get', {
+    {% for i in form_r.var %}
+      {{ i }}:  $('input[name="{{ i }}"]').val(){% if not loop.last %},{% endif %}
+    {% endfor %}
+    }, function(data) {
+      $("#result").text(data.result);
+    });
+    return false;
+  });
+});
+</script>
+{% endblock %}

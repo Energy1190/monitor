@@ -4,15 +4,16 @@
 import os
 import datetime
 from shutil import copyfile
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template, jsonify
 from db import db_set, db_find, db_get
 from requests_s import processing_incoming_json
 from reguests_db import get_route_info_database
 from configuration import validate_yaml
+from finder import Router
 
 app = Flask(__name__)
 
-def write_config(x, conf, path, path_t, path_old):
+def write_config(x, path, path_t, path_old):
     if x.__dict__['environ']['REQUEST_METHOD'] == 'POST':
         try:
             return validate_yaml(request.form['config'])
@@ -68,8 +69,7 @@ def config():
     path = '/data/config/conf.yaml'
     path_t = '/data/config/conf.tmp'
     path_old = '/data/config/conf.old'
-    conf = ''
-    write_config(request, conf, path, path_t, path_old)
+    write_config(request, path, path_t, path_old)
     conf = open_config(request.form, conf, path, path_t)
     try:
         if validate_yaml(request.form['config']):
@@ -92,7 +92,7 @@ def requests_a(f_name, name):
 def requests_g():
     args_r = {i: request.args.get(i) for i in list(request.args)}
     database_json = get_route_info_database(**args_r)
-    return render_template('requests_route.html', data=database_json, time=(datetime.datetime.now() + datetime.timedelta(hours=3)).timetuple())
+    return jsonify(result=database_json)
 
 @app.route("/<name>", methods=['GET'])
 def users_p(name):
@@ -118,8 +118,12 @@ def users_p(name):
     else:
         return "Not Found 404", 404
 
+@app.route("/finder/<name>", methods=['GET'])
+def form_finder_b(name):
+    args_r = {i: request.args.get(i) for i in list(request.args)}
+    database_json = get_route_info_database(**args_r)
+    return render_template('finder.html', time=(datetime.datetime.now() + datetime.timedelta(hours=2)).timetuple(),
+                           data=database_json, name=name, form_r=Router)
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
-
-
-

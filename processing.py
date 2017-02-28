@@ -25,7 +25,7 @@ def processing_statistics_route(target_dhcp, target_stat):
             y.set_dict()
             r.append(y.dicts)
         logger.debug('Complete generate result. Example data: \n {0}'.format(r[0]))
-        y.set({'stat': r, 'time': (datetime.datetime.now() + datetime.timedelta(hours=3)).timetuple()[0:dx['deep']], 'inter': 'hour'})
+        y.set({'stat': r, 'time': dx['start_time'], 'inter': 'hour'})
         logger.debug('Successful set result in {0}'.format(target_stat))
         logger.info('Successful end generate statistics from router base per {0}'.format((datetime.datetime.now() + datetime.timedelta(hours=2))))
         if (datetime.datetime.now() + datetime.timedelta(hours=3)).hour == 0:
@@ -43,7 +43,8 @@ def processing_statistics_route_per_day(target_stat):
             x = list(day)
             x.append(i)
             r.append(db_get(tuple(x), target=target_stat, fild='time'))
-        x = [{'in': j['data']['in_bytes'], 'out': j['data']['out_bytes'], 'ip': j['ip']} for i in r for j in i['stat'] if i and j['data'].get('in_bytes') and j['data'].get('out_bytes')]
+        x = [{'in': j['data']['in_bytes'], 'out': j['data']['out_bytes'], 'ip': j['ip']} for i in r if i and i.get('stat')
+             for j in i['stat'] if j['data'].get('in_bytes') and j['data'].get('out_bytes')]
         r = {}
         for i in x:
             if i['ip'] not in r:
