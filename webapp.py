@@ -91,8 +91,14 @@ def requests_a(f_name, name):
 @app.route("/requests/get", methods=['GET'])
 def requests_g():
     args_r = {i: request.args.get(i) for i in list(request.args)}
-    database_json = get_route_info_database(**args_r,  visibal=True)
+    database_json = get_route_info_database(**args_r,)
     return jsonify(result=database_json)
+
+@app.route("/frame/requests/get", methods=['GET'])
+def requests_g():
+    args_r = {i: request.args.get(i) for i in list(request.args)}
+    database_json = get_route_info_database(**args_r, limited=True)
+    return render_template('database_table.html', data=database_json)
 
 @app.route("/<name>", methods=['GET'])
 def users_p(name):
@@ -121,7 +127,7 @@ def users_p(name):
 @app.route("/finder/<name>", methods=['GET'])
 def form_finder_b(name):
     args_r = {i: request.args.get(i) for i in list(request.args)}
-    database_json = get_route_info_database(**args_r, visibal=True)
+    database_json = get_route_info_database(**args_r)
     return render_template('finder.html', time=(datetime.datetime.now() + datetime.timedelta(hours=2)).timetuple(),
                            data=database_json, name=name, form_r=Router)
 

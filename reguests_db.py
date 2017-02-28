@@ -39,14 +39,22 @@ def get_answer(dx, target, visibal=False):
         limit = 1000000
     x = []
     y = []
+    logger.debug('Get database info')
+    logger.debug('Inquiry is {0}'.format(str(dx)))
+    logger.debug('Limit: {0}'.format(str(limit)))
+    logger.debug('All target: {0}'.format(str(target)))
     if type(target[0]) == list:
         for j in target:
-            y += db_find(dx, target=j, limit=1000000)
+            logger.debug('Current target is {0}'.format(str(j)))
+            y += db_find(dx, target=j, limit=limit)
     else:
-        y = db_find(dx, target=target, limit=1000000)
+        logger.debug('One target')
+        y = db_find(dx, target=target, limit=limit)
+    logger.debug('Remove duplicates')
     for i in y:
         if i not in x:
             x.append(i)
+    logger.debug('Done, result contains {0} objects'.format(str(len(y))))
     return x
 
 def get_route_info_database(*args, start_time=None, end_time=None, deep=4, **kvargs):
@@ -61,8 +69,8 @@ def get_route_info_database(*args, start_time=None, end_time=None, deep=4, **kva
             del dx['end_time']
         if 'deep' in dx.keys():
             del dx['deep']
-        if 'visibal' in dx.keys():
-            del dx['visibal']
+        if 'limited' in dx.keys():
+            del dx['limited']
         if start_time and end_time:
             start_time = get_time_tuple(start_time)
             end_time = get_time_tuple(end_time)
@@ -106,7 +114,7 @@ def get_route_info_database(*args, start_time=None, end_time=None, deep=4, **kva
                                                                       str(dx.get('month')),
                                                                       str(dx.get('day')),
                                                                       str(dx.get('hour'))))
-                for i in get_answer(dx, target, visibal=kvargs.get('visibal')):
+                for i in get_answer(dx, target, visibal=kvargs.get('limited')):
                     x.append(i)
             logger.debug('Successful search in the database log')
             return x
