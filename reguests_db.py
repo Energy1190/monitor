@@ -63,6 +63,8 @@ def get_route_info_database(*args, start_time=None, end_time=None, deep=4, **kva
         logger.debug('Incoming parameters: {0}'.format(str(kvargs)))
         x = []
         t = []
+        limited = kvargs.get('limited')
+        logger.debug('Limit: {0}'.format(str(limited)))
         dx = kvargs
         if 'start_time' in dx.keys():
             del dx['start_time']
