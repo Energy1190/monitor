@@ -74,7 +74,7 @@ def detect_crit():
     logger.info('Start watch to CRITICAL error')
     err = []
     e = False
-    mess = None
+    mess = str(' - ')
     while True:
         if os.path.exists('logging.log'):
             for i in open('logging.log', 'r'):

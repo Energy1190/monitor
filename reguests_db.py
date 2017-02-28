@@ -2,6 +2,7 @@ from db import db_find
 from traceback import format_exc
 from logmodule import logger
 import datetime
+import time
 
 def get_time_tuple(time_str):
     try:
@@ -31,7 +32,11 @@ def get_time_requests(start_time, end_time, deep=4):
         logger.error('Fail generate time. Error: {0}'.format(str(err)))
         logger.error('Trace: {0}'.format(str(format_exc())))
 
-def get_answer(dx, target):
+def get_answer(dx, target, visibal=False):
+    if visibal:
+        limit = 100
+    else:
+        limit = 1000000
     x = []
     y = []
     if type(target[0]) == list:
@@ -39,7 +44,6 @@ def get_answer(dx, target):
             y += db_find(dx, target=j, limit=1000000)
     else:
         y = db_find(dx, target=target, limit=1000000)
-    x.append(dx)
     for i in y:
         if i not in x:
             x.append(i)
@@ -57,6 +61,8 @@ def get_route_info_database(*args, start_time=None, end_time=None, deep=4, **kva
             del dx['end_time']
         if 'deep' in dx.keys():
             del dx['deep']
+        if 'visibal' in dx.keys():
+            del dx['visibal']
         if start_time and end_time:
             start_time = get_time_tuple(start_time)
             end_time = get_time_tuple(end_time)
@@ -96,7 +102,7 @@ def get_route_info_database(*args, start_time=None, end_time=None, deep=4, **kva
                     dx['hour'] = j[3]
                 if len(j) >= 5:
                     dx['minute'] = j[4]
-                for i in get_answer(dx, target):
+                for i in get_answer(dx, target, visibal=kvargs.get('visibal')):
                     x.append(i)
             logger.debug('Successful search in the database log')
             return x
