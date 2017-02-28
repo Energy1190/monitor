@@ -102,7 +102,10 @@ def get_route_info_database(*args, start_time=None, end_time=None, deep=4, **kva
                     dx['hour'] = j[3]
                 if len(j) >= 5:
                     dx['minute'] = j[4]
-                logger.debug('Add result for {0}.'.format(dx.get('year'),dx.get('month'),dx.get('day'),dx.get('hour')))
+                logger.debug('Add result for {0}-{1}-{2}-{3}.'.format(str(dx.get('year')),
+                                                                      str(dx.get('month')),
+                                                                      str(dx.get('day')),
+                                                                      str(dx.get('hour'))))
                 for i in get_answer(dx, target, visibal=kvargs.get('visibal')):
                     x.append(i)
             logger.debug('Successful search in the database log')
