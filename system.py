@@ -78,6 +78,7 @@ def detect_crit():
     while True:
         if os.path.exists('logging.log'):
             for i in open('logging.log', 'r'):
+                i = str(i)
                 if 'CRITICAL' in i and i not in err:
                     err.append(i)
                     mess += i + '\n'
@@ -85,7 +86,7 @@ def detect_crit():
                 elif 'CRITICAL' not in i and e:
                     if 'INFO' in i or 'ERROR' in i or 'DEBUG' in i or 'WARNING' in i:
                         send_mail(mess, subject='CRITICAL error')
-                        mess = None
+                        mess = str(' - ')
                         e = False
             time.sleep(60)
 
