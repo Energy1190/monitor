@@ -54,7 +54,7 @@ def get_answer(dx, target, visibal=False):
     for i in y:
         if i not in x:
             x.append(i)
-    logger.debug('Done, result contains {0} objects'.format(str(len(y))))
+    logger.debug('Done, result contains {0} objects'.format(str(len(x))))
     return x
 
 def get_route_info_database(*args, start_time=None, end_time=None, deep=4, **kvargs):
