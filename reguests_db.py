@@ -64,7 +64,6 @@ def get_route_info_database(*args, start_time=None, end_time=None, deep=4, **kva
         x = []
         t = []
         limited = kvargs.get('limited')
-        logger.debug('Limit: {0}'.format(str(limited)))
         dx = kvargs
         if 'start_time' in dx.keys():
             del dx['start_time']
@@ -116,7 +115,7 @@ def get_route_info_database(*args, start_time=None, end_time=None, deep=4, **kva
                                                                       str(dx.get('month')),
                                                                       str(dx.get('day')),
                                                                       str(dx.get('hour'))))
-                for i in get_answer(dx, target, visibal=kvargs.get('limited')):
+                for i in get_answer(dx, target, visibal=limited):
                     x.append(i)
             logger.debug('Successful search in the database log')
             return x
