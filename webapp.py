@@ -97,7 +97,8 @@ def requests_g():
 @app.route("/frame/requests/get", methods=['GET'])
 def requests_ff():
     args_r = {i: request.args.get(i) for i in list(request.args)}
-    args_r['limited'] = True
+    if 'limited' not in args_r.keys():
+        args_r['limited'] = True
     database_json = get_route_info_database(**args_r)
     return render_template('database_table.html', data=database_json)
 
