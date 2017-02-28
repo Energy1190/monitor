@@ -95,7 +95,7 @@ def requests_g():
     return jsonify(result=database_json)
 
 @app.route("/frame/requests/get", methods=['GET'])
-def requests_g():
+def requests_ff():
     args_r = {i: request.args.get(i) for i in list(request.args)}
     database_json = get_route_info_database(**args_r, limited=True)
     return render_template('database_table.html', data=database_json)
