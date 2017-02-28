@@ -87,7 +87,7 @@ def get_route_info_database(*args, start_time=None, end_time=None, deep=4, **kva
         else:
             ss = start_time.timetuple()
             target = ['route', 'base-{0}-{1}-{2}'.format(ss[0],ss[1],ss[2])]
-        logger.debug('Search options: start-time: {0}, end-time{1}'.format(str(start_time),str(end_time)))
+        logger.debug('Search options: start-time: {0}, end-time: {1}'.format(str(start_time),str(end_time)))
         logger.debug('Search base(s): {0}'.format(str(target)))
         t = get_time_requests(start_time, end_time, deep=deep)
         if t:
