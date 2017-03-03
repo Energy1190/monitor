@@ -6,7 +6,7 @@ from logmodule import logger
 from requests_s import Statistic
 from reguests_db import get_route_info_database
 
-def processing_statistics_route(target_dhcp, target_stat):
+def main(target_dhcp, target_stat):
     try:
         logger.info('Start generate statistics from router base per {0}'.format((datetime.datetime.now() + datetime.timedelta(hours=2))))
         x = db_find(target=target_dhcp, limit=1000)
@@ -55,8 +55,8 @@ def processing_statistics_route_per_day(target_stat):
         for i in r:
             r[i]['in'] = sizeof_fmt(r[i]['in'])
             r[i]['out'] = sizeof_fmt(r[i]['out'])
-        x = [{'ip': i, 'data': {'in': sizeof_fmt(r[i]['in']), 'out': sizeof_fmt(r[i]['out'])}} for i in r]
-        db_set({'stat': r, 'time': day, 'inter': 'day'}, target=target_stat)
+        x = [{'ip': i, 'data': {'in': r[i]['in'], 'out': r[i]['out']}} for i in r]
+        db_set({'stat': x, 'time': day, 'inter': 'day'}, target=target_stat)
         logger.info('Successful end generate statistics from router base per day: {0}'.format(str(day)))
     except Exception as err:
         logger.error('Fail processing generate statistics from router base per day. Error : {0}'.format(str(err)))

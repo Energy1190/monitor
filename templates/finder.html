@@ -1,9 +1,33 @@
 {% extends "index.html" %}
 {% block title %}{{ name }}{% endblock %}
+{% block script%}
+  <script>
+    var values = {};
+    $(document).ready(function(){
+        $("#sub").click(function(){
+            var $inputs = $('#finders :input');
+            $inputs.each(function() {
+                if($(this).val()) {
+                    values[this.name] = $(this).val();
+                }
+            });
+            var shallowEncoded = $.param( values, true );
+            $.getJSON("/requests/get?" + shallowEncoded, function(result){
+                $("#results tr").remove();
+                $.each(result, function(i, field){
+                    for (i = 0; i<field.length;i++) {
+                        $("#results tbody").append('<tr><td>' + field[i] + '</td></tr>');
+                    }
+                });
+            });
+        });
+    });
+  </script>
+{% endblock %}
 {% block content %}
 <div class="row">
      <div class="panel-heading">Form</div>
-    <form class="form-inline">
+    <form class="form-inline" name="finders" id="finders">
         <div class="table-responsive">
             <table class="table table-condensed">
                 {% if name == 'router'%}
@@ -12,7 +36,7 @@
                         <tr>
                         {% endif %}
                                 <td><label for="{{ i }}">{{ i }}</label></td>
-                                <td><input class="form-control" id="{{ i }}"></td>
+                                <td><input class="form-control" name="{{ i }}" id="{{ i }}"></td>
                         {% if not loop.index % 2 %}
                         </tr>
                         {% endif %}
@@ -20,7 +44,7 @@
                         <tr>
                             <td>
                                 <button type="button" class="btn btn-default">Add</button>
-                                <button type="submit" class="btn btn-default">Submit</button>
+                                <button type="button" class="btn btn-default" id="sub">Submit</button>
                             </td>
                         </tr>
                 {% endif %}
@@ -29,37 +53,23 @@
     </form>
 </div>
 <div class="row">
-    <div class="panel panel-default">
-        <div class="panel-heading">Result</div>
-        <table class="table">
-            <thead>
-            {% if name == 'router'%}
-            <tr>
-                <th>Data</th>
-            </tr>
-            {% endif %}
-            <tbody>
-        {% for i in data %}
-            <tr>
-                <td>{{ i }}</td>
-            </tr>
-        {% endfor %}
-        </table>
-        <span id="result">?</span>
+    <div class="col-xs-12 col-md-8">
+        <div class="panel panel-default">
+          <div class="panel-heading">All requests from route</div>
+            <table class="table" id="results">
+                <thead>
+                <tr>
+                    <th>Data</th>
+                </tr>
+                </thead>
+                <tbody>
+            {% for i in data %}
+                <tr>
+                    <td>{{ i }}</td>
+                </tr>
+            {% endfor %}
+            </table>
+        </div>
     </div>
 </div>
-<script type=text/javascript>
-$(function() {
-  $('a#getbase').bind('click', function() {
-    $.getJSON('/request/get', {
-    {% for i in form_r.var %}
-      {{ i }}:  $('input[name="{{ i }}"]').val(){% if not loop.last %},{% endif %}
-    {% endfor %}
-    }, function(data) {
-      $("#result").text(data.result);
-    });
-    return false;
-  });
-});
-</script>
 {% endblock %}
