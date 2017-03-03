@@ -354,7 +354,6 @@ class Vals(Base):
     def set_dict(self):
         Base.set_dict(self)
         del self.dicts['old']
-        del self.dicts['trg']
 
 def delete_old_reqests(target, status='Old'):
     """Процедура очистки устаревших/обработанных объектов в базе данных,
