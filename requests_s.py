@@ -343,9 +343,9 @@ class Vals(Base):
                 self.dicts[i] = trg[i]
                 x = self.get_dsttrg(src=i, fild='name')
                 if x and str(self.dicts[i]) not in x['vals']:
-                    y = x
-                    y['vals'].append(str(self.dicts[i]))
-                    self.update(dsttrg=x, srctrg=y, target=target)
+                    y = x['vals']
+                    y.append(str(self.dicts[i]))
+                    self.update(dsttrg=x, srctrg={'name': i, 'vals': y}, target=target)
                 else:
                     y = {'name': i, 'vals': []}
                     y['vals'].append(str(self.dicts[i]))

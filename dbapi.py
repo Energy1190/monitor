@@ -24,7 +24,6 @@ def main():
     if x.command == 'find':
         if x.limit:
             kwargs['limit'] = int(x.limit)
-            kwargs['fild'] = str(x.fild)
         if len(args):
             kwargs['db_dict'] = args[0]
         args = ()
