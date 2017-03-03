@@ -11,6 +11,7 @@ from system import detect_crit, write_pid, get_pid, detect_fail_pid
 from requests_s import check_base, processing_incoming_json
 from processing.processing_incoming_route import main as processing_incoming_route
 from processing.processing_statistics_route import main as processing_statistics_route
+from processing.processing_get_vals import main as processing_get_vals
 
 def application():
     app.debug = True
@@ -21,6 +22,15 @@ def daemon():
 
 def critical_detect():
     detect_crit()
+
+def get_vals():
+    while True:
+        time_now = (datetime.datetime.now() + datetime.timedelta(hours=3))
+        target_collection = 'base-{0}-{1}-{2}'.format(time_now.timetuple()[0],
+                                                      time_now.timetuple()[1],
+                                                      time_now.timetuple()[2])
+        processing_get_vals( ['route', target_collection], ['systems', 'vals'])
+        time.sleep(4000)
 
 def processing_logs():
     try:
@@ -93,7 +103,8 @@ if __name__ == '__main__':
         proc4 = multiprocessing.Process(name='logs', target=processing_logs)
         proc5 = multiprocessing.Process(name='dally', target=get_dally_statistics)
         proc6 = multiprocessing.Process(name='critical', target=critical_detect)
-        for i in [proc2, proc3, proc4, proc5, proc6]:
+        proc7 = multiprocessing.Process(name='vals', target=get_vals)
+        for i in [proc2, proc3, proc4, proc5, proc6, proc7]:
             i.start()
             write_pid(i.pid)
         logger.info('All processes started')

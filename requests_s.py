@@ -9,7 +9,6 @@ import datetime
 from Crypto.Cipher import AES
 from Crypto import Random
 from watch import send_mail
-from logmodule import logclass
 from db import db_get, db_find, db_update, db_set, db_del, db_del_all
 from system import error_log_write, return_nub, time_now
 
@@ -23,7 +22,6 @@ class Base():
     извлекаться значения для проверки по умолчанию.
     """
     def __init__(self, trg, target=None):
-        logclass.info('Create Baseclass object')
         self.old = []
         self.dicts = {}
         self.dst = target
@@ -70,19 +68,16 @@ class Base():
 
     def set_dict(self):
         self.dicts = {i: self.__dict__[i] for i in self.__dict__ if i != 'dicts' and i != 'message' and i != 'dst'}
-        logclass.debug('Generate dicts: {0}'.format(str(self.dicts)))
 
     def delete(self, trg, target=None):
         if target:
             db_del(trg, target=target)
-            logclass.debug('Delete object {0} from {1}'.format(str(trg), str(target)))
 
     def set(self, trg, target=None):
         if target:
             db_set(trg, target=target)
         else:
             db_set(trg, target=self.dst)
-        logclass.debug('Set object {0} from {1}'.format(str(trg), str(target)))
 
     def update(self, srctrg=None, dsttrg=None, target=None):
         if target and dsttrg:
@@ -95,7 +90,6 @@ class Base():
                 db_update(srctrg, target=self.dst, fild=dsttrg)
             else:
                 db_update(self.dicts, target=self.dst, fild=dsttrg)
-        logclass.debug('Update object {0} to {1}'.format(str(dsttrg), str(srctrg)))
 
     def check_dict(self, target_dict):
         """
@@ -111,7 +105,6 @@ class Base():
             if i != '_id' and i != 'old' and i in target_dict:
                 if self.dicts[i] != target_dict[i]:
                     self.old.append({i: target_dict[i], 'time': time_now})
-                    logclass.debug('Detect old val - {0}: {1}'.format(str(i), str(target_dict[i])))
 
     def get_dsttrg(self, src, fild):
         """
@@ -123,7 +116,6 @@ class Base():
         """
         x = db_get(src, target=self.dst, fild=fild)
         if x:
-            logclass.debug('Get object - {0}'.format(str(x)))
             return x
         else:
             return False
@@ -149,7 +141,6 @@ class Comp(Base):
         self.get_time_dict()
         self.old = []
         self.set_dict()
-        logclass.debug('Create Compclass - {0}'.format(str(self.computername)))
 
 class Dhcp(Base):
     """Класс обрабатывает информацию от DHCP-сервера на основании полученного от него
@@ -173,7 +164,6 @@ class Dhcp(Base):
         self.timeinfo = time.gmtime((return_nub(self.dhcpinfo["Timeinfo"]) + 10800000)/1000.)
         self.dhcpinfo = self.dhcpinfo["Dhcpinfo"]
         self.dhcpinfo = self.generate_dict(self.dhcpinfo)
-        logclass.debug('Create DHCPclass')
 
     def remove_end(self, x):
         for i in range(100):
@@ -230,12 +220,10 @@ class User(Base):
         except:
             pass
         self.set_dict()
-        logclass.info('Create Userclass object - {0}'.format(str(self.username)))
 
     def check_dict(self, target_dict):
         Comp.check_dict(self, target_dict)
         self.copmslist.extend(target_dict['copmslist'])
-        logclass.info('Check User complist - {0}'.format(str(self.copmslist)))
 
 class Statistic(Base):
     def __init__(self, trg, ip, name, target=None):
@@ -247,7 +235,6 @@ class Statistic(Base):
         self.trg = trg
         self.time = time_now
         self.data = self.summ_trafic()
-        logclass.info('Create Statisticclass object - {0}'.format(str(self.ip)))
 
     def set_dict(self):
         Base.set_dict(self)
@@ -337,23 +324,26 @@ class Route(Base):
 class Vals(Base):
     def __init__(self, trg, target=None):
         Base.__init__(self, trg, target=target)
+        self.exeption = ['_id', 'origsent', 'termsent', 'time', 'year', 'month', 'day', 'hour', 'min', 'second']
         self.set_dict()
         if trg:
             for i in trg:
-                self.dicts[i] = trg[i]
-                x = self.get_dsttrg(src=i, fild='name')
-                if x and str(self.dicts[i]) not in x:
-                    y = x['vals']
-                    y.append(str(self.dicts[i]))
-                    self.update(dsttrg=x, srctrg={'name': i, 'vals': y}, target=target)
-                else:
-                    y = {'name': i, 'vals': []}
-                    y['vals'].append(str(self.dicts[i]))
-                    self.set(y, target=target)
+                if i not in self.exeption:
+                    self.dicts[i] = trg[i]
+                    x = self.get_dsttrg(src=i, fild='name')
+                    if x and str(self.dicts[i]) not in x:
+                        y = x['vals']
+                        y.append(str(self.dicts[i]))
+                        self.update(dsttrg=x, srctrg={'name': i, 'vals': y}, target=target)
+                    else:
+                        y = {'name': i, 'vals': []}
+                        y['vals'].append(str(self.dicts[i]))
+                        self.set(y, target=target)
 
     def set_dict(self):
         Base.set_dict(self)
         del self.dicts['old']
+        del self.dicts['exeption']
 
 def delete_old_reqests(target, status='Old'):
     """Процедура очистки устаревших/обработанных объектов в базе данных,
