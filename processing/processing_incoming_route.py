@@ -7,7 +7,7 @@ def main(target, out_target):
         x = Route(t, target=target)
         y = x.set_dict()
         if y:
-            Vals(y, target=['system', 'vals'])
+            Vals(y, target=['systems', 'vals'])
             x.set(x.dicts, target=out_target)
             x.delete(t,target=target)
             return True
