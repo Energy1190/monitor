@@ -13,7 +13,7 @@ logger.addHandler(fh)
 logger.addHandler(ch)
 
 logclass = logging.getLogger('class_logs')
-logclass.setLevel(logging.DEBUG)
+logclass.setLevel(logging.CRITICAL)
 fh2 = logging.FileHandler('class.log')
 fh2.setLevel(logging.DEBUG)
 ch2 = logging.StreamHandler()
