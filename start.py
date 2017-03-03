@@ -9,8 +9,8 @@ from traceback import format_exc
 from logmodule import logger
 from system import detect_crit, write_pid, get_pid, detect_fail_pid
 from requests_s import check_base, processing_incoming_json
-from .processing.processing_incoming_route import main as processing_incoming_route
-from .processing.processing_statistics_route import main as processing_statistics_route
+from processing.processing_incoming_route import main as processing_incoming_route
+from processing.processing_statistics_route import main as processing_statistics_route
 
 def application():
     app.debug = True
