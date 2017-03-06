@@ -16,7 +16,7 @@
                 $("#results tr").remove();
                 $.each(result, function(i, field){
                     for (i = 0; i<field.length;i++) {
-                        $("#results tbody").append('<tr><td>' + jQuery.parseJSON(field[i]) + '</td></tr>');
+                        $("#results tbody").append('<tr><td>' + JSON.parse(field[i]) + '</td></tr>');
                     }
                 });
             });

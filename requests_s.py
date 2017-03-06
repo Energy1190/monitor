@@ -342,7 +342,7 @@ class Vals(Base):
                         logger.debug('New list - {0}'.format(str(y)))
                         logger.debug('Existeted filds: {0}'.format(str(x)))
                         logger.debug('New filds: {0}'.format(str({'name': i, 'vals': y})))
-                    else:
+                    elif not x:
                         y = {'name': i, 'vals': []}
                         y['vals'].append(str(self.dicts[i]))
                         self.set(y, target=target)
