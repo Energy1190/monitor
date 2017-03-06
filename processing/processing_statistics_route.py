@@ -5,9 +5,11 @@ from traceback import format_exc
 from logmodule import logger
 from requests_s import Statistic
 from reguests_db import get_route_info_database
+from classes.dictory import Stat
 
 def main(target_dhcp, target_stat):
     try:
+        date = (datetime.datetime.now() + datetime.timedelta(hours=3)).timetuple()[0:3]
         logger.info('Start generate statistics from router base per {0}'.format((datetime.datetime.now() + datetime.timedelta(hours=2))))
         x = db_find(target=target_dhcp, limit=1000)
         logger.debug('Get data from collection {0}. Example data: \n {1}'.format(target_dhcp, x[0]))
@@ -25,13 +27,29 @@ def main(target_dhcp, target_stat):
             y.set_dict()
             r.append(y.dicts)
         logger.debug('Complete generate result. Example data: \n {0}'.format(r[0]))
-        y.set({'stat': r, 'time': dx['start_time'], 'inter': 'hour'})
+        results = {'stat': r, 'time': dx['start_time'], 'inter': 'hour'}
+        y.set(results)
         logger.debug('Successful set result in {0}'.format(target_stat))
         logger.info('Successful end generate statistics from router base per {0}'.format((datetime.datetime.now() + datetime.timedelta(hours=2))))
-        if (datetime.datetime.now() + datetime.timedelta(hours=3)).hour == 0:
-            processing_statistics_route_per_day(target_stat)
+        processing_statistics_route_per_today(target_stat, results, date)
     except Exception as err:
         logger.error('Fail processing generate statistics from router base per {0}. Error : {1}'.format(datetime.datetime.now() + datetime.timedelta(hours=2), str(err)))
+        logger.error('Trace: {0}'.format(str(format_exc())))
+
+def processing_statistics_route_per_today(target_stat, result, date):
+    try:
+        x = db_get(tuple(date), target=target_stat, fild='time')
+        if not x:
+            result['inter'] = 'day'
+            db_set(result, target=target_stat)
+        else:
+            a = [Stat(i) for i in x.get('stat')]
+            b = [Stat(i) for i in result.get('stat')]
+            c = [i+j for i in a for j in b if str(i['ip']) == str(j['ip'])]
+            result = {'stat': c, 'time': date, 'inter': 'day'}
+            db_set(result, target=target_stat)
+    except Exception as err:
+        logger.error('Fail processing generate statistics from router base per day. Error : {0}'.format(str(err)))
         logger.error('Trace: {0}'.format(str(format_exc())))
 
 def processing_statistics_route_per_day(target_stat):

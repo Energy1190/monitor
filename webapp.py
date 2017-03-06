@@ -10,6 +10,7 @@ from requests_s import processing_incoming_json
 from reguests_db import get_route_info_database
 from configuration import validate_yaml
 from classes.finder import Router
+from logmodule import logger
 
 app = Flask(__name__)
 
@@ -58,6 +59,7 @@ def hello():
         trg = request.json
         trg['Status'] = 'New'
         db_set(trg, target=['clients', 'json'])
+        logger.debug('incoming POST: {0}'.format(str(trg)))
         try:
             processing_incoming_json(['clients', 'json'], ['clients', 'users'], ['clients', 'comps'], ['clients', 'dhcp'])
         except:
@@ -125,9 +127,9 @@ def form_finder_b(name):
     args_r = {i: request.args.get(i) for i in list(request.args)}
     if 'limited' not in args_r.keys():
         args_r['limited'] = True
-    database_json = get_route_info_database(**args_r)
+    x = Router()
     return render_template('finder.html', time=(datetime.datetime.now() + datetime.timedelta(hours=2)).timetuple(),
-                           data=database_json, name=name, form_r=Router)
+                           name=name, form_r=x)
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
