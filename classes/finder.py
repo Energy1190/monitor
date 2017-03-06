@@ -21,7 +21,10 @@ class Router(Finder):
     def get_val(self):
         x = {}
         for i in self.var:
-            x[i] = db_get(i, target=self.target, fild='name')['vals']
+            if dict(db_get(i, target=self.target, fild='name')).get('vals'):
+                x[i] = db_get(i, target=self.target, fild='name')['vals']
+            else:
+                x[i] = []
         self.var = x
 
 class Trafic(Finder):
