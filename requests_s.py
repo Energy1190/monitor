@@ -335,7 +335,7 @@ class Vals(Base):
                     if x and not x['vals'].count(str(self.dicts[i])):
                         y = x['vals']
                         y.append(str(self.dicts[i]))
-                        self.update(dsttrg=x, srctrg={'name': i, 'vals': y}, target=target)
+                        self.update(dsttrg={'name': i}, srctrg={'name': i, 'vals': y}, target=target)
                         logger.debug('Check existed list')
                     elif not x:
                         y = {'name': i, 'vals': []}
