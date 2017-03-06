@@ -21,8 +21,9 @@ class Router(Finder):
     def get_val(self):
         x = {}
         for i in self.var:
-            if dict(db_get(i, target=self.target, fild='name')).get('vals'):
-                x[i] = db_get(i, target=self.target, fild='name')['vals']
+            t = db_get(i, target=self.target, fild='name')
+            if t:
+                x[i] = t['vals']
             else:
                 x[i] = []
         self.var = x

@@ -331,7 +331,7 @@ class Vals(Base):
                 if i not in self.exeption:
                     self.dicts[i] = trg[i]
                     x = self.get_dsttrg(src=i, fild='name')
-                    if x and str(self.dicts[i]) not in x['vals']:
+                    if x and not x['vals'].count(str(self.dicts[i])):
                         y = x['vals']
                         y.append(str(self.dicts[i]))
                         self.update(dsttrg=x, srctrg={'name': i, 'vals': y}, target=target)
