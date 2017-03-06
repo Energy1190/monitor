@@ -347,7 +347,7 @@ class Vals(Base):
                         y['vals'].append(str(self.dicts[i]))
                         self.set(y, target=target)
                         logger.debug('Can not find list')
-                        logger.debug('Check result - {0}'.format(str(x['vals'].count(str(self.dicts[i]))))
+                        logger.debug('Check result - {0}'.format(str(x['vals'].count(str(self.dicts[i])))))
                         logger.debug('Old list - {0}'.format(str(x['vals'])))
                         logger.debug('New list - {0}'.format(str(y)))
                         logger.debug('Existeted filds: {0}'.format(str(x)))
