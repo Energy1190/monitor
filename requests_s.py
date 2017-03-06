@@ -11,6 +11,7 @@ from Crypto import Random
 from watch import send_mail
 from db import db_get, db_find, db_update, db_set, db_del, db_del_all
 from system import error_log_write, return_nub, time_now
+from logmodule import logger
 
 class Base():
     """ Базовый класс для обработки входящих JSON-объектов. Включает в себя необходимые объекты:
@@ -335,10 +336,22 @@ class Vals(Base):
                         y = x['vals']
                         y.append(str(self.dicts[i]))
                         self.update(dsttrg=x, srctrg={'name': i, 'vals': y}, target=target)
+                        logger.debug('Check existed list')
+                        logger.debug('Vars:')
+                        logger.debug('Old list - {0}'.format(str(x['vals'])))
+                        logger.debug('New list - {0}'.format(str(y)))
+                        logger.debug('Existeted filds: {0}'.format(str(x)))
+                        logger.debug('New filds: {0}'.format(str({'name': i, 'vals': y})))
                     else:
                         y = {'name': i, 'vals': []}
                         y['vals'].append(str(self.dicts[i]))
                         self.set(y, target=target)
+                        logger.debug('Can not find list')
+                        logger.debug('Check result - {0}'.format(str(x['vals'].count(str(self.dicts[i]))))
+                        logger.debug('Old list - {0}'.format(str(x['vals'])))
+                        logger.debug('New list - {0}'.format(str(y)))
+                        logger.debug('Existeted filds: {0}'.format(str(x)))
+                        logger.debug('Existeted list: {0}'.format(str(x['vals'])))
 
     def set_dict(self):
         Base.set_dict(self)
