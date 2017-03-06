@@ -52,6 +52,7 @@ def get_answer(dx, target, visibal=False):
         y = db_find(dx, target=target, limit=limit)
     logger.debug('Remove duplicates')
     for i in y:
+        del i['_id']
         if i not in x:
             x.append(i)
     logger.debug('Done, result contains {0} objects'.format(str(len(x))))
