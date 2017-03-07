@@ -1,5 +1,5 @@
 import datetime
-from db import db_find, db_get, db_set
+from db import db_find, db_get, db_set, db_update
 from system import sizeof_fmt
 from traceback import format_exc
 from logmodule import logger
@@ -49,7 +49,7 @@ def processing_statistics_route_per_today(target_stat, result, date):
             b = [Stat(i) for i in result.get('stat')]
             c = [i+j for i in a for j in b if str(i['ip']) == str(j['ip'])]
             result = {'stat': c, 'time': date, 'inter': 'day'}
-            db_set(result, target=target_stat)
+            db_update(result, target=target_stat, fild={'time': date})
     except Exception as err:
         logger.error('Fail processing generate statistics from router base per day. Error : {0}'.format(str(err)))
         logger.error('Trace: {0}'.format(str(format_exc())))
