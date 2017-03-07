@@ -37,10 +37,12 @@ def main(target_dhcp, target_stat):
         logger.error('Trace: {0}'.format(str(format_exc())))
 
 def processing_statistics_route_per_today(target_stat, result, date):
+    logger.info('Start sum day stat')
     try:
         x = db_get(tuple(date), target=target_stat, fild='time')
         if not x:
             result['inter'] = 'day'
+            result['time'] = tuple(date)
             db_set(result, target=target_stat)
         else:
             a = [Stat(i) for i in x.get('stat')]
