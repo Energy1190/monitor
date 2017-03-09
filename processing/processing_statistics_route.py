@@ -38,6 +38,8 @@ def main(target_dhcp, target_stat):
 
 def processing_statistics_route_per_today(target_stat, result, date):
     logger.info('Start sum day stat')
+    logger.debug('Date is {0}'.format(str(tuple(date))))
+    logger.debug('Result is {0}'.format(str(result)))
     try:
         x = db_get(tuple(date), target=target_stat, fild='time')
         if not x:
@@ -49,7 +51,9 @@ def processing_statistics_route_per_today(target_stat, result, date):
             b = [Stat(i) for i in result.get('stat')]
             c = [i+j for i in a for j in b if str(i['ip']) == str(j['ip'])]
             result = {'stat': c, 'time': date, 'inter': 'day'}
+            logger.debug('SUM is {0}'.format(str(c)))
             db_update(result, target=target_stat, fild={'time': date})
+        logger.debug('End get is {0}'.format(str(db_get(tuple(date), target=target_stat, fild='time'))))
     except Exception as err:
         logger.error('Fail processing generate statistics from router base per day. Error : {0}'.format(str(err)))
         logger.error('Trace: {0}'.format(str(format_exc())))
