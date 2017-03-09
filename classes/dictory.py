@@ -40,13 +40,11 @@ class Stat(Dictory):
                     else:
                         self.trg['olduser'] = [{self.trg['user']: other['time']}]
                     self.trg['user'] = other['user']
-                if self.trg['data'].get('in_bytes') and self.trg['data'].get('out_bytes'):
-                    logger.debug('Vars - self: {0} and  over: {1}'.format(str(self.trg['data']['in_bytes']), str(other['data'].get('in_bytes'))))
+                if 'in_bytes' in list(self.trg['data']) and 'out_bytes' in list(self.trg['data']):
                     self.trg['data']['in_bytes'] = int(self.trg['data']['in_bytes']) + int(other['data'].get('in_bytes') or 0)
                     self.trg['data']['out_bytes'] = int(self.trg['data']['out_bytes']) + int(other['data'].get('out_bytes') or 0)
                     self.trg['data']['in'] = self.sizeof_fmt(self.trg['data']['in_bytes'])
                     self.trg['data']['out'] = self.sizeof_fmt(self.trg['data']['out_bytes'])
-                    logger.debug('End vars {0} and {1}'.format(str(self.trg['data']['in_bytes']), str(self.trg['data']['out_bytes'])))
                 return self.trg
         except:
             logger.error('Fail sum Statistics.')
