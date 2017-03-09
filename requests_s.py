@@ -26,6 +26,18 @@ class Base():
         self.old = []
         self.dicts = {}
         self.dst = target
+        if trg.get('Key'):
+            self.key = base64.b64decode(trg['Key'])
+        if trg.get('Body'):
+            self.body = trg['Body']
+
+    def remove_end(self, x):
+        for i in range(100):
+            try:
+                return json.loads(str(self.decrypt(x)[:-i], 'utf-8'))
+            except:
+                pass
+        return False
 
     def encrypt( self, raw ):
         """
@@ -68,7 +80,8 @@ class Base():
             self.dicts['second'] = self.time.second
 
     def set_dict(self):
-        self.dicts = {i: self.__dict__[i] for i in self.__dict__ if i != 'dicts' and i != 'message' and i != 'dst'}
+        exeption = ['dicts', 'message', 'dst', 'Key', 'Body', 'Targets', 'Crypt']
+        self.dicts = {i: self.__dict__[i] for i in self.__dict__ if i not in exeption}
 
     def delete(self, trg, target=None):
         if target:
@@ -159,20 +172,9 @@ class Dhcp(Base):
     """
     def __init__(self, trg, target=None):
         Base.__init__(self, trg, target=target)
-        self.key = base64.b64decode(trg['Key'])
-        self.body = trg['Body']
-        self.dhcpinfo = self.remove_end(self.body)
         self.timeinfo = time.gmtime((return_nub(self.dhcpinfo["Timeinfo"]) + 10800000)/1000.)
         self.dhcpinfo = self.dhcpinfo["Dhcpinfo"]
         self.dhcpinfo = self.generate_dict(self.dhcpinfo)
-
-    def remove_end(self, x):
-        for i in range(100):
-            try:
-                return json.loads(str(self.decrypt(x)[:-i], 'utf-8'))
-            except:
-                pass
-        return False
 
     def check_time(self, x):
         if x:
@@ -420,11 +422,17 @@ def get_database_incoming(target, status=None):
     else:
         return db_get(None, target=target, fild=None)
 
+def decrypt_str(t):
+    d = t.get('Targets')
+    return [Base(t).remove_end(t), d]
+
 def processing_incoming_json(target, out_target_users, out_target_comps, dhcp_target):
     t = get_database_incoming(target, status='New')
     if t:
         try:
-            if 'Version' in list(t):
+            if 'Crypt' in list(t) and t['Crypt'] == 'true':
+                t, d = decrypt_str(t)
+            if 'Version' in list(t) or d == 'report':
                 if int(t['Version']) > 2:
                     x = Comp(t, target=out_target_comps)
                     y = x.get_dsttrg(t['Userinfo']['Computername'], 'computername')
@@ -441,7 +449,7 @@ def processing_incoming_json(target, out_target_users, out_target_comps, dhcp_ta
                 else:
                     x.set(x.dicts)
                 x.delete(t, target=target)
-            elif 'Key' in list(t):
+            elif d == 'dhcp':
                     x = Dhcp(t, target=dhcp_target)
                     x.set_dict()
                     for i in x.dicts['dhcpinfo']:
