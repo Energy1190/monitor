@@ -7,10 +7,11 @@ from requests_s import Statistic
 from reguests_db import get_route_info_database
 from classes.dictory import Stat
 
-def main(target_dhcp, target_stat, times=(datetime.datetime.now() + datetime.timedelta(hours=2)).timetuple()[0:4],
-         date=(datetime.datetime.now() + datetime.timedelta(hours=3)).timetuple()[0:3]):
+def main(target_dhcp, target_stat, times=None, date=(datetime.datetime.now() + datetime.timedelta(hours=3)).timetuple()[0:3]):
+    if not times:
+        times=(datetime.datetime.now() + datetime.timedelta(hours=2)).timetuple()[0:4]
     try:
-        logger.info('Start generate statistics from router base per {0}'.format((datetime.datetime.now() + datetime.timedelta(hours=2))))
+        logger.info('Start generate statistics from router base per {0}'.format(str(times)))
         x = db_find(target=target_dhcp, limit=1000)
         logger.debug('Get data from collection {0}. Example data: \n {1}'.format(target_dhcp, x[0]))
         r = []
