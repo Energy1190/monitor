@@ -35,6 +35,7 @@ class Base():
     def remove_end(self, x):
         for i in range(100):
             try:
+                logger.debug(str(self.decrypt(x)[:-i], 'utf-8'))
                 return json.loads(str(self.decrypt(x)[:-i], 'utf-8'))
             except:
                 pass
@@ -429,6 +430,7 @@ def decrypt_str(t):
 
 def processing_incoming_json(target, out_target_users, out_target_comps, dhcp_target):
     t = get_database_incoming(target, status='New')
+    incoming = t
     if t:
         try:
             if 'Crypt' in list(t) and t['Crypt'] == 'true':
@@ -464,7 +466,7 @@ def processing_incoming_json(target, out_target_users, out_target_comps, dhcp_ta
         except Exception as err:
             error_log_write(t, err=err)
             send_mail(str(t), host='local error')
-            db_del(t, target=target)
+            db_del(incoming, target=target)
 
 if __name__ == '__main__':
     pass
