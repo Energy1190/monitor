@@ -36,7 +36,7 @@ def main(target_dhcp, target_stat, times=(datetime.datetime.now() + datetime.tim
         logger.error('Fail processing generate statistics from router base per {0}. Error : {1}'.format(datetime.datetime.now() + datetime.timedelta(hours=2), str(err)))
         logger.error('Trace: {0}'.format(str(format_exc())))
 
-def processing_statistics_route_per_day(target_dhcp, target_stat, result, date):
+def processing_statistics_route_per_day(target_dhcp, target_stat, result, date, times):
     logger.info('Start sum day stat')
     logger.debug('Date is {0}'.format(str(tuple(date))))
     logger.debug('Result is {0}'.format(str(result)))
@@ -53,16 +53,17 @@ def processing_statistics_route_per_day(target_dhcp, target_stat, result, date):
             result = {'stat': c, 'time': date, 'inter': 'day'}
             logger.debug('SUM is {0}'.format(str(c)))
             db_update(result, target=target_stat, fild={'time': date})
-        check_empty_hours(target_dhcp, target_stat, date)
+        check_empty_hours(target_dhcp, target_stat, date, times)
         logger.debug('End get is {0}'.format(str(db_get(tuple(date), target=target_stat, fild='time'))))
     except Exception as err:
         logger.error('Fail processing generate statistics from router base per day. Error : {0}'.format(str(err)))
         logger.error('Trace: {0}'.format(str(format_exc())))
 
-def check_empty_hours(target_dhcp, target_stat, date):
+def check_empty_hours(target_dhcp, target_stat, date, times):
     x = list(date)
+    y = list(times)
     x.append(0)
-    for i in range(0, 23):
+    for i in range(0, int(y[3])):
         x[3] = i
         y = db_get(tuple(x), target=target_stat, fild='time')
         if not y:
