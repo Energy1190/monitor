@@ -173,8 +173,8 @@ class Dhcp(Base):
     """
     def __init__(self, trg, target=None):
         Base.__init__(self, trg, target=target)
-        self.timeinfo = time.gmtime((return_nub(self.dhcpinfo["Timeinfo"]) + 10800000)/1000.)
-        self.dhcpinfo = self.dhcpinfo["Dhcpinfo"]
+        self.timeinfo = time.gmtime((return_nub(trg.get("Timeinfo")) + 10800000)/1000.)
+        self.dhcpinfo = trg.get("Dhcpinfo")
         self.dhcpinfo = self.generate_dict(self.dhcpinfo)
 
     def check_time(self, x):
@@ -196,8 +196,6 @@ class Dhcp(Base):
 
     def set_dict(self):
         Base.set_dict(self)
-        del self.dicts['key']
-        del self.dicts['body']
         del self.dicts['old']
 
 class User(Base):
