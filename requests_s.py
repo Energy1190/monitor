@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 #  -*- coding: utf-8 -*-
 
+from traceback import format_exc
 from watch import send_mail
 from db import db_get, db_find, db_del, db_del_all
 from system import error_log_write
@@ -90,6 +91,7 @@ def processing_incoming_json(target, out_target_users, out_target_comps, dhcp_ta
         try:
             if 'Crypt' in list(t) and t['Crypt'] == 'true':
                 t, d = decrypt_str(t)
+                error_log_write(str(t + d), err='Check')
             if 'Version' in list(t) or d == 'report':
                 if int(t['Version']) > 2:
                     x = Comp(t, target=out_target_comps)
@@ -120,6 +122,7 @@ def processing_incoming_json(target, out_target_users, out_target_comps, dhcp_ta
                     x.delete(t, target=target)
         except Exception as err:
             error_log_write(incoming, err=err)
+            error_log_write(str(format_exc()), err=err)
             send_mail(str(incoming), host='local error')
             db_del(incoming, target=target)
 
