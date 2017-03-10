@@ -16,7 +16,7 @@ class Database():
             self.dicts = {self.fild: self.fild_var}
         elif self.id and not self.dicts:
             self.dicts = {'_id': self.id}
-        if '_id' in dicts:
+        if dicts and '_id' in dicts:
             del self.dicts['_id']
 
     def _db_path(self, target=None):
