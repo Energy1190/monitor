@@ -31,7 +31,7 @@ def main(target_dhcp, target_stat, times=(datetime.datetime.now() + datetime.tim
         y.set(results)
         logger.debug('Successful set result in {0}'.format(target_stat))
         logger.info('Successful end generate statistics from router base per {0}'.format((datetime.datetime.now() + datetime.timedelta(hours=2))))
-        processing_statistics_route_per_day(target_dhcp, target_stat, results, date)
+        processing_statistics_route_per_day(target_dhcp, target_stat, results, date, times)
     except Exception as err:
         logger.error('Fail processing generate statistics from router base per {0}. Error : {1}'.format(datetime.datetime.now() + datetime.timedelta(hours=2), str(err)))
         logger.error('Trace: {0}'.format(str(format_exc())))

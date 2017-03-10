@@ -35,7 +35,6 @@ class Base():
     def remove_end(self, x):
         for i in range(100):
             try:
-                logger.debug(str(self.decrypt(x)[:-i], 'utf-8'))
                 return json.loads(str(self.decrypt(x)[:-i], 'utf-8'))
             except:
                 pass
@@ -426,7 +425,7 @@ def get_database_incoming(target, status=None):
 
 def decrypt_str(t):
     d = t.get('Targets')
-    return [Base(t).remove_end(t), d]
+    return [Base(t).remove_end(t.get('Body')), d]
 
 def processing_incoming_json(target, out_target_users, out_target_comps, dhcp_target):
     t = get_database_incoming(target, status='New')
