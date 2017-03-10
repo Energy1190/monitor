@@ -1,15 +1,15 @@
 import datetime
 from db import db_find, db_get, db_set, db_update
-from system import sizeof_fmt
 from traceback import format_exc
 from logmodule import logger
-from requests_s import Statistic
 from reguests_db import get_route_info_database
-from classes.dictory import Stat
-
-def main(target_dhcp, target_stat, times=None, date=(datetime.datetime.now() + datetime.timedelta(hours=3)).timetuple()[0:3]):
+from classes.route import Stat
+from classes.db_mongo import Database
+def main(target_dhcp, target_stat, times=None, date=None):
     if not times:
         times=(datetime.datetime.now() + datetime.timedelta(hours=2)).timetuple()[0:4]
+    if not date:
+        date=(datetime.datetime.now() + datetime.timedelta(hours=3)).timetuple()[0:3]
     try:
         logger.info('Start generate statistics from router base per {0}'.format(str(times)))
         x = db_find(target=target_dhcp, limit=1000)
@@ -24,12 +24,11 @@ def main(target_dhcp, target_stat, times=None, date=(datetime.datetime.now() + d
         for i in x:
             logger.debug('Start generate statistics for {0}'.format(i['ip']))
             dx['connsrcip'] = i['ip']
-            y = Statistic(get_route_info_database(**dx), i['ip'], i['name'], target=target_stat)
-            y.set_dict()
-            r.append(y.dicts)
+            y = Stat(get_route_info_database(**dx), i['ip'], i['name'], ['clients','users'])
+            r.append(y.trg)
         logger.debug('Complete generate result. Example data: \n {0}'.format(r[0]))
         results = {'stat': r, 'time': dx['start_time'], 'inter': 'hour'}
-        y.set(results)
+        Database(target=target_stat).set(results)
         logger.debug('Successful set result in {0}'.format(target_stat))
         logger.info('Successful end generate statistics from router base per {0}'.format((datetime.datetime.now() + datetime.timedelta(hours=2))))
         processing_statistics_route_per_day(target_dhcp, target_stat, results, date, times)

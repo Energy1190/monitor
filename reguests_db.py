@@ -2,7 +2,7 @@ from db import db_find
 from traceback import format_exc
 from logmodule import logger
 import datetime
-import time
+
 
 def get_time_tuple(time_str):
     try:

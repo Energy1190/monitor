@@ -2,7 +2,7 @@ import pymongo
 from bson.objectid import ObjectId
 
 class Database():
-    def __init_(self, target, dicts=None, fild=None, fild_var=None, id=None, limit=100000,
+    def __init__(self, target=None, dicts=None, fild=None, fild_var=None, id=None, limit=100000,
                 client=('mongoDB', 27017)):
         self.db = pymongo.MongoClient(*client)
         self.target = target
@@ -16,7 +16,8 @@ class Database():
             self.dicts = {self.fild: self.fild_var}
         elif self.id and not self.dicts:
             self.dicts = {'_id': self.id}
-
+        if '_id' in dicts:
+            del self.dicts['_id']
 
     def _db_path(self, target=None):
         if target:
@@ -32,8 +33,11 @@ class Database():
             except:
                 return ObjectId(str(num))
 
-    def set(self):
-        return self.path.save(self.dicts)
+    def set(self, x, path=None):
+        if path:
+            return self._db_path(target=path).save(x)
+        else:
+            return self.path.save(x)
 
     def get(self):
         if self.dicts:
@@ -52,3 +56,9 @@ class Database():
 
     def delete_all(self):
         return self.path.delete_many()
+
+    def update(self, x, path=None):
+        if path:
+            return self._db_path(target=path).replace_one(self.dicts, x)
+        else:
+            return self.path.replace_one(self.dicts, x)

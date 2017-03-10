@@ -1,5 +1,6 @@
 from traceback import format_exc
-from requests_s import Route, get_database_incoming
+from requests_s import get_database_incoming
+from classes.route import Route
 from logmodule import logger
 
 def main(target, out_target):
