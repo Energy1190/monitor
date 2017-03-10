@@ -464,8 +464,8 @@ def processing_incoming_json(target, out_target_users, out_target_comps, dhcp_ta
                             x.set(i)
                     x.delete(t, target=target)
         except Exception as err:
-            error_log_write(t, err=err)
-            send_mail(str(t), host='local error')
+            error_log_write(incoming, err=err)
+            send_mail(str(incoming), host='local error')
             db_del(incoming, target=target)
 
 if __name__ == '__main__':
