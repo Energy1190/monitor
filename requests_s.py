@@ -26,10 +26,11 @@ class Base():
         self.old = []
         self.dicts = {}
         self.dst = target
-        if trg.get('Key'):
-            self.key = base64.b64decode(trg['Key'])
-        if trg.get('Body'):
-            self.body = trg['Body']
+        if type(trg) == dict:
+            if trg.get('Key'):
+                self.key = base64.b64decode(trg['Key'])
+            if trg.get('Body'):
+                self.body = trg['Body']
 
     def remove_end(self, x):
         for i in range(100):

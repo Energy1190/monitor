@@ -66,7 +66,7 @@ $encryptedString = Encrypt-String $key $JSON
 $hash2 = @{ Body = $encryptedString;
             Key = $key;
             Targets = 'dhcp';
-            Crypt = 'false'
+            Crypt = 'true'
             }
 $JSON2 = $hash2 | ConvertTo-Json -Depth 25 -Compress
 Invoke-RestMethod -uri $url -Method POST -Body $JSON2 -ContentType 'application/json'
