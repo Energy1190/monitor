@@ -47,8 +47,8 @@ def processing_statistics_route_per_day(target_dhcp, target_stat, result, date, 
             result['time'] = tuple(date)
             db_set(result, target=target_stat)
         else:
-            a = [Stat(i) for i in x.get('stat')]
-            b = [Stat(i) for i in result.get('stat')]
+            a = [Stat(dicts=i) for i in x.get('stat')]
+            b = [Stat(dicts=i) for i in result.get('stat')]
             c = [i+j for i in a for j in b if str(i['ip']) == str(j['ip'])]
             result = {'stat': c, 'time': date, 'inter': 'day'}
             logger.debug('SUM is {0}'.format(str(c)))
