@@ -1,5 +1,5 @@
 from traceback import format_exc
-from classes.route import Vals
+from classes.vals import Vals
 from db import db_find
 from logmodule import logger
 
