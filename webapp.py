@@ -10,6 +10,7 @@ from reguests_db import get_route_info_database
 from configuration import validate_yaml
 from classes.finder import Router
 from logmodule import logger
+from web.auth import auth
 from processing.processing_incoming_json import main as processing_incoming_json
 
 app = Flask(__name__)
@@ -67,6 +68,7 @@ def hello():
     return render_template('index.html', time=(datetime.datetime.now() + datetime.timedelta(hours=3)).timetuple())
 
 @app.route("/config", methods=['POST', 'GET'])
+@auth
 def config():
     path = '/data/config/conf.yaml'
     path_t = '/data/config/conf.tmp'
@@ -85,12 +87,14 @@ def config():
     return render_template('config.html', conf=conf, valid=valid, time=(datetime.datetime.now() + datetime.timedelta(hours=3)).timetuple())
 
 @app.route("/requests/<f_name>/<name>", methods=['GET'])
+@auth
 def requests_a(f_name, name):
     args_r = {i: request.args.get(i) for i in list(request.args)}
     database_json = db_find(args_r, target=[f_name, name])
     return render_template('requests_route.html', data=database_json, time=(datetime.datetime.now() + datetime.timedelta(hours=3)).timetuple())
 
 @app.route("/requests/get", methods=['GET'])
+@auth
 def requests_g():
     args_r = {i: request.args.get(i) for i in list(request.args)}
     if 'limited' not in args_r.keys():
@@ -99,6 +103,7 @@ def requests_g():
     return jsonify(result=database_json)
 
 @app.route("/<name>", methods=['GET'])
+@auth
 def users_p(name):
     names = False
     users = False
@@ -123,6 +128,7 @@ def users_p(name):
         return "Not Found 404", 404
 
 @app.route("/finder/<name>", methods=['GET'])
+@auth
 def form_finder_b(name):
     args_r = {i: request.args.get(i) for i in list(request.args)}
     if 'limited' not in args_r.keys():
