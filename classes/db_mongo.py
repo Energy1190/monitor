@@ -7,7 +7,7 @@ class Database():
         self.db = pymongo.MongoClient(*client)
         self.target = target
         self.path = self._db_path(self.target)
-        self.dicts=dicts
+        self.dicts=dict(dicts)
         self.fild=fild
         self.fild_var=fild_var
         self.id = self._id_test(id)
@@ -33,7 +33,13 @@ class Database():
             except:
                 return ObjectId(str(num))
 
+    def change(self, **kvargs):
+        for i in kvargs:
+            if i in self.__dict__:
+                self.__dict__[i] = kvargs[i]
+
     def set(self, x, path=None):
+        x = dict(x)
         if path:
             return self._db_path(target=path).save(x)
         else:
@@ -58,6 +64,7 @@ class Database():
         return self.path.delete_many()
 
     def update(self, x, path=None):
+        x = dict(x)
         if path:
             return self._db_path(target=path).replace_one(self.dicts, x)
         else:

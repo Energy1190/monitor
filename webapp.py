@@ -6,11 +6,11 @@ import datetime
 from shutil import copyfile
 from flask import Flask, request, render_template, jsonify
 from db import db_set, db_find, db_get
-from requests_s import processing_incoming_json
 from reguests_db import get_route_info_database
 from configuration import validate_yaml
 from classes.finder import Router
 from logmodule import logger
+from processing.processing_incoming_json import main as processing_incoming_json
 
 app = Flask(__name__)
 

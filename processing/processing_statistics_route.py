@@ -5,7 +5,63 @@ from logmodule import logger
 from reguests_db import get_route_info_database
 from classes.route import Stat
 from classes.db_mongo import Database
-def main(target_dhcp, target_stat, times=None, date=None):
+
+class Statistics():
+    def __init__(self, target, target_stat, times=None, date=None, **kvargs):
+        self.dx = kvargs
+        logger.debug('Incomig dict {0}'.format(str(self.dx)))
+        self.result = []
+        self.times = (times or (datetime.datetime.now() + datetime.timedelta(hours=2)).timetuple()[0:4])
+        self.date = (date or (datetime.datetime.now() + datetime.timedelta(hours=2)).timetuple()[0:3])
+        self.iplist = Database(target=target)
+        self.body = {'stat': self.result, 'time': times, 'inter': 'hour'}
+        self.daystat = Database(target=target_stat)
+        self.dx['start_time'] = (kvargs.get('start_time') or times)
+        self.dx['end_time'] = (kvargs.get('end_time') or times)
+
+    def set(self):
+        self.daystat.set(self.body)
+
+    def set_day(self, x):
+        self.daystat.change(fild='time', fild_var=self.date)
+        self.daystat.update(x)
+
+    def generate(self):
+        for i in self.iplist.find():
+            self.dx['connsrcip'] = i['ip']
+            y = Stat(get_route_info_database(**self.dx), i['ip'], i['name'], ['clients','users'])
+            self.result.append(y.trg)
+
+    def per_day(self):
+        self.daystat.change(fild='time', fild_var=self.date)
+        x = self.daystat.find()
+        if x:
+            a = [Stat(dicts=i) for i in x.get('stat')]
+            b = [Stat(dicts=i) for i in self.body.get('stat')]
+            c = [i + j for i in a for j in b if str(i['ip']) == str(j['ip'])]
+            return {'stat': c, 'time': self.date, 'inter': 'day'}
+        else:
+            self.body['time'] = self.date
+            self.body['inter'] = 'day'
+            return False
+
+def main(target_dhcp, target_stat):
+    try:
+        x = Statistics(target_dhcp, target_stat, conndestif='wan1', connrecvif='lan')
+        x.generate()
+        x.set()
+        y = x.per_day()
+        if y:
+            x.set_day(y)
+        else:
+            x.set()
+        check_empty_hours(target_dhcp, target_stat, x.date, x.times)
+    except Exception as err:
+        logger.error('Fail processing generate statistics from router base per {0}. Error : {1}'.format(
+            datetime.datetime.now() + datetime.timedelta(hours=2), str(err)))
+        logger.error('Trace: {0}'.format(str(format_exc())))
+
+def main_old(target_dhcp, target_stat, times=None, date=None):
     if not times:
         times=(datetime.datetime.now() + datetime.timedelta(hours=2)).timetuple()[0:4]
     if not date:

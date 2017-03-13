@@ -84,47 +84,5 @@ def decrypt_str(t):
     d = t.get('Targets')
     return [Base(t).remove_end(t.get('Body')), d]
 
-def processing_incoming_json(target, out_target_users, out_target_comps, dhcp_target):
-    t = get_database_incoming(target, status='New')
-    incoming = t
-    if t:
-        try:
-            if 'Crypt' in list(t) and t['Crypt'] == 'true':
-                t, d = decrypt_str(t)
-                error_log_write(str(t + d), err='Check')
-            if 'Version' in list(t) or d == 'report':
-                if int(t['Version']) > 2:
-                    x = Comp(t, target=out_target_comps)
-                    y = x.get_dsttrg(t['Userinfo']['Computername'], 'computername')
-                    if y:
-                        x.check_dict(y)
-                        x.update(dsttrg=y)
-                    else:
-                        x.set(x.dicts)
-                x = User(t, target=out_target_users)
-                y = x.get_dsttrg(t['Userinfo']['Username'], 'username')
-                if y:
-                    x.check_dict(y)
-                    x.update(dsttrg=y)
-                else:
-                    x.set(x.dicts)
-                x.delete(t, target=target)
-            elif d == 'dhcp':
-                    x = Dhcp(t, target=dhcp_target)
-                    x.set_dict()
-                    for i in x.dicts['dhcpinfo']:
-                        y = x.get_dsttrg(i['name'], 'name')
-                        if y:
-                            if str(y['ip']) != str(i['ip']):
-                                x.update(srctrg=i, dsttrg=y)
-                        else:
-                            x.set(i)
-                    x.delete(t, target=target)
-        except Exception as err:
-            error_log_write(incoming, err=err)
-            error_log_write(str(format_exc()), err=err)
-            send_mail(str(incoming), host='local error')
-            db_del(incoming, target=target)
-
 if __name__ == '__main__':
     pass
