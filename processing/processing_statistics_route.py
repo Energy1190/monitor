@@ -34,7 +34,7 @@ class Statistics():
 
     def per_day(self):
         self.daystat.change(fild='time', fild_var=self.date)
-        x = self.daystat.find()
+        x = dict(self.daystat.get())
         if x:
             a = [Stat(dicts=i) for i in x.get('stat')]
             b = [Stat(dicts=i) for i in self.body.get('stat')]
@@ -46,6 +46,7 @@ class Statistics():
             return False
 
 def main(target_dhcp, target_stat):
+    logger.info(logger.info('Start generate statistics from router base per hour'))
     try:
         x = Statistics(target_dhcp, target_stat, conndestif='wan1', connrecvif='lan')
         x.generate()

@@ -132,27 +132,5 @@ class Route(Base):
         else:
             return False
 
-class Vals(Base):
-    def __init__(self, trg, target=None):
-        Base.__init__(self, trg, target=target)
-        self.exeption = ['_id', 'origsent', 'termsent', 'time', 'year', 'month', 'day', 'hour', 'min', 'second']
-        self.set_dict()
-        if trg:
-            for i in trg:
-                if i not in self.exeption:
-                    self.dicts[i] = trg[i]
-                    x = self.get_dsttrg(src=i, fild='name')
-                    if x and not x['vals'].count(str(self.dicts[i])):
-                        y = x['vals']
-                        y.append(str(self.dicts[i]))
-                        self.update(dsttrg={'name': i}, srctrg={'name': i, 'vals': y}, target=target)
-                    elif not x:
-                        y = {'name': i, 'vals': []}
-                        y['vals'].append(str(self.dicts[i]))
-                        self.set(y, target=target)
 
-    def set_dict(self):
-        Base.set_dict(self)
-        del self.dicts['old']
-        del self.dicts['exeption']
 

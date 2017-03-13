@@ -12,12 +12,11 @@ class Database():
         self.fild_var=fild_var
         self.id = self._id_test(id)
         self.limit = limit
+        self._id_del()
         if self.fild and self.fild_var and not self.dicts:
             self.dicts = {self.fild: self.fild_var}
         elif self.id and not self.dicts:
             self.dicts = {'_id': self.id}
-        if dicts and '_id' in dicts:
-            del self.dicts['_id']
 
     def _db_path(self, target=None):
         if target:
@@ -25,6 +24,10 @@ class Database():
                 return self.db[target[0]]
             elif len(target) == 2:
                 return self.db[target[0]][target[1]]
+
+    def _id_del(self):
+        if self.dicts and '_id' in self.dicts:
+            del self.dicts['_id']
 
     def _id_test(self, num):
         if num:
@@ -37,6 +40,7 @@ class Database():
         for i in kvargs:
             if i in self.__dict__:
                 self.__dict__[i] = kvargs[i]
+        self._id_del()
 
     def set(self, x, path=None):
         x = dict(x)
