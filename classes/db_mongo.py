@@ -7,7 +7,7 @@ class Database():
         self.db = pymongo.MongoClient(*client)
         self.target = target
         self.path = self._db_path(self.target)
-        self.dicts=dict(dicts)
+        self.dicts=(dicts and dict(dicts))
         self.fild=fild
         self.fild_var=fild_var
         self.id = self._id_test(id)
