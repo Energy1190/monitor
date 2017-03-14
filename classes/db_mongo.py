@@ -31,9 +31,11 @@ class Database():
                 return self.db[target[0]][target[1]]
 
     def _id_del(self, x):
-        logger.debug('Object st {0} as type {1}'.format(str(x), type(x)))
         if x and '_id' in x:
             del x['_id']
+        if type(x) != dict:
+            logger.debug('Object st {0} as type {1}'.format(str(x), type(x)))
+        return x
 
     def _id_test(self, num):
         if num:
