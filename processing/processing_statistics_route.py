@@ -30,7 +30,7 @@ class Statistics():
         for i in self.iplist.find():
             self.dx['connsrcip'] = i['ip']
             y = Stat(get_route_info_database(**self.dx), i['ip'], i['name'], ['clients','users'])
-            self.result.append(y.trg)
+            self.result.append(dict(y))
 
     def per_day(self):
         self.daystat.change(fild='time', fild_var=self.date)

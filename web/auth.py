@@ -1,10 +1,14 @@
 from functools import wraps
-from flask import request, Response
+from flask import request, Response, session
+
+logins = [{'name': 'admin', 'pass': 'secret'}]
 
 def check_auth(username, password):
-    user = 'admin'
-    pasw = 'secret'
-    return username == user and password == pasw
+    for i in logins:
+        if i['name'] == username:
+            if i['pass'] == password:
+                return True
+    return False
 
 def fail_auth():
     return Response('Could not verify your access level for that URL.\n'
@@ -17,5 +21,6 @@ def auth(func):
         x = request.authorization
         if not x or not check_auth(x.username, x.password):
             return fail_auth()
+        session['username'] = x.username
         return func(*args, **kwargs)
     return decorator
