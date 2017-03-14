@@ -45,10 +45,10 @@ class Statistics():
             self.body['inter'] = 'day'
             return False
 
-def main(target_dhcp, target_stat):
+def main(target_dhcp, target_stat, times=None, date=None):
     logger.info(logger.info('Start generate statistics from router base per hour'))
     try:
-        x = Statistics(target_dhcp, target_stat, conndestif='wan1', connrecvif='lan')
+        x = Statistics(target_dhcp, target_stat, times=times, date=date, conndestif='wan1', connrecvif='lan')
         x.generate()
         x.set()
         y = x.per_day()

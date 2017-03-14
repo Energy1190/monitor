@@ -16,6 +16,7 @@ from processing.processing_incoming_json import main as processing_incoming_json
 
 def application():
     app.debug = True
+    app.secret_key = 'not-secret-key'
     app.run(port=5000, host='0.0.0.0')
 
 def daemon():
