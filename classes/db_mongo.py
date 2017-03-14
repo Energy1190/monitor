@@ -14,7 +14,6 @@ class Database():
         self.limit = limit
         self._id_del()
         self._check_fild()
-        self._try_dict()
         if self.id and not self.dicts:
             self.dicts = {'_id': self.id}
 
