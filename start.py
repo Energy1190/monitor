@@ -5,7 +5,7 @@ import time
 import datetime
 from webapp import app
 from watch import watch_main
-from traceback import format_exc, print_stack
+from traceback import format_exc
 from logmodule import logger
 from system import detect_crit, write_pid, get_pid, detect_fail_pid
 from requests_s import check_base
@@ -15,7 +15,6 @@ from processing.processing_get_vals import main as processing_get_vals
 from processing.processing_incoming_json import main as processing_incoming_json
 
 def application():
-    print_stack()
     app.debug = True
     app.run(port=5000, host='0.0.0.0')
 
@@ -26,7 +25,6 @@ def critical_detect():
     detect_crit()
 
 def get_vals():
-    print_stack()
     while True:
         time_now = (datetime.datetime.now() + datetime.timedelta(hours=3))
         target_collection = 'base-{0}-{1}-{2}'.format(time_now.timetuple()[0],
@@ -36,7 +34,6 @@ def get_vals():
         time.sleep(4000)
 
 def processing_logs():
-    print_stack()
     try:
         while True:
             time_now = (datetime.datetime.now() + datetime.timedelta(hours=3))
@@ -53,7 +50,6 @@ def processing_logs():
         logger.critical(text)
 
 def edit_requests():
-    print_stack()
     try:
         while True:
             processing_incoming_json(['clients', 'json'], ['clients', 'users'], ['clients', 'comps'], ['clients', 'dhcp'])
@@ -66,7 +62,6 @@ def edit_requests():
         logger.critical(text)
 
 def get_dally_statistics():
-    print_stack()
     x = False
     try:
         while True:

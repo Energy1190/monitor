@@ -1,7 +1,5 @@
 import pymongo
-import traceback
 from bson.objectid import ObjectId
-from logmodule import logger
 
 class Database():
     def __init__(self, target=None, dicts=None, fild=None, fild_var=None, id=None, limit=100000,
@@ -36,9 +34,6 @@ class Database():
             del x['_id']
         if x and 'db' in x:
             del x['db']
-        if type(x) != dict:
-            logger.debug('Object st {0} as type {1}'.format(str(x), type(x)))
-            logger.debug('Trace: {0}'.format(str(traceback.extract_stack())))
         return x
 
     def _id_test(self, num):
