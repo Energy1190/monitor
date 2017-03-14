@@ -7,16 +7,21 @@ class Database():
         self.db = pymongo.MongoClient(*client)
         self.target = target
         self.path = self._db_path(self.target)
-        self.dicts=(dicts and dict(dicts))
+        self.dicts= dicts
         self.fild=fild
         self.fild_var=fild_var
         self.id = self._id_test(id)
         self.limit = limit
         self._id_del()
-        if self.fild and self.fild_var and not self.dicts:
-            self.dicts = {self.fild: self.fild_var}
-        elif self.id and not self.dicts:
+        self._check_fild()
+        self._try_dict()
+        if self.id and not self.dicts:
             self.dicts = {'_id': self.id}
+
+    def __setattr__(self, key, value):
+        if key == 'dicts' and value:
+            value = dict(value)
+        return object.__setattr__(self, key, value)
 
     def _db_path(self, target=None):
         if target:
@@ -36,10 +41,15 @@ class Database():
             except:
                 return ObjectId(str(num))
 
+    def _check_fild(self):
+        if self.fild and self.fild_var and not self.dicts:
+            self.dicts = {self.fild: self.fild_var}
+
     def change(self, **kvargs):
         for i in kvargs:
             if i in self.__dict__:
                 self.__dict__[i] = kvargs[i]
+        self._check_fild()
         self._id_del()
 
     def set(self, x, path=None):

@@ -13,7 +13,7 @@ def main(target, out_target_users, out_target_comps, dhcp_target):
         try:
             if 'Crypt' in list(t) and t['Crypt'] == 'true':
                 t, d = decrypt_str(t)
-                error_log_write(str(t + d), err='Check')
+                error_log_write(str(str(t) + str(d)), err='Check')
             if 'Version' in list(t) or d == 'report':
                 if int(t['Version']) > 2:
                     x = Comp(t, target=out_target_comps)
