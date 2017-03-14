@@ -34,7 +34,7 @@ class Statistics():
 
     def per_day(self):
         self.daystat.change(fild='time', fild_var=self.date)
-        x = dict(self.daystat.get())
+        x = self.daystat.get()
         if x:
             a = [Stat(dicts=i) for i in x.get('stat')]
             b = [Stat(dicts=i) for i in self.body.get('stat')]

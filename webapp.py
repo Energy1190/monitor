@@ -137,13 +137,5 @@ def form_finder_b(name):
     return render_template('finder.html', time=(datetime.datetime.now() + datetime.timedelta(hours=2)).timetuple(),
                            name=name, form_r=x)
 
-@app.route("/testus/test", methods=['GET'])
-@auth
-def testus():
-    print(str(session))
-    print(type(session))
-    print(dir(session))
-    print(help(session))
-    return str(session)
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
