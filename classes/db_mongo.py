@@ -31,6 +31,7 @@ class Database():
                 return self.db[target[0]][target[1]]
 
     def _id_del(self, x):
+        logger.debug('Object st {0} as type {1}'.format(str(x), type(x)))
         if x and '_id' in x:
             del x['_id']
 
@@ -54,11 +55,11 @@ class Database():
 
     def set(self, x, path=None):
         x = self._id_del(dict(x))
-        logger.debug('Object st {0} as type {1}'.format(str(x), type(x)))
-        if path:
-            return self._db_path(target=path).save(x)
-        else:
-            return self.path.save(x)
+        if x:
+            if path:
+                return self._db_path(target=path).save(x)
+            else:
+                return self.path.save(x)
 
     def get(self):
         if self.dicts:
