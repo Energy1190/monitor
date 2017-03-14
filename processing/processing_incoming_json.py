@@ -22,6 +22,7 @@ def main(target, out_target_users, out_target_comps, dhcp_target):
                         x.check_dict(y)
                         x.update(dsttrg=y)
                     else:
+                        logger.debug('Some error here {0} as type {1}'.format(str(x.dicts), type(x.dicts)))
                         x.set(x.dicts)
                 x = User(t, target=out_target_users)
                 y = x.get_dsttrg(t['Userinfo']['Username'], 'username')
