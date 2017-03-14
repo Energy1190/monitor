@@ -77,7 +77,7 @@ class Base():
             self.dicts['second'] = self.time.second
 
     def set_dict(self):
-        exeption = ['dicts', 'message', 'dst', 'Key', 'Body', 'Targets', 'Crypt', 'key', 'body']
+        exeption = ['dicts', 'message', 'dst', 'Key', 'Body', 'Targets', 'Crypt', 'key', 'body', 'db']
         self.dicts = {i: self.__dict__[i] for i in self.__dict__ if i not in exeption}
 
     def delete(self, trg, target=None):

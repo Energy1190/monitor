@@ -15,7 +15,7 @@ class Database():
         self.id = self._id_test(id)
         self.limit = limit
         self._check_fild()
-        self._id_del(self.dicts)
+        self._del(self.dicts)
         if self.id and not self.dicts:
             self.dicts = {'_id': self.id}
 
@@ -31,9 +31,11 @@ class Database():
             elif len(target) == 2:
                 return self.db[target[0]][target[1]]
 
-    def _id_del(self, x):
+    def _del(self, x):
         if x and '_id' in x:
             del x['_id']
+        if x and 'db' in x:
+            del x['db']
         if type(x) != dict:
             logger.debug('Object st {0} as type {1}'.format(str(x), type(x)))
             logger.debug('Trace: {0}'.format(str(traceback.extract_stack())))
@@ -55,10 +57,10 @@ class Database():
             if i in self.__dict__:
                 self.__dict__[i] = kvargs[i]
         self._check_fild()
-        self._id_del(self.dicts)
+        self._del(self.dicts)
 
     def set(self, x, path=None):
-        x = self._id_del(dict(x))
+        x = self._del(dict(x))
         if x:
             if path:
                 return self._db_path(target=path).save(x)
