@@ -1,5 +1,6 @@
 import pymongo
 from bson.objectid import ObjectId
+from logmodule import logger
 
 class Database():
     def __init__(self, target=None, dicts=None, fild=None, fild_var=None, id=None, limit=100000,
@@ -12,7 +13,7 @@ class Database():
         self.fild_var=fild_var
         self.id = self._id_test(id)
         self.limit = limit
-        self._id_del()
+        self._id_del(self.dicts)
         self._check_fild()
         if self.id and not self.dicts:
             self.dicts = {'_id': self.id}
@@ -29,9 +30,9 @@ class Database():
             elif len(target) == 2:
                 return self.db[target[0]][target[1]]
 
-    def _id_del(self):
-        if self.dicts and '_id' in self.dicts:
-            del self.dicts['_id']
+    def _id_del(self, x):
+        if x and '_id' in x:
+            del x['_id']
 
     def _id_test(self, num):
         if num:
@@ -49,10 +50,11 @@ class Database():
             if i in self.__dict__:
                 self.__dict__[i] = kvargs[i]
         self._check_fild()
-        self._id_del()
+        self._id_del(self.dicts)
 
     def set(self, x, path=None):
-        x = dict(x)
+        x = self._id_del(dict(x))
+        logger.debug('Object st {0} as type {1}'.format(str(x), type(x)))
         if path:
             return self._db_path(target=path).save(x)
         else:
