@@ -12,7 +12,7 @@ def get_ldap_info():
 def ldap_auth(username, password):
     server = ldap3.Server(get_ldap_info()[0]['server'])
     conn = ldap3.Connection(server, user=str(get_ldap_info()[0]['domain']+ '\\' + username), password=password, authentication=ldap3.NTLM)
-    return conn.bind()
+    return bool(conn.bind())
 
 def check_auth(username, password):
     for i in logins:

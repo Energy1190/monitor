@@ -25,7 +25,6 @@ class Stat(Dictory):
         return str(self.trg)
 
     def __getitem__(self, item):
-        print(item)
         return self.trg[item]
 
     def get(self, obj):
