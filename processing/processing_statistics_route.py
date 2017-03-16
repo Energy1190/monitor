@@ -16,8 +16,8 @@ class Statistics():
         self.iplist = Database(target=target)
         self.body = {'stat': self.result, 'time': times, 'inter': 'hour'}
         self.daystat = Database(target=target_stat)
-        self.dx['start_time'] = (kvargs.get('start_time') or times)
-        self.dx['end_time'] = (kvargs.get('end_time') or times)
+        self.dx['start_time'] = (kvargs.get('start_time') or times or self.times)
+        self.dx['end_time'] = (kvargs.get('end_time') or times or self.times)
 
     def set(self):
         logger.debug('Ad stat {0}'.format(str(self.body)))
