@@ -13,7 +13,6 @@ def main(target, out_target_users, out_target_comps, dhcp_target):
         try:
             if 'Crypt' in list(t) and t['Crypt'] == 'true':
                 t, d = decrypt_str(t)
-                error_log_write(str(str(t) + str(d)), err='Check')
             if 'Version' in list(t) or d == 'report':
                 if int(t['Version']) > 2:
                     x = Comp(t, target=out_target_comps)
@@ -25,7 +24,9 @@ def main(target, out_target_users, out_target_comps, dhcp_target):
                         x.set(x.dicts)
                 x = User(t, target=out_target_users)
                 y = x.get_dsttrg(t['Userinfo']['Username'], 'username')
+                error_log_write(str(x), err=str('Check class'))
                 if y:
+                    error_log_write(str(y), err=str('Check base'))
                     x.check_dict(y)
                     x.update(dsttrg=y)
                 else:

@@ -11,10 +11,8 @@ def get_ldap_info():
     return [{'server': i['server'], 'domain': i['name']} for i in x]
 
 def ldap_auth(username, password):
-    logger.debug('Auth user - {0}, password - {1}'.format(str(username), str(password)))
-    logger.debug('As type {0} and {1}'.format(type(username), type(password)))
     server = ldap3.Server(get_ldap_info()[0]['server'])
-    conn = ldap3.Connection(server, user=str(get_ldap_info()[0]['domain']+ '\\' + username), password=password, authentication=ldap3.NTLM)
+    conn = ldap3.Connection(server, user=str(get_ldap_info()[0]['domain']+ '\\' + username), password=password)
     return bool(conn.bind())
 
 def check_auth(username, password):
