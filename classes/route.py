@@ -51,17 +51,11 @@ class Stat(Dictory):
         try:
             if str(self.trg['ip']) == str(other['ip']):
                 self.trg['counts'] = int(self.trg['counts']) + int(other['counts'])
-                if other.get('name') and self.trg.get('name') != other['name']:
-                    if self.trg.get('oldname'):
-                        self.trg['oldname'].append({self.trg['name']: other['time']})
-                    else:
-                        self.trg['oldname'] = [{self.trg['name']: other['time']}]
+                if other.get('name') and self.get('name') and self.trg.get('name') != other['name']:
+                    self.trg['oldname'] = [{self.trg['name']: other['time']}]
                     self.trg['name'] = other['name']
-                if other.get('user') and self.get('user') != other['user']:
-                    if self.trg.get('olduser'):
-                        self.trg['olduser'].append({self.trg['user']: other['time']})
-                    else:
-                        self.trg['olduser'] = [{self.trg['user']: other['time']}]
+                if other.get('user') and self.get('user') and self.get('user') != other['user']:
+                    self.trg['olduser'] = {self.trg['user']: other['time']}
                     self.trg['user'] = other['user']
                 if 'in_bytes' in list(self.trg['data']) and 'out_bytes' in list(self.trg['data']):
                     self.trg['data']['in_bytes'] = int(self.trg['data']['in_bytes']) + int(other['data'].get('in_bytes') or 0)
