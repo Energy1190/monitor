@@ -42,7 +42,7 @@ def main(target, out_target_users, out_target_comps, dhcp_target):
                                 x.update(srctrg=i, dsttrg=y)
                         else:
                             x.set(i)
-                    x.delete(t, target=target)
+                    x.delete(incoming, target=target)
                     Iptable(target=['systems', 'iptables'], names=out_target_comps, users=out_target_users)
         except Exception as err:
             logger.error('Error processing incoming json: {0}'.format(str(err)))

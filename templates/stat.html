@@ -20,8 +20,9 @@
             </tr>
             </thead>
             <tbody>
-        {% for i in data['stat'] %}
-            <tr>
+        {% for i in sorted(data['stat'], key=lambda x: x.get['level']) %}
+        {% if i.get('level') != 'zero' %}
+            <tr {% if i.get('level') %} class="{{ i['level'] }}"{% endif %}>
                 <td nowrap>{{ i['ip'] }}</td>
                 {% if names %}
                 <td nowrap>{% if i['name'] %}{{ i['name'] }}{% endif %}</td>
@@ -32,6 +33,7 @@
                 <td nowrap>{{ i['data']['in'] }}</td>
                 <td nowrap>{{ i['data']['out'] }}</td>
             </tr>
+        {% endif %}
         {% endfor %}
         </table>
     </div>

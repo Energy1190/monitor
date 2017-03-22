@@ -1,6 +1,7 @@
 import ipcalc
 from classes.base import Base
 from classes.db_mongo import Database
+from logmodule import logger
 
 class Iptable():
     def __init__(self, target=None, net=None, names=None, users=None):
@@ -37,7 +38,10 @@ class Iptable():
                         i['user'] = None
 
     def set_or_update(self):
+        logger.debug('Complete generate IPTABLE')
+        logger.debug('Object {0}'.format(str(self.iplist)))
         x = self.db.get()
+        logger.debug('Current object in basr is {0}'.format(str(x)))
         if self.db.get():
             self.db.change(dicts=x)
             self.db.update(self.iplist)

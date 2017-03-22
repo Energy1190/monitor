@@ -11,8 +11,10 @@ class Stat(Dictory):
     def __init__(self, *args, dicts=None):
         if dicts:
             self.trg = dicts
+            self.set_level()
         else:
             self.trg = self.generate_stat(*args)
+            self.set_level()
 
     def sizeof_fmt(self, num, suffix='B'):
         for unit in ['','Ki','Mi','Gi','Ti','Pi','Ei','Zi']:
@@ -20,6 +22,21 @@ class Stat(Dictory):
                 return "%3.1f%s%s" % (num, unit, suffix)
             num /= 1024.0
         return "%.1f%s%s" % (num, 'Yi', suffix)
+
+    def set_level(self):
+        x = int(self.trg['data']['in_bytes']) + int(self.trg['data']['out_bytes'])
+        if not x:
+            self.trg['level'] = 'zero'
+        elif x <= 1026:
+            self.trg['level'] = 'default'
+        elif x <= 1024000:
+            self.trg['level'] = 'active'
+        elif x <= 1024000000:
+            self.trg['level'] = 'info'
+        elif x <= 5120000000:
+            self.trg['level'] = 'warning'
+        elif x > 5120000000:
+            self.trg['level'] = 'danger'
 
     def __str__(self):
         return str(self.trg)
@@ -51,13 +68,14 @@ class Stat(Dictory):
                     self.trg['data']['out_bytes'] = int(self.trg['data']['out_bytes']) + int(other['data'].get('out_bytes') or 0)
                     self.trg['data']['in'] = self.sizeof_fmt(self.trg['data']['in_bytes'])
                     self.trg['data']['out'] = self.sizeof_fmt(self.trg['data']['out_bytes'])
+                self.set_level()
                 return self.trg
         except:
             logger.error('Fail sum Statistics.')
             logger.error(str(format_exc()))
 
     def get_user(self, name, target):
-        x = Database(dicts={'computername': name}, target=target).get()
+        x = Database(dicts={'computername': name.split(sep='.')[0]}, target=target).get()
         if x:
             return x['username']
         else:
@@ -75,7 +93,7 @@ class Stat(Dictory):
                 in_t += float(i['termsent'])
         return {'data': {'in': self.sizeof_fmt(in_t), 'out': self.sizeof_fmt(out_t), 'in_bytes': in_t, 'out_bytes': out_t},
                 'counts': counts, 'ip': ip, 'time': (datetime.datetime.now() + datetime.timedelta(hours=3)),
-                'name': self.get_user(name, target=target)}
+                'name': name, 'user': self.get_user(name, target=target)}
 
 class Route(Base):
     """ Класс обрабатывающий входящие сообщения с роутера. Согласно документации
