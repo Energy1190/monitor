@@ -10,10 +10,17 @@ def main():
         for i in list(t):
             x = []
             del i['_id']
-            for j in i['compslist']:
+            if i.get('copmslist'):
                 if j not in x:
                     x.append(j)
                 else:
                     print('Duplicate {0} in user {1}'.format(str(j), str(i['username'])))
-            i['compslist'] = x
+                i['compslist'] = x
+            if i.get('compslist'):
+                for j in i['compslist']:
+                    if j not in x:
+                        x.append(j)
+                    else:
+                        print('Duplicate {0} in user {1}'.format(str(j), str(i['username'])))
+                i['compslist'] = x
             Database(target=['clients','users'], fild='username', fild_var=i['username']).update(i)
