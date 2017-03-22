@@ -31,7 +31,7 @@ def main(target, out_target_users, out_target_comps, dhcp_target):
                     x.update(dsttrg=y)
                 else:
                     x.set(x.dicts)
-                x.delete(t, target=target)
+                x.delete(incoming, target=target)
             elif d == 'dhcp':
                     x = Dhcp(t, target=dhcp_target)
                     x.set_dict()
