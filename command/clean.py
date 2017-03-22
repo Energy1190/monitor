@@ -11,10 +11,11 @@ def main():
             x = []
             del i['_id']
             if i.get('copmslist'):
-                if j not in x:
-                    x.append(j)
-                else:
-                    print('Duplicate {0} in user {1}'.format(str(j), str(i['username'])))
+                for j in i['copmslist']:
+                    if j not in x:
+                        x.append(j)
+                    else:
+                        print('Duplicate {0} in user {1}'.format(str(j), str(i['username'])))
                 i['compslist'] = x
             if i.get('compslist'):
                 for j in i['compslist']:
