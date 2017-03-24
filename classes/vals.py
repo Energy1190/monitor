@@ -28,8 +28,10 @@ class Iptable():
                         i = {'name': None, 'ip': i}
 
     def get_users(self):
+        logger.debug('User generate for IPTABLE')
         if self.users:
             x = self.users.find()
+            logger.debug('Users base is {0}'.format(str(x)))
             for i in self.iplist:
                 for j in x:
                     if str(i).split(sep='.')[0] == str(j['computername']):
@@ -41,8 +43,8 @@ class Iptable():
         logger.debug('Complete generate IPTABLE')
         logger.debug('Object {0}'.format(str(self.iplist)))
         x = self.db.get()
-        logger.debug('Current object in basr is {0}'.format(str(x)))
-        if self.db.get():
+        logger.debug('Current object in base is {0}'.format(str(x)))
+        if x:
             self.db.change(dicts=x)
             self.db.update(self.iplist)
         else:

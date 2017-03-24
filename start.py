@@ -32,6 +32,9 @@ def get_vals():
                                                       time_now.timetuple()[1],
                                                       time_now.timetuple()[2])
         processing_get_vals( ['route', target_collection], ['systems', 'vals'])
+        check_base(['clients', 'comps'])
+        check_base(['clients', 'users'])
+        check_base(['clients', 'dhcp'])
         time.sleep(4000)
 
 def processing_logs():
@@ -48,18 +51,6 @@ def processing_logs():
                 time.sleep(5)
     except Exception as err:
         text = 'Fail router logs work\n' + str(format_exc()) + '\n' + str(err)
-        logger.critical(text)
-
-def edit_requests():
-    try:
-        while True:
-            processing_incoming_json(['clients', 'json'], ['clients', 'users'], ['clients', 'comps'], ['clients', 'dhcp'])
-            check_base(['clients', 'comps'])
-            check_base(['clients', 'users'])
-            check_base(['clients', 'dhcp'])
-            time.sleep(360)
-    except Exception as err:
-        text = 'Fail JSON work\n' + str(format_exc()) + '\n' + str(err)
         logger.critical(text)
 
 def get_dally_statistics():
@@ -101,12 +92,11 @@ if __name__ == '__main__':
         x = subprocess.getstatusoutput(['/bin/bash', '-c', 'python', '/data/monitor/selftest.py'])[0]
         logger.info('Selftest complete. Exit code: {0}'.format(x))
         proc2 = multiprocessing.Process(name='daemon', target=daemon)
-        proc3 = multiprocessing.Process(name='editor', target=edit_requests)
         proc4 = multiprocessing.Process(name='logs', target=processing_logs)
         proc5 = multiprocessing.Process(name='dally', target=get_dally_statistics)
         proc6 = multiprocessing.Process(name='critical', target=critical_detect)
         proc7 = multiprocessing.Process(name='vals', target=get_vals)
-        for i in [proc2, proc3, proc4, proc5, proc6, proc7]:
+        for i in [proc2, proc4, proc5, proc6, proc7]:
             i.start()
             write_pid(i.pid)
         logger.info('All processes started')

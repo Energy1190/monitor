@@ -86,3 +86,6 @@ class Database():
             return self._db_path(target=path).replace_one(self.dicts, x)
         else:
             return self.path.replace_one(self.dicts, x)
+
+    def count(self, func, *args, **kwargs):
+        return (func(*args, **kwargs).count())

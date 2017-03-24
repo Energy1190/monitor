@@ -1,11 +1,8 @@
 #!/usr/bin/env python3
 #  -*- coding: utf-8 -*-
 
-from traceback import format_exc
-from watch import send_mail
 from db import db_get, db_find, db_del, db_del_all
-from system import error_log_write
-from classes.clients import User, Dhcp, Comp, Base
+from classes.clients import Base
 
 def delete_old_reqests(target, status='Old'):
     """Процедура очистки устаревших/обработанных объектов в базе данных,
