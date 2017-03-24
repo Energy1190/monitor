@@ -3,6 +3,7 @@
 
 import os
 import datetime
+import multiprocessing
 from shutil import copyfile
 from flask import Flask, request, render_template, jsonify, session
 from db import db_set, db_find, db_get
@@ -61,10 +62,8 @@ def hello():
         trg['Status'] = 'New'
         db_set(trg, target=['clients', 'json'])
         logger.debug('incoming POST: {0}'.format(str(trg)))
-        try:
-            processing_incoming_json(['clients', 'json'], ['clients', 'users'], ['clients', 'comps'], ['clients', 'dhcp'])
-        except:
-            pass
+        multiprocessing.Process(name='JSON', target= processing_incoming_json,
+                                args=[['clients', 'json'], ['clients', 'users'], ['clients', 'comps'], ['clients', 'dhcp']]).start()
     return render_template('index.html', time=(datetime.datetime.now() + datetime.timedelta(hours=3)).timetuple())
 
 @app.route("/config", methods=['POST', 'GET'])
