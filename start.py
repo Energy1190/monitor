@@ -13,9 +13,6 @@ from requests_s import check_base
 from system.system import detect_crit, write_pid, get_pid, detect_fail_pid
 from system.logmodule import logger
 
-def critical_detect():
-    detect_crit()
-
 def get_vals():
     while True:
         time_now = (datetime.datetime.now() + datetime.timedelta(hours=3))
@@ -61,9 +58,8 @@ if __name__ == '__main__':
         x = subprocess.getstatusoutput(['/bin/bash', '-c', 'python', '/data/monitor/selftest.py'])[0]
         logger.info('Selftest complete. Exit code: {0}'.format(x))
         proc4 = multiprocessing.Process(name='logs', target=processing_logs)
-        proc6 = multiprocessing.Process(name='critical', target=critical_detect)
         proc7 = multiprocessing.Process(name='vals', target=get_vals)
-        for i in [proc4, proc6, proc7]:
+        for i in [proc4, proc7]:
             i.start()
             write_pid(i.pid)
         logger.info('All processes started')
