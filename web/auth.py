@@ -1,8 +1,7 @@
-import ldap3
 from functools import wraps
-from configuration import get_val
+import ldap3
+from system.configuration import get_val
 from flask import request, Response, session
-from logmodule import logger
 
 logins = [{'name': 'admin', 'pass': 'secret'}]
 

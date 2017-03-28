@@ -2,13 +2,14 @@
 #  -*- coding: utf-8 -*-
 
 import os
-import requests
-import time
 import threading
-from logmodule import logger
+import time
+import requests
 from traceback import format_exc
-from configuration import get_val
-from system import send_mail
+from system.configuration import get_val
+from system.system import send_mail
+from system.logmodule import logger
+
 
 def get_db_connect(http, flag='url'):
     try:
@@ -47,7 +48,7 @@ def checks_server(i, flag=None):
             if not x:
                 send_mail('Fail connect to {0} as {1}'.format(i['target'], i['flag']), host=i['target'])
 
-def watch_main():
+def main():
     logger.info('begin to follow...')
     try:
         logger.info('Start watch to servers')
@@ -70,7 +71,4 @@ def watch_main():
         send_mail('Daemon end work', subject='Daemon end work')
 
 if __name__ == '__main__':
-#    print(get_check_list())
     pass
-    file = open('ss.txt', 'a+')
-    file.write('Hello')

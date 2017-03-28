@@ -3,8 +3,8 @@ from classes.base import Base
 from classes.clients import Comp, User, Dhcp
 from classes.db_mongo import Database
 from classes.vals import Iptable
-from system import error_log_write
-from logmodule import logger
+from system.system import error_log_write
+from system.logmodule import logger
 
 
 def get_database_incoming(target, status=None):

@@ -2,7 +2,6 @@ import os
 import yaml
 from jsonschema import validate
 
-
 def validate_yaml(loads):
     schema = """
     required:

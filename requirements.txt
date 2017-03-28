@@ -1,0 +1,9 @@
+flask
+pymongo
+pyyaml
+jsonschema
+requests
+pycrypto
+six
+ipcalc
+ldap3

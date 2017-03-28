@@ -1,7 +1,8 @@
 from traceback import format_exc
-from requests_s import get_database_incoming
 from classes.route import Route
-from logmodule import logger
+from requests_s import get_database_incoming
+from system.logmodule import logger
+
 
 def main(target, out_target):
     try:

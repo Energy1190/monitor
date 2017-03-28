@@ -1,8 +1,9 @@
 import datetime
 from traceback import format_exc
-from logmodule import logger
 from classes.base import Base
 from classes.db_mongo import Database
+from system.logmodule import logger
+
 
 class Dictory():
     pass

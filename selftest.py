@@ -1,8 +1,8 @@
 import os
 import unittest
-import system
-import configuration
-import logmodule
+import system.configuration
+from system import logmodule
+from system import system
 
 class TestSystem(unittest.TestCase):
     def test_isfloat(self):

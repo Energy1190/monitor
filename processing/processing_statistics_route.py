@@ -1,10 +1,10 @@
 import datetime
-from db import db_find, db_get, db_set, db_update
 from traceback import format_exc
-from logmodule import logger
-from reguests_db import get_route_info_database
-from classes.route import Stat
 from classes.db_mongo import Database
+from classes.route import Stat
+from reguests_db import get_route_info_database
+from system.logmodule import logger
+
 
 class Statistics():
     def __init__(self, target, target_stat, times=None, date=None, **kvargs):
@@ -72,7 +72,7 @@ def check_empty_hours(target_dhcp, target_stat, date, times):
     x.append(0)
     for i in range(0, int(y[3])):
         x[3] = i
-        y = db_get(tuple(x), target=target_stat, fild='time')
+        y = Database(target=target_stat, fild='time', fild_var=tuple(x)).get()
         if not y:
             logger.info('Miss hour {0} start generate'.format(str(i)))
             main(target_dhcp, target_stat, times=tuple(x), date=date)

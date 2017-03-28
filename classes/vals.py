@@ -1,7 +1,8 @@
 import ipcalc
 from classes.base import Base
 from classes.db_mongo import Database
-from logmodule import logger
+from system.logmodule import logger
+
 
 class Iptable():
     def __init__(self, target=None, net=None, names=None, users=None):

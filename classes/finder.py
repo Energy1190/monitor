@@ -1,4 +1,4 @@
-from db import db_find, db_get
+from classes.db_mongo import Database
 
 class Finder():
     pass
@@ -14,14 +14,14 @@ class Router(Finder):
         self.get_val()
 
     def get_var(self):
-        for i in db_find( target=self.target):
+        for i in Database(target=self.target).find():
             if i['name'] not in self.var:
                 self.var.append(i['name'])
 
     def get_val(self):
         x = {}
         for i in self.var:
-            t = db_get(i, target=self.target, fild='name')
+            t = Database(target=self.target, fild='name', fild_var=i).get()
             if t:
                 x[i] = t['vals']
             else:

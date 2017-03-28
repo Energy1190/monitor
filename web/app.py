@@ -1,95 +1,34 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import os
 import datetime
 import multiprocessing
-from shutil import copyfile
-from flask import Flask, request, render_template, jsonify, session
-from db import db_set, db_find, db_get
-from reguests_db import get_route_info_database
-from configuration import validate_yaml
+from flask import Flask, request, render_template, jsonify
+from classes.db_mongo import Database
 from classes.finder import Router
-from logmodule import logger
-from web.auth import auth
 from processing.processing_incoming_json import main as processing_incoming_json
+from reguests_db import get_route_info_database
+from system.logmodule import logger
+from web.auth import auth
 
 app = Flask(__name__)
-
-def write_config(x, path, path_t, path_old):
-    if x.__dict__['environ']['REQUEST_METHOD'] == 'POST':
-        try:
-            return validate_yaml(request.form['config'])
-        except:
-            if os.path.exists(path):
-                if os.path.exists(path_old):
-                  os.remove(path_old)
-                copyfile(path, path_old)
-            try:
-                if validate_yaml(request.form['config']):
-                    file = open(path_t, 'w+')
-                    file.writelines(request.form['config'])
-                    file.close()
-                    copyfile(path_t, path)
-                    os.remove(path_t)
-                else:
-                    return validate_yaml(request.form['config'])
-            except:
-                if os.path.exists(path):
-                    if os.path.exists(path_old):
-                      os.remove(path)
-                    copyfile(path_old, path)
-                    os.remove(path_old)
-    return True
-
-def open_config(x, conf, path, path_t):
-    try:
-        x['validate']
-        return x['config']
-    except:
-        if os.path.exists(path):
-            copyfile(path, path_t)
-            file = open(path_t, 'r')
-            conf = file.read()
-            file.close()
-            os.remove(path_t)
-        return conf
 
 @app.route("/", methods=['POST', 'GET'])
 def hello():
     if request.__dict__['environ']['REQUEST_METHOD'] == 'POST':
         trg = request.json
         trg['Status'] = 'New'
-        db_set(trg, target=['clients', 'json'])
+        Database(dicts=trg, target=['clients', 'json']).set(trg)
         logger.debug('incoming POST: {0}'.format(str(trg)))
         multiprocessing.Process(name='JSON', target= processing_incoming_json,
                                 args=[['clients', 'json'], ['clients', 'users'], ['clients', 'comps'], ['clients', 'dhcp']]).start()
     return render_template('index.html', time=(datetime.datetime.now() + datetime.timedelta(hours=3)).timetuple())
 
-@app.route("/config", methods=['POST', 'GET'])
-@auth
-def config():
-    path = '/data/config/conf.yaml'
-    path_t = '/data/config/conf.tmp'
-    path_old = '/data/config/conf.old'
-    write_config(request, path, path_t, path_old)
-    conf = open_config(request.form, conf, path, path_t)
-    try:
-        if validate_yaml(request.form['config']):
-            valid = 1
-        else:
-            valid = 2
-    except:
-        valid = 0
-        if not write_config(conf, path, path_t, path_old):
-            valid = 2
-    return render_template('config.html', conf=conf, valid=valid, time=(datetime.datetime.now() + datetime.timedelta(hours=3)).timetuple())
-
 @app.route("/requests/<f_name>/<name>", methods=['GET'])
 @auth
 def requests_a(f_name, name):
     args_r = {i: request.args.get(i) for i in list(request.args)}
-    database_json = db_find(args_r, target=[f_name, name])
+    database_json = Database(dicts=args_r, target=[f_name, name]).find()
     return render_template('requests_route.html', data=database_json, time=(datetime.datetime.now() + datetime.timedelta(hours=3)).timetuple())
 
 @app.route("/requests/get", methods=['GET'])
@@ -111,7 +50,7 @@ def users_p(name):
         if 'time' in args_r:
             args_r['time'] = list(map(int, args_r['time'].replace('(', '').replace(')', '').split(sep=', ')))
         if name == 'stat':
-            database_json = db_get(args_r, target=['clients', name], fild=None)
+            database_json = Database(dicts=args_r, target=['clients', name]).get()
             if database_json:
                 for i in database_json.get('stat'):
                     if i.get('name'):
@@ -119,7 +58,7 @@ def users_p(name):
                     if i.get('user'):
                         users = True
         else:
-            database_json = db_find(args_r, target=['clients', name], limit=500)
+            database_json = Database(dicts=args_r, target=['clients', name], limit=500).find()
         return render_template(str(name + '.html'), data=database_json, time=(datetime.datetime.now() + datetime.timedelta(hours=2)).timetuple(),
                                names=names,
                                users=users)

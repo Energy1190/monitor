@@ -1,7 +1,7 @@
-from db import db_find
-from traceback import format_exc
-from logmodule import logger
 import datetime
+from traceback import format_exc
+from classes.db_mongo import Database
+from system.logmodule import logger
 
 
 def get_time_tuple(time_str):
@@ -46,10 +46,10 @@ def get_answer(dx, target, visibal=False):
     if type(target[0]) == list:
         for j in target:
             logger.debug('Current target is {0}'.format(str(j)))
-            y += db_find(dx, target=j, limit=limit)
+            y += Database(dicts=dx, target=j, limit=limit).find()
     else:
         logger.debug('One target')
-        y = db_find(dx, target=target, limit=limit)
+        y = Database(dicts=dx, target=target, limit=limit).find()
     logger.debug('Remove duplicates')
     for i in y:
         del i['_id']

@@ -1,6 +1,5 @@
 import time
-import datetime
-from system import return_nub
+from system.system import return_nub
 from classes.base import Base
 
 class Comp(Base):

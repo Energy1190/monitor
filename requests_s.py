@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 #  -*- coding: utf-8 -*-
 
-from db import db_get, db_find, db_del, db_del_all
+from classes.db_mongo import Database
 from classes.clients import Base
 
 def delete_old_reqests(target, status='Old'):
@@ -11,11 +11,11 @@ def delete_old_reqests(target, status='Old'):
     """
     try:
         if status:
-            trg = db_get(status, target=target, fild='Status')
+            trg = Database(target=target, fild='Status', fild_var=status).get()
             for i in trg:
-                db_del(i, target=target)
+                Database(dicts=i, target=target).delete()
         else:
-            db_del_all(target=target)
+            Database(target=target).delete_all()
     except:
         pass
 
@@ -39,7 +39,7 @@ def check_base(target):
     элемент удаляется из коллекции.
     """
     y = []
-    x = db_find(target=target, limit=10000)
+    x = Database(target=target, limit=10000).find()
     if target[1] == 'comps':
         name = 'computername'
     elif target[1] == 'users':
@@ -59,23 +59,23 @@ def check_base(target):
                     elif name == 'ip' and str(i[j]).lower() not in list(y):
                         if y.get(str(i[j]).lower()) and i['time'] < y.get(str(i[j]).lower()):
                             print('delete:', i)
-                            db_del(i, target=target)
+                            Database(dicts=i, target=target).delete()
                         else:
                             y[str(i[j]).lower()] = i['time']
                     else:
                         print('delete:', i)
-                        db_del(i, target=target)
+                        Database(dicts=i, target=target).delete()
                 else:
                     print('delete:', i)
-                    db_del(i, target=target)
+                    Database(dicts=i, target=target).delete()
         if name not in i:
-            db_del(i, target=target)
+            Database(dicts=i, target=target).delete()
 
 def get_database_incoming(target, status=None):
     if status:
-        return db_get(status, target=target, fild='Status')
+        return Database(target=target, fild='Status', fild_var=status).get()
     else:
-        return db_get(None, target=target, fild=None)
+        return Database(target=target).get()
 
 def decrypt_str(t):
     d = t.get('Targets')

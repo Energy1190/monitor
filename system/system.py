@@ -1,11 +1,10 @@
-import os
-import sys
-import time
-import smtplib
 import datetime
-from logmodule import logger
+import os
+import smtplib
+import time
 from email.mime.text import MIMEText
-from configuration import get_val
+from system.configuration import get_val
+from system.logmodule import logger
 
 error_c = 0
 log_lock = False
@@ -14,6 +13,16 @@ time_now_tuple = time_now.timetuple()[0:4]
 target_collection ='base-{0}-{1}-{2}'.format(time_now.timetuple()[0],
                                              time_now.timetuple()[1],
                                              time_now.timetuple()[2])
+
+def watch_pid():
+    pid = os.getpid()
+    if not os.path.exists('pid.num'):
+        f = open('pid.num', 'w+')
+        f.write(str(pid) + '\n')
+        f.close()
+        print('Program PID is {0}'.format(str(pid)))
+    else:
+        print('Detect duplicate program. PID - {0}'.format(str(pid)))
 
 def write_pid(pid):
     if os.path.exists('pid.num'):
