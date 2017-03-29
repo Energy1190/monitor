@@ -1,6 +1,13 @@
 import pymongo
 from bson.objectid import ObjectId
-from system.decorate import counter
+
+def counter(class_name, operation):
+    def class_count(func):
+        def wraper(*args, **kwargs):
+            x = Count()
+            x.set_count(class_name, operation)
+            return func(*args, **kwargs)
+        return wraper()
 
 class Database():
     @counter('Database', 'create')
@@ -97,3 +104,38 @@ class Database():
 
     def count(self, func, *args, **kwargs):
         return (func(*args, **kwargs).count())
+
+class Count():
+    names = []
+    base = []
+    db = Database(target=['systems', 'counts'])
+
+    def get_base(self):
+        return list(self.db.find())
+
+    def set_count(self, name, operant):
+        self.name = name
+        self.count = 1
+        if name not in Count.names:
+            Count.base.append(name)
+            Count.base.append({'name': self.name, 'count': self.count})
+            return {'name': self.name, 'count': self.count, 'operation': operant}
+        else:
+            for i in Count.base:
+                if i and i['name'] == name:
+                    if i['operation'] == operant:
+                        i['count'] = i['count'] + self.count
+                        return i
+
+    def update_base(self):
+        x = self.get_base()
+        if x:
+            for i in Count.base:
+                self.db.change(dicts={'name': i['name'], 'operation': i['operation']})
+                self.db.update(i)
+        else:
+            for i in Count.base:
+                self.db.set(i)
+        Count.names = []
+        Count.base = []
+
