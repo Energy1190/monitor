@@ -1,7 +1,9 @@
 import pymongo
 from bson.objectid import ObjectId
+from system.system import counter
 
 class Database():
+    @counter('Database', 'create')
     def __init__(self, target=None, dicts=None, fild=None, fild_var=None, id=None, limit=100000,
                 client=('mongoDB', 27017)):
         self.db = pymongo.MongoClient(*client)
@@ -54,6 +56,7 @@ class Database():
         self._check_fild()
         self._del(self.dicts)
 
+    @counter('Database', 'set')
     def set(self, x, path=None):
         x = self._del(dict(x))
         if x:
@@ -62,24 +65,29 @@ class Database():
             else:
                 return self.path.save(x)
 
+    @counter('Database', 'get')
     def get(self):
         if self.dicts:
             return self.path.find_one(self.dicts)
         else:
             return self.path.find_one()
 
+    @counter('Database', 'find')
     def find(self):
         if self.dicts:
             return self.path.find(self.dicts, limit=self.limit)
         else:
             return self.path.find(limit=self.limit)
 
+    @counter('Database', 'delete')
     def delete(self):
         return self.path.delete_one(self.dicts)
 
+    @counter('Database', 'full-delete')
     def delete_all(self):
         return self.path.delete_many()
 
+    @counter('Database', 'update')
     def update(self, x, path=None):
         x = dict(x)
         if path:
