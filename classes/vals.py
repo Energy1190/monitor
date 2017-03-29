@@ -1,7 +1,6 @@
 import ipcalc
 from classes.base import Base
 from classes.db_mongo import Database
-from system.logmodule import logger
 
 class Iptable():
     def __init__(self, target=None, net=None, names=None, users=None):
@@ -28,10 +27,8 @@ class Iptable():
                         i = {'name': None, 'ip': i}
 
     def get_users(self):
-        logger.debug('User generate for IPTABLE')
         if self.users:
             x = self.users.find()
-            logger.debug('Users base is {0}'.format(str(x)))
             for i in self.iplist:
                 for j in x:
                     if str(i).split(sep='.')[0] == str(j['computername']):
@@ -40,15 +37,14 @@ class Iptable():
                         i['user'] = None
 
     def set_or_update(self):
-        logger.debug('Complete generate IPTABLE')
-        logger.debug('Object {0}'.format(str(self.iplist)))
-        x = self.db.get()
-        logger.debug('Current object in base is {0}'.format(str(x)))
+        try:
+            x = list(self.db.find())
+        except:
+            x = []
         if x:
-            self.db.change(dicts=x)
-            self.db.update(self.iplist)
-        else:
-            self.db.set(self.iplist)
+            self.db.delete_all()
+        for i in self.iplist:
+            self.db.set(i)
 
 class Vals(Base):
     def __init__(self, trg, target=None):

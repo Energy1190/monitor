@@ -90,6 +90,16 @@ class User(Base):
             pass
         self.set_dict()
 
+    def _check_list_elem(self, x):
+        while True:
+            if self.compslist.count(x) > 1:
+                self.compslist.remove(x)
+            if self.compslist.count(x) == 1:
+                break
+            if self.compslist.count(x) == 0:
+                self.compslist.append(x)
+
     def check_dict(self, target_dict):
         Comp.check_dict(self, target_dict)
-        self.compslist.extend(target_dict['compslist'])
+        for i in target_dict['compslist']:
+            self._check_list_elem(i)
