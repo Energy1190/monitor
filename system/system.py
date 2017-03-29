@@ -5,8 +5,6 @@ import time
 from email.mime.text import MIMEText
 from system.configuration import get_val
 from system.logmodule import logger
-import threading
-from classes.db_mongo import Count
 
 error_c = 0
 log_lock = False
@@ -15,19 +13,6 @@ time_now_tuple = time_now.timetuple()[0:4]
 target_collection ='base-{0}-{1}-{2}'.format(time_now.timetuple()[0],
                                              time_now.timetuple()[1],
                                              time_now.timetuple()[2])
-
-def maintenance(time):
-    def main_func(func):
-        def wraper(*args, **kwargs):
-            threading.Thread(target=flush_counts,args=(time)).start()
-            return func(*args, **kwargs)
-        return wraper()
-
-def flush_counts(time):
-    while True:
-        x = Count()
-        x.update_base()
-        time.sleep(time)
 
 def watch_pid():
     pid = os.getpid()

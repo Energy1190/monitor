@@ -3,10 +3,8 @@
 
 
 from web.app import app
-from system.system import maintenance
 from system.system import watch_pid as check
 
-@maintenance(3600)
 def main():
     print('Start web interface')
     check()
