@@ -1,6 +1,6 @@
 import pymongo
 from bson.objectid import ObjectId
-from system.system import counter
+from system.decorate import counter
 
 class Database():
     @counter('Database', 'create')
