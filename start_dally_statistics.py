@@ -3,5 +3,6 @@
 
 from processing.processing_statistics_route import main
 
-print('Start dally statistics generate')
-main(['clients', 'dhcp'], ['clients', 'stat'])
+if __name__ == '__main__':
+    print('Start dally statistics generate')
+    main(['clients', 'dhcp'], ['clients', 'stat'])

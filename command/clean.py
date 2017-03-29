@@ -1,6 +1,15 @@
+#!/usr/bin/env python
+#  -*- coding: utf-8 -*-
 '''
     Очищает от повторений список compslist для всех пользователей
 '''
+
+import os
+import sys
+path = '/data/monitor'
+if os.path.exists(path):
+    if path not in sys.path:
+        sys.path.append(path)
 
 from classes.db_mongo import Database
 

@@ -4,6 +4,7 @@
 from processing.processing_watch import main
 from system.system import watch_pid as check
 
-print('Start watch for world')
-check()
-main()
+if __name__ == '__main__':
+    print('Start watch for world')
+    check()
+    main()
