@@ -56,12 +56,10 @@ def main(target, out_target_users, out_target_comps, dhcp_target):
                     for i in x.dicts['dhcpinfo']:
                         y = x.get_dsttrg(i['name'], 'name')
                         if y:
-                            if str(y['ip']) != str(i['ip']):
-                                x.update(srctrg=i, dsttrg=y)
+                            x.update(srctrg=i, dsttrg=y)
                         else:
                             x.set(i)
                     x.delete(t[0], target=target)
-                    Iptable(target=['systems', 'iptables'], names=out_target_comps, users=out_target_users)
             else:
                 logger.error('Unidentified JSON detect. Delete.')
                 logger.error('Object: {0}'.format(str(t[0])))
