@@ -15,6 +15,6 @@ def main():
     target_collection = 'base-{0}-{1}-{2}'.format(time_now.timetuple()[0],
                                                   time_now.timetuple()[1],
                                                   time_now.timetuple()[2])
-    get_iplist(target=['systems', 'iptables'], names=['clients', 'comps'], users=['clients', 'users'])
+    get_iplist(target=['systems', 'iptables'], names=['clients', 'dhcp'], users=['clients', 'users'])
     checks([['clients', 'comps'], ['clients', 'users'], ['clients', 'dhcp']])
     processing_get_vals(['route', target_collection], ['systems', 'vals'])
