@@ -10,6 +10,8 @@ class Iptable():
         self.db = Database(target=self.target)
         self.names = (names and Database(target=names))
         self.users = (users and Database(target=users))
+        self.get_name()
+        self.get_users()
         self.set_or_update()
 
     def generate_iplist(self):
@@ -31,10 +33,11 @@ class Iptable():
             x = self.users.find()
             for i in self.iplist:
                 for j in x:
-                    if str(i).split(sep='.')[0] == str(j['computername']):
-                        i['user'] = str(j['username'])
-                    else:
-                        i['user'] = None
+                    if i['name']:
+                        if str(i['name']).split(sep='.')[0] == str(j['computername']):
+                            i['user'] = str(j['username'])
+                        else:
+                            i['user'] = None
 
     def set_or_update(self):
         try:
