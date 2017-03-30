@@ -21,23 +21,23 @@ class Iptable():
     def get_name(self):
         if self.names:
             x = self.names.find()
-            for i in self.iplist:
+            for i in range(0, len(self.iplist)):
                 for j in x:
-                    if str(i) == str(j['ip']):
-                        i = {'name': str(j['name']), 'ip': i}
+                    if str(self.iplist[i]) == str(j['ip']):
+                        self.iplist[i] = {'name': str(j['name']), 'ip':  self.iplist[i]}
                     else:
-                        i = {'name': None, 'ip': i}
+                        self.iplist[i] = {'name': None, 'ip':  self.iplist[i]}
 
     def get_users(self):
         if self.users:
             x = self.users.find()
-            for i in self.iplist:
+            for i in range(0, len(self.iplist)):
                 for j in x:
-                    if i['name']:
-                        if str(i['name']).split(sep='.')[0] == str(j['computername']):
-                            i['user'] = str(j['username'])
+                    if self.iplist[i]['name']:
+                        if str(self.iplist[i]['name']).split(sep='.')[0] == str(j['computername']):
+                            self.iplist[i]['user'] = str(j['username'])
                         else:
-                            i['user'] = None
+                            self.iplist[i]['user'] = None
 
     def set_or_update(self):
         try:
