@@ -24,7 +24,7 @@ class Iptable():
             for i in self.iplist:
                 for j in x:
                     if str(i) == str(j['ip']):
-                        i = {'name': str(j('name')), 'ip': i}
+                        i = {'name': str(j['name']), 'ip': i}
                     else:
                         i = {'name': None, 'ip': i}
 
