@@ -6,47 +6,33 @@ class Iptable():
     def __init__(self, target=None, net=None, names=None, users=None):
         self.net = (net or '172.16.0.0/19')
         self.target = target
-        self.iplist = self.generate_iplist()
         self.db = Database(target=self.target)
         self.names = (names and Database(target=names))
         self.users = (users and Database(target=users))
-        self.get_name()
-        self.get_users()
+        self.iplist = self.generate_iplist()
         self.set_or_update()
-        print(self.names, self.users)
 
     def generate_iplist(self):
         x = ipcalc.Network(self.net)
-        return [{'ip': str(i)} for i in x]
+        return [{'ip': str(i),
+                 'name': self.get_name(str(i)),
+                 'user': self.get_users(self.get_name(str(i)))} for i in x]
 
-    def get_name(self):
-        if self.names:
-            x = self.names.find()
-            print(x)
-            for i in self.iplist:
-                if x:
-                    for j in x:
-                        if str(i['ip']) == str(j['ip']):
-                            i['name'] = str(j['name'])
-                        else:
-                            i['name'] = None
-                else:
-                    i['name'] = None
+    def get_name(self, ip):
+        x = list(self.names.find())
+        if self.names and x:
+            for i in x:
+                if str(ip) == str(i['ip']):
+                    return i['name']
+        return None
 
-    def get_users(self):
-        if self.users:
-            x = self.users.find()
-            print(x)
-            for i in self.iplist:
-                if x:
-                    for j in x:
-                        if i['name']:
-                            if str(i['name']).split(sep='.')[0] == str(j['computername']):
-                                i['user'] = str(j['username'])
-                            else:
-                                i['user'] = None
-                else:
-                    i['user'] = None
+    def get_users(self, name):
+        x = list(self.users.find())
+        if self.users and x:
+            for i in x:
+                if str(i['name']).split(sep='.')[0].lower() == str(i['computername']).lower():
+                    return str(i['username'])
+        return None
 
     def set_or_update(self):
         try:

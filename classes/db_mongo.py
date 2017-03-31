@@ -78,7 +78,7 @@ class Database():
         return self.path.delete_one(self.dicts)
 
     def delete_all(self):
-        return self.path.delete_many()
+        return self.path.delete_many({})
 
     def update(self, x, path=None):
         x = dict(x)

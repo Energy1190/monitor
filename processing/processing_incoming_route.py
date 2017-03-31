@@ -1,5 +1,6 @@
 from traceback import format_exc
 from classes.route import Route
+from classes.vals import Vals
 from requests_s import get_database_incoming
 from system.logmodule import logger
 
@@ -11,6 +12,7 @@ def main(target, out_target):
             x = Route(t, target=target)
             if x.set_dict():
                 x.set(x.dicts, target=out_target)
+                Vals(x.dicts, target=['systems', 'vals'])
                 x.delete(t,target=target)
                 return True
             else:

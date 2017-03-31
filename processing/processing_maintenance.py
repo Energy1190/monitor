@@ -17,4 +17,3 @@ def main():
                                                   time_now.timetuple()[2])
     get_iplist(target=['systems', 'iptables'], names=['clients', 'dhcp'], users=['clients', 'users'])
     checks([['clients', 'comps'], ['clients', 'users'], ['clients', 'dhcp']])
-    processing_get_vals(['route', target_collection], ['systems', 'vals'])
