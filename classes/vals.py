@@ -13,6 +13,7 @@ class Iptable():
         self.get_name()
         self.get_users()
         self.set_or_update()
+        print(self.names, self.users)
 
     def generate_iplist(self):
         x = ipcalc.Network(self.net)
@@ -21,25 +22,31 @@ class Iptable():
     def get_name(self):
         if self.names:
             x = self.names.find()
-            print(list(x), list(x)[0], list(x)[0].get('name'))
+            print(x)
             for i in self.iplist:
-                for j in x:
-                    if str(i['ip']) == str(j['ip']):
-                        i['name'] = str(j['name'])
-                    else:
-                        i['name'] = None
+                if x:
+                    for j in x:
+                        if str(i['ip']) == str(j['ip']):
+                            i['name'] = str(j['name'])
+                        else:
+                            i['name'] = None
+                else:
+                    i['name'] = None
 
     def get_users(self):
         if self.users:
             x = self.users.find()
-            print(list(x), list(x)[0], list(x)[0].get('computername'))
+            print(x)
             for i in self.iplist:
-                for j in x:
-                    if i['name']:
-                        if str(i['name']).split(sep='.')[0] == str(j['computername']):
-                            i['user'] = str(j['username'])
-                        else:
-                            i['user'] = None
+                if x:
+                    for j in x:
+                        if i['name']:
+                            if str(i['name']).split(sep='.')[0] == str(j['computername']):
+                                i['user'] = str(j['username'])
+                            else:
+                                i['user'] = None
+                else:
+                    i['user'] = None
 
     def set_or_update(self):
         try:
