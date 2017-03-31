@@ -50,7 +50,7 @@ class Vals():
     def __init__(self):
         self.exeption = ['_id', 'origsent', 'termsent', 'time', 'year', 'month', 'day', 'hour', 'min', 'second']
 
-    def update(self, func):
+    def update(func):
         def wraper(self, *args, **kwargs):
             trg = func(self, *args, **kwargs)
             if trg[1]:
@@ -68,11 +68,11 @@ class Vals():
     @update
     def analyze_trg(self, name, val):
         c = False
-        x = self.get_item_for_list(name)[0]
-        if x and not x['vals'].count(val):
-            x['vals'].append(val)
+        x = self.get_item_for_list(name)
+        if x and not x[0]['vals'].count(val):
+            x[0]['vals'].append(val)
             c = True
-        return [{'name': name, 'vals': x['vals']}, c, x[1]]
+        return [{'name': name, 'vals': x[0]['vals']}, c, x[1]]
 
     def get_item_for_list(self, name):
         for i in range(0, len(Vals.vals_list)):
