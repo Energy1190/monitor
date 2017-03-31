@@ -5,14 +5,14 @@ from requests_s import get_database_incoming
 from system.logmodule import logger
 
 
-def main(target, out_target):
+def main(target, out_target, vals):
     try:
         t = get_database_incoming(target, status=None)
         if t:
             x = Route(t, target=target)
             if x.set_dict():
                 x.set(x.dicts, target=out_target)
-                Vals(x.dicts, target=['systems', 'vals'])
+                vals.check(x.dicts)
                 x.delete(t,target=target)
                 return True
             else:
