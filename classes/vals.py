@@ -1,5 +1,5 @@
 import ipcalc
-from classes.base import Base
+from system.logmodule import logger
 from classes.db_mongo import Database
 
 class Iptable():
@@ -52,13 +52,18 @@ class Vals():
 
     def update(func):
         def wraper(self, *args, **kwargs):
-            trg = func(self, *args, **kwargs)
+            try:
+                trg = func(self, *args, **kwargs)
+                logger.debug('Fail: ' + str(args) + ' ' + str(kwargs))
+            except:
+                trg = [None,None,None]
             if trg[1]:
                 Database(target=self.target, dicts={'name': trg[0]['name']}).update(trg[0])
             if not trg[2]:
                 Vals.vals_list.append(trg[0])
             else:
                 Vals.vals_list[trg[2]] = trg[0]
+            return trg
         return wraper
 
     def check(self, trg):

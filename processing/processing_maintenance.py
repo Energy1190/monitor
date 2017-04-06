@@ -1,7 +1,6 @@
 import datetime
 from requests_s import check_base
 from classes.vals import Iptable
-from processing.processing_get_vals import main as processing_get_vals
 
 def get_iplist(target=None, names=None, users=None):
     Iptable(target=target, names=names, users=users)
