@@ -9,7 +9,14 @@ from traceback import format_exc
 from system.configuration import get_val
 from system.system import send_mail
 from system.logmodule import logger
+from classes.db_mongo import Database
 
+def check_db(t, dicts=None):
+    x = Database(target=['systems', 'watch'], dicts=dicts)
+    if x.get():
+        x.update(t)
+    else:
+        x.set(t)
 
 def get_db_connect(http, flag='url'):
     try:
@@ -35,26 +42,27 @@ def get_check_list(name):
 
 def checks_server(i, flag=None):
     logger.debug('Launched check to {0} as {1}'.format(i['target'], i['flag']))
+    status = True
     if flag == 'ping':
         x = os.system("ping -c 1 " + i['target'] + " 1>/dev/null")
         if x:
             time.sleep(300)
             if x:
-                send_mail('Fail connect to {0} as {1}'.format(i['target'], i['flag']), host=i['target'])
+                status = False
     else:
         x = get_db_connect(i['target'], flag=i['flag'])
         if not x:
             time.sleep(300)
             if not x:
-                send_mail('Fail connect to {0} as {1}'.format(i['target'], i['flag']), host=i['target'])
+                status = False
+    check_db({'name': i['target'], 'status': status}, dicts=i['target'])
 
 def main():
     logger.info('begin to follow...')
     try:
         logger.info('Start watch to servers')
         target = get_check_list('[Checks]')
-        send_mail(str('Start work. Checks: {0}'.format([str(i['target'] + ' as ' + i['flag']) for i in get_check_list('[Checks]')])),
-                  subject='Daemon start work')
+        check_db({'name': 'start', 'status': False}, dicts={'name': 'start'})
         while True:
             n = 0
             for i in target:
