@@ -34,6 +34,21 @@ def sending_mails():
             xl.append(i)
     send_mail(send_text(xl), subject='Daemon status')
 
+def clear_collection(collection_now):
+    t_list = []
+    t_now = datetime.datetime(*map(int, collection_now.split(sep='-')[1:])) + datetime.timedelta(days=1)
+    for i in range(32):
+        t_list.append(t_now.timetuple()[:3])
+        t_now = t_now - datetime.timedelta(days=1)
+    x = [{tuple(map(int, i.split(sep='-')[1:])): t_list.count(tuple(map(int, i.split(sep='-')[1:])))}
+          for i in Database(target=['route']).get_collections_names() if 'base' in str(i)]
+    for i in x:
+        for j in i:
+            if not i[j]:
+                print('Delete collection {0}'.format(str('base-' + '-'.join(map(str, list(i))))))
+                Database(target=['route', str('base-' + '-'.join(map(str, list(i))))]).delete_all()
+                Database(target=['route', str('base-' + '-'.join(map(str, list(i))))]).drop()
+
 def main():
     time_now = (datetime.datetime.now() + datetime.timedelta(hours=3))
     target_collection = 'base-{0}-{1}-{2}'.format(time_now.timetuple()[0],
@@ -42,3 +57,4 @@ def main():
     get_iplist(target=['systems', 'iptables'], names=['clients', 'dhcp'], users=['clients', 'users'])
     checks([['clients', 'comps'], ['clients', 'users'], ['clients', 'dhcp']])
     sending_mails()
+    clear_collection(target_collection)

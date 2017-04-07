@@ -90,3 +90,8 @@ class Database():
     def count(self, func, *args, **kwargs):
         return (func(*args, **kwargs).count())
 
+    def get_collections_names(self):
+        return self.path.collection_names(include_system_collections=False)
+
+    def drop(self):
+        return self.path.drop()
