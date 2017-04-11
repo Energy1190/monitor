@@ -32,7 +32,9 @@ def sending_mails():
         x = Database(target=['systems', 'watch'], dicts={'name': i}).get()
         if x and not x['status']:
             xl.append(i)
-    send_mail(send_text(xl), subject='Daemon status')
+    t = send_text(xl)
+    if t:
+        send_mail(t, subject='Daemon status')
 
 def clear_collection(collection_now):
     t_list = []
