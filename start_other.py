@@ -18,3 +18,4 @@ if __name__ == '__main__':
         x = processing_incoming_route(['route', 'info'], ['route', target_collection], v)
         if not x:
             time.sleep(5)
+        time.sleep(0.1)
