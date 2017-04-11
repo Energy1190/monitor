@@ -103,15 +103,15 @@ def get_route_info_database(*args, start_time=None, end_time=None, deep=4, **kva
         if t:
             for j in t:
                 if len(j) >= 1:
-                    dx['year'] = int(j[0])
+                    dx['year'] = str(j[0])
                 if len(j) >= 2:
-                    dx['month'] = int(j[1])
+                    dx['month'] = str(j[1])
                 if len(j) >= 3:
-                    dx['day'] = int(j[2])
+                    dx['day'] = str(j[2])
                 if len(j) >= 4:
-                    dx['hour'] = int(j[3])
+                    dx['hour'] = str(j[3])
                 if len(j) >= 5:
-                    dx['minute'] = int(j[4])
+                    dx['minute'] = str(j[4])
                 logger.debug('Add result for {0}-{1}-{2}-{3}.'.format(str(dx.get('year')),
                                                                       str(dx.get('month')),
                                                                       str(dx.get('day')),

@@ -68,13 +68,13 @@ class Base():
                 self.dicts['time'] = time.strftime('%d.%m.%Y %H:%M:%S', self.time)
                 self.time = datetime.datetime.fromtimestamp(time.mktime(self.time))
             else:
-                self.dicts['time'] = self.time
-            self.dicts['year'] = self.time.year
-            self.dicts['month'] = self.time.month
-            self.dicts['day'] = self.time.day
-            self.dicts['hour'] = self.time.hour
-            self.dicts['min'] = self.time.minute
-            self.dicts['second'] = self.time.second
+                self.dicts['time'] = str(self.time)
+            self.dicts['year'] = str(self.time.year)
+            self.dicts['month'] = str(self.time.month)
+            self.dicts['day'] = str(self.time.day)
+            self.dicts['hour'] = str(self.time.hour)
+            self.dicts['min'] = str(self.time.minute)
+            self.dicts['second'] = str(self.time.second)
 
     def set_dict(self):
         exeption = ['dicts', 'message', 'dst', 'Key', 'Body', 'Targets', 'Crypt', 'key', 'body', 'db']
