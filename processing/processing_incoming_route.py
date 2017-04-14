@@ -12,7 +12,7 @@ def main(target, out_target, vals):
             x = Route(t, target=target)
             if x.set_dict():
                 x.set(x.dicts, target=out_target)
-                vals.check(x.dicts)
+#                vals.check(x.dicts)
                 x.delete(t,target=target)
                 return True
             else:

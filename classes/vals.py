@@ -47,6 +47,7 @@ class Iptable():
 class Vals():
     target = ['systems', 'vals']
     vals_list = list(Database(target=target).find())
+
     def __init__(self):
         self.exeption = ['_id', 'origsent', 'termsent', 'time', 'year', 'month', 'day', 'hour', 'min', 'second']
 

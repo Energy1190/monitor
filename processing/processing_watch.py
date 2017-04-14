@@ -55,7 +55,7 @@ def checks_server(i, flag=None):
             time.sleep(300)
             if not x:
                 status = False
-    check_db({'name': i['target'], 'status': status}, dicts=i['target'])
+    check_db({'name': i['target'], 'status': status}, dicts={'name': i['target']})
 
 def main():
     logger.info('begin to follow...')

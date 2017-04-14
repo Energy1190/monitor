@@ -1,8 +1,9 @@
 import os
 import unittest
-import system.configuration
+from system import configuration
 from system import logmodule
 from system import system
+from classes.debuger import DebugVals
 
 class TestSystem(unittest.TestCase):
     def test_isfloat(self):
@@ -61,6 +62,9 @@ class TestConfiguration(unittest.TestCase):
         self.assertTrue(y)
         self.assertEqual(len(y), 1)
         logmodule.logger.debug('Done')
+
+class TestValClass(unittest.TestCase):
+    pass
 
 if __name__ == '__main__':
     unittest.main()
