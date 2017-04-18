@@ -1,3 +1,4 @@
+import os
 import gc
 import logging
 from traceback import format_exc
@@ -12,7 +13,7 @@ def main(target, out_target, vals):
         return [x.get(), x.count(x.find)]
 
     def object_operation(object, object_class, target):
-        x = object_class()
+        x = object_class(output=open(os.devnull, 'w'))
         x.set_storage(type='mongoDB', target=target)
         x.set_main(object)
         x.set_object()
