@@ -53,6 +53,7 @@ class Base():
 
     def update_object(self):
         assert self.mainfild, "Main key value is not specified"
+        assert self.exist, "The object was not found in the storage, try the set method"
         self.database.change(dicts={self.mainfild: self.obj.get(self.mainfild)})
         self.database.update(self.obj)
         print("The object in the storage has been updated. Object name: {0}".format(str(self.obj.get(self.mainfild))),
