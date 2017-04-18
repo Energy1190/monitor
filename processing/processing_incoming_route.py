@@ -26,6 +26,4 @@ def main(target, out_target, vals):
         logging.error('Can not process incoming object')
         logging.error(str(format_exc()))
 
-    if count >=1:
-        main(target, out_target, vals)
-    gc.collect()
+    Database(target=target, dicts=incoming).delete()
