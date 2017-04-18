@@ -1,6 +1,6 @@
 import datetime
 from traceback import format_exc
-from classes.base import Base
+from classes.base import Base_old
 from classes.db_mongo import Database
 from system.logmodule import logger
 
@@ -28,16 +28,22 @@ class Stat(Dictory):
         x = int(self.trg['data']['in_bytes']) + int(self.trg['data']['out_bytes'])
         if not x:
             self.trg['level'] = 'zero'
+            self.trg['level_num'] = 0
         elif x <= 1026:
             self.trg['level'] = 'default'
+            self.trg['level_num'] = 1
         elif x <= 1024000:
             self.trg['level'] = 'active'
+            self.trg['level_num'] = 2
         elif x <= 1024000000:
             self.trg['level'] = 'info'
+            self.trg['level_num'] = 3
         elif x <= 5120000000:
             self.trg['level'] = 'warning'
+            self.trg['level_num'] = 4
         elif x > 5120000000:
             self.trg['level'] = 'danger'
+            self.trg['level_num'] = 5
 
     def __str__(self):
         return str(self.trg)

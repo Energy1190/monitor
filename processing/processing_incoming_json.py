@@ -1,72 +1,57 @@
+import pytz
+import datetime
+import logging
 from traceback import format_exc
-from classes.base import Base
-from classes.clients import Comp, User, Dhcp
+from classes.base import Base, Comp, User, Dhcp
 from classes.db_mongo import Database
-from classes.vals import Iptable
+from classes.crypts import Crypt
 from system.system import error_log_write
-from system.logmodule import logger
 
+def main(target, out_target_users, out_target_comps, out_dhcp_target):
+    def get_database_incoming(target, status=None):
+        x = Database(target=target)
+        if status:
+            x.change(fild='Status', fild_var=status)
+        return [x.get(), x.count(x.find)]
 
-def get_database_incoming(target, status=None):
-    x = Database(target=target)
-    if status:
-        x.change(fild='Status', fild_var=status)
-    return [x.get(), x.count(x.find)]
+    def object_operation(object, object_class, target, name):
+        x = object_class()
+        x.set_storage(type='mongoDB', target=target)
+        y = (x.set_main(object) or x.generate_main_list(object))
+        if type(y) == list:
+            x.generate_from_list(y, 'dhcp', time=datetime.datetime.now(pytz.timezone('Europe/Moscow')))
+        else:
+            x.check_object(name)
+            if x.exist:
+                x.update_object()
+            else:
+                x.set_object()
 
-def decrypt(crypt):
-    if 'Crypt' in list(crypt) and crypt['Crypt'] == 'true':
-        def decrypt_str(crypt):
-            d = crypt.get('Targets')
-            return [Base(crypt).remove_end(crypt.get('Body')), d]
-        return decrypt_str(crypt)
-    else:
-        return [crypt, 'old']
-
-def main(target, out_target_users, out_target_comps, dhcp_target):
-    t = get_database_incoming(target, status='New')
-    count = 0
+    logging.info('---'*20)
+    logging.info('A new inbound object was detected')
+    incoming, count = get_database_incoming(target, status='New')
+    original = incoming
     try:
-        incoming, count = t
         if incoming:
-            incoming, d = decrypt(incoming)
+            d = incoming.get('Targets')
+            x = Crypt().remove_end(incoming.get('Body'))
+            if x:
+                incoming = x
             if d == 'report':
                 if int(incoming['Version']) > 2:
-                    x = Comp(incoming, target=out_target_comps)
-                    y = x.get_dsttrg(incoming['Userinfo']['Computername'], 'computername')
-                    if y:
-                        x.check_dict(y)
-                        x.update(dsttrg=y)
-                    else:
-                        x.set(x.dicts)
-                x = User(incoming, target=out_target_users)
-                y = x.get_dsttrg(incoming['Userinfo']['Username'], 'username')
-                error_log_write(str(x), err=str('Check class'))
-                error_log_write(str(incoming['Userinfo']['Username']), err=str('Check class'))
-                error_log_write(str(y), err=str('Check class'))
-                if y:
-                    error_log_write(str(y), err=str('Check base'))
-                    x.check_dict(y)
-                    x.update(dsttrg=y)
-                else:
-                    x.set(x.dicts)
-                x.delete(t[0], target=target)
+                    object_operation(incoming, Comp, out_target_comps, incoming['Userinfo']['Computername'])
+                object_operation(incoming, User, out_target_users, incoming['Userinfo']['Username'])
             elif d == 'dhcp':
-                    x = Dhcp(t, target=dhcp_target)
-                    x.set_dict()
-                    for i in x.dicts['dhcpinfo']:
-                        y = x.get_dsttrg(i['name'], 'name')
-                        if y:
-                            x.update(srctrg=i, dsttrg=y)
-                        else:
-                            x.set(i)
-                    x.delete(t[0], target=target)
+                object_operation(incoming.get("Dhcpinfo"), Dhcp, out_dhcp_target, None)
             else:
-                logger.error('Unidentified JSON detect. Delete.')
-                logger.error('Object: {0}'.format(str(t[0])))
-                Database(dicts=t[0], target=target).delete()
+                logging.error('The incoming object can not be processed, information about it is placed in the log file')
+                error_log_write(str(original), err='Can not be processed')
     except Exception as err:
-        logger.error('Error processing incoming json: {0}'.format(str(err)))
-        logger.error('Trace: {0}'.format(str(format_exc())))
-        Database(dicts=t[0], target=target).delete()
-    if count > 1:
-        main(target, out_target_users, out_target_comps, dhcp_target)
+        logging.error('There were errors processing the incoming object')
+        logging.error(str(format_exc()))
+        error_log_write(str(original), err='Errors occurred')
+
+    Database(target=target, dicts=original).delete()
+    logging.info('The incoming object was processed and deleted')
+    if count >= 1:
+        main(target, out_target_users, out_target_comps, out_dhcp_target)

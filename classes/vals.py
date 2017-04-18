@@ -45,10 +45,9 @@ class Iptable():
             self.db.set(i)
 
 class Vals():
-    target = ['systems', 'vals']
-    vals_list = list(Database(target=target).find())
-
     def __init__(self):
+        if self.__class__.__name__ == "Vals":
+            Vals.vals_list = list(Database(target=['systems', 'vals']).find())
         self.exeption = ['_id', 'origsent', 'termsent', 'time', 'year', 'month', 'day', 'hour', 'min', 'second']
 
     def update(func):

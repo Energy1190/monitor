@@ -1,23 +1,30 @@
+import gc
+import logging
 from traceback import format_exc
-from classes.route import Route
-from classes.vals import Vals
-from requests_s import get_database_incoming
-from system.logmodule import logger
-
+from classes.base import Route
+from classes.db_mongo import Database
 
 def main(target, out_target, vals):
+    def get_database_incoming(target, status=None):
+        x = Database(target=target)
+        if status:
+            x.change(fild='Status', fild_var=status)
+        return [x.get(), x.count(x.find)]
+
+    def object_operation(object, object_class, target):
+        x = object_class()
+        x.set_storage(type='mongoDB', target=target)
+        x.set_main(object)
+        x.set_object()
+
+    incoming, count = get_database_incoming(target, status=None)
     try:
-        t = get_database_incoming(target, status=None)
-        if t:
-            x = Route(t, target=target)
-            if x.set_dict():
-                x.set(x.dicts, target=out_target)
-#                vals.check(x.dicts)
-                x.delete(t,target=target)
-                return True
-            else:
-                x.delete(t,target=target)
-                return False
+        if incoming:
+            object_operation(incoming, Route, out_target)
     except Exception as err:
-        logger.error('Error processing incoming log: {0}'.format(str(err)))
-        logger.error('Trace: {0}'.format(str(format_exc())))
+        logging.error('Can not process incoming object')
+        logging.error(str(format_exc()))
+
+    if count >=1:
+        main(target, out_target, vals)
+    gc.collect()

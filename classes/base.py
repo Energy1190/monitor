@@ -1,134 +1,150 @@
-import json
+import sys
 import time
-import base64
 import datetime
-from Crypto.Cipher import AES
-from Crypto import Random
+from system.system import return_nub
 from classes.db_mongo import Database
 
 class Base():
-    """ Базовый класс для обработки входящих JSON-объектов. Включает в себя необходимые объекты:
+    def __init__(self, mainfild=None, output=sys.stdout, error=sys.stderr):
+        self.mainfild = (mainfild or 'name')    # Определяет ключ, по которому будет происходить поиск в базе данных
+        self.output = output                    # Определяет stdout
+        self.error = error                      # Определяет stderr
+        self.exist = False
+        print("A new class object was created. Class: {0}".format(str(self.__class__.__name__)), file=self.output)
+        self.obj = {}
+        self.database = None
 
-    * old - список со значениями, которые были заменены в результате обновления записи в
-    базе данных.
-    * dicts - словарь, который будет по умолчанию записан в базу данных.
-    * dst - коллекйия в базе данных, куда будет производиться запись, а так же откуда будут
-    извлекаться значения для проверки по умолчанию.
-    """
-    def __init__(self, trg, target=None):
-        self.old = []
-        self.dicts = {}
-        self.dst = target
-        self.key = None
-        self.body = None
-        self.db = Database(target=target, dicts=trg)
-        if type(trg) == dict:
-            if trg.get('Key'):
-                self.key = base64.b64decode(trg['Key'])
-            if trg.get('Body'):
-                self.body = trg['Body']
+    def set_storage(self, type=None, target=None):
+        if type == 'mongoDB':
+            self.database = Database(target=target)
+        else:
+            self.database = type
+        method = ['change', 'set', 'get', 'update']
+        x = [i for i in method if i not in dir(self.database)]
+        if x:
+            t = "The selected storage type does not support the necessary operations - {0}".format(", ".join(x))
+            print(t, file=self.error)
+            raise TypeError(t)
+        print("Assigned storage. Class: {0}. Storage: {1}".format(str(self.__class__.__name__), str(type)), file=self.output)
 
-    def remove_end(self, x):
-        for i in range(100):
-            try:
-                return json.loads(str(self.decrypt(x)[:-i], 'utf-8'))
-            except:
-                pass
+    def set_parameter(self, name=None, val=None):
+        self.obj[name] = val
+
+    def get_parameter(self, name=None):
+        return self.obj[name]
+
+    def get_object(self, name):
+        assert self.mainfild, "Main key value is not specified"
+        assert not self.obj, "You can not get an object. Self object is not empty"
+        self.database.change(dicts={self.mainfild: name})
+        self.obj = self.database.get()
+        print("Received object from storage. Object name: {0}. Object contains keys: {1}.".format(str(name), str(list(self.obj))),
+              file=self.output)
+        return self.obj
+
+    def set_object(self):
+        assert self.mainfild, "Main key value is not specified"
+        assert self.exist, "The object already exists in the storage, try use the update method"
+        self.database.change(dicts={self.mainfild: self.obj.get(self.mainfild)})
+        self.database.set(self.obj)
+        print("The object is stored in the storage. Object name: {0}".format(str(self.obj.get(self.mainfild))),
+              file=self.output)
+        return self.obj
+
+    def update_object(self):
+        assert self.mainfild, "Main key value is not specified"
+        self.database.change(dicts={self.mainfild: self.obj.get(self.mainfild)})
+        self.database.update(self.obj)
+        print("The object in the storage has been updated. Object name: {0}".format(str(self.obj.get(self.mainfild))),
+              file=self.output)
+
+    def check_object(self, name, get=None):
+        assert self.mainfild, "Main key value is not specified"
+        self.database.change(dicts={self.mainfild: name})
+        x = self.database.get()
+        if x:
+            self.exist = True
+        else:
+            self.exist = False
+
+    def generate_from_list(self, list_object, name, time=None, custom=None):
+        x = []
+        for i in list_object:
+            for j in i:
+                self.set_parameter(name=j, val=i[j])
+                if self.check_object(j):
+                    self.update_object()
+                else:
+                    self.set_object()
+            x.append(self.obj)
+            self.obj = {}
+        print("{0} objects added to and generated in the repository".format(str(len(list_object))), file=self.output)
+        return {'name': name, 'data': x, 'time': time, 'custom': custom}
+
+    def set_main(self, data_object):
         return False
 
-    def encrypt( self, raw ):
-        """
-        Метод шифрования объектов в AES.
-        :param raw:
-        :return:
-        """
-        iv = Random.new().read( AES.block_size )
-        cipher = AES.new( self.key, AES.MODE_CBC, iv )
-        return base64.b64encode( iv + cipher.encrypt( raw ) )
+class User(Base):
+    def set_main(self, data_object):
+        self.mainfild = 'username'
+        self.set_parameter(name='username', val=str(data_object['Userinfo']['Username']).lower())
+        self.set_parameter(name='domain', val=str(data_object['Userinfo']['Domainname']).lower())
+        self.set_parameter(name='computername', val=str(data_object['Userinfo']['Computername']).lower())
+        self.set_parameter(name='grouppolicy', val=str(data_object.get('GroupPolicyinfo')))
+        self.set_parameter(name='ps_version', val=str(data_object.get('Version')))
+        self.set_parameter(name='time', val=time.gmtime((return_nub(data_object['Timeinfo']) + 10800000) / 1000.))
+        return True
 
-    def decrypt( self, enc ):
-        """
-        Метод дешифрования объектов из AES. Требует значение self.key
-        :param enc:
-        :return:
-        """
-        enc = base64.b64decode(enc)
-        iv = enc[:16]
-        cipher = AES.new(self.key, AES.MODE_CBC, iv )
-        return cipher.decrypt( enc[16:] )
+class Comp(Base):
+    def set_main(self, data_object):
+        self.mainfild = 'computername'
+        self.set_parameter(name='computername', val=str(data_object['Userinfo']['Computername']))
+        self.set_parameter(name='system', val=data_object.get('Systeminfo'))
+        self.set_parameter(name='hard', val=data_object.get('Harddriveinfo'))
+        self.set_parameter(name='disk', val=data_object.get('Diskinfo'))
+        self.set_parameter(name='net', val=data_object.get('Networkinfo'))
+        self.set_parameter(name='groups', val=data_object.get('Groupsinfo'))
+        self.set_parameter(name='error', val=data_object.get('Errorinfo'))
+        self.set_parameter(name='program', val=data_object.get('Programsinfo'))
+        self.set_parameter(name='service', val=data_object.get('Serviceinfo'))
+        self.set_parameter(name='task', val=data_object.get('Tasksinfo'))
+        self.set_parameter(name='ps_version', val=data_object.get('Version'))
+        self.set_parameter(name='time', val=time.gmtime((return_nub(data_object['Timeinfo']) + 10800000) / 1000.))
+        return True
 
-    def get_time_dict(self):
+class Dhcp(Base):
+    def set_main(self, data_object):
+        return None
+
+    def generate_main_list(self, list_object):
+        """Метод выводит более удобочитаемый список на основании полученного JSON-объекта.
+        И сортирует полученный список по IP-адресам.
         """
-        Метод для записи в словарь информации о времени. Разбитие времени на отдельные
-        элементы сделано для более удобного поиска по базе данных
-        :return:
-        """
-        if 'time' in self.__dict__:
-            if type(self.time) == time.struct_time:
-                self.dicts['time'] = time.strftime('%d.%m.%Y %H:%M:%S', self.time)
-                self.time = datetime.datetime.fromtimestamp(time.mktime(self.time))
-            else:
-                self.dicts['time'] = str(self.time)
-            self.dicts['year'] = str(self.time.year)
-            self.dicts['month'] = str(self.time.month)
-            self.dicts['day'] = str(self.time.day)
-            self.dicts['hour'] = str(self.time.hour)
-            self.dicts['min'] = str(self.time.minute)
-            self.dicts['second'] = str(self.time.second)
+        return sorted([{'name': list_object['name'][i],
+                        'ip': list_object['ip'][i]['IPAddressToString'],
+                        'mac': list_object['mac'][i],
+                        'endtime': (lambda x=list_object['timeend'][i]: time.gmtime((return_nub(x) + 10800000)/1000.) if x else x)(),
+                        'time': time.gmtime((return_nub(list_object.get("Timeinfo")) + 10800000)/1000.),
+                        'rezervation': list_object['rezervation'][i]} for i in range(0, len(list_object['name']))],
+                      key=lambda y: y['ip'])
 
-    def set_dict(self):
-        exeption = ['dicts', 'message', 'dst', 'Key', 'Body', 'Targets', 'Crypt', 'key', 'body', 'db']
-        self.dicts = {i: self.__dict__[i] for i in self.__dict__ if i not in exeption}
-
-    def delete(self, trg, target=None):
-        if target:
-            self.db.delete()
-
-    def set(self, trg=None, target=None):
-        if target:
-            self.db.set(trg, path=target)
-        elif trg:
-            self.db.set(trg)
+class Route(Base):
+    def set_main(self, data_object):
+        assert data_object.get('message'), "Empty message."
+        assert data_object.get('time'), "No time set."
+        x = data_object['message'].split(sep=' ')
+        name = x[0][:-1]
+        x.remove(x[0])
+        self.obj = {i.split(sep='=')[0]: i.split(sep='=')[1] for i in x if len(i.split(sep='=')) > 1}
+        self.set_parameter(name='name', val=name)
+        if type(data_object['time']) == time.struct_time:
+            self.set_parameter(name='time', val=time.strftime('%d.%m.%Y %H:%M:%S', data_object['time']))
+            data_object['time'] = datetime.datetime.fromtimestamp(time.mktime(data_object['time']))
         else:
-            self.db.set(self.dicts)
-
-    def update(self, srctrg=None, dsttrg=None, target=None):
-        if target and dsttrg:
-            if srctrg:
-                Database(target=target, dicts=dsttrg).update(srctrg)
-            else:
-                Database(target=target, dicts=dsttrg).update(self.dicts)
-        elif dsttrg:
-            if srctrg:
-                Database(target=self.dst, dicts=dsttrg).update(srctrg)
-            else:
-                Database(target=self.dst, dicts=dsttrg).update(self.dicts)
-
-    def check_dict(self, target_dict):
-        """
-        Метод для проверки идентичности словарей. Исключает
-        значения _id (идентификационный номер записи в базе данных) и old
-        (список со старыми значениями). В случае обнаружения различий в
-        записях - записывает устаревшее значение в словарь old с указанием
-        времени сделаных изменений.
-        :param target_dict:
-        :return:
-        """
-        for i in self.dicts:
-            if i != '_id' and i != 'old' and i in target_dict:
-                if self.dicts[i] != target_dict[i]:
-                    self.old.append({i: target_dict[i], 'time': (datetime.datetime.now() + datetime.timedelta(hours=3))})
-
-    def get_dsttrg(self, src, fild):
-        """
-        Метод для получения объекта из целевой базы данных. Ищет объект по элементу
-        словаря ключ(fild) - значение(src)
-        :param src:
-        :param fild:
-        :return:
-        """
-        x = Database(target=self.dst, fild=fild, fild_var=src).get()
-        if x:
-            return x
-        else:
-            return False
+            self.set_parameter(name='time',val=str(data_object['time']))
+            self.set_parameter(name='year', val=str(data_object['time'].year))
+            self.set_parameter(name='month', val=str(data_object['time'].month))
+            self.set_parameter(name='day', val=str(data_object['time'].day))
+            self.set_parameter(name='hour', val=str(data_object['time'].hour))
+            self.set_parameter(name='min', val=str(data_object['time'].minute))
+        return True

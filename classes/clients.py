@@ -1,6 +1,6 @@
 import time
 from system.system import return_nub
-from classes.base import Base
+from classes.base_old import Base
 
 class Comp(Base):
     """Класс обрабатывает информацию о компьютере на основании полученного от него
