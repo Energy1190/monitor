@@ -1,6 +1,6 @@
 import datetime
 from traceback import format_exc
-from classes.base import Base_old
+from classes.base_old import Base
 from classes.db_mongo import Database
 from system.logmodule import logger
 
