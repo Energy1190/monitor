@@ -112,10 +112,10 @@ def return_nub(x):
 def error_log_write(t, err=None):
     global error_c
     error_c += 1
-    if not os.path.exists('error.log'):
-        file = open('error.log', 'w+')
+    if not os.path.exists('/error.log'):
+        file = open('/error.log', 'w+')
     else:
-        file = open('error.log', 'a+')
+        file = open('/error.log', 'a+')
     file.write('Error № {0} \n'.format(error_c))
     file.write('Error time {0} \n'.format(datetime.datetime.now() + datetime.timedelta(hours=3)))
     if err and t:
