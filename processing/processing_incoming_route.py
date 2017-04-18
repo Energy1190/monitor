@@ -25,5 +25,6 @@ def main(target, out_target, vals):
     except Exception as err:
         logging.error('Can not process incoming object')
         logging.error(str(format_exc()))
-
-    Database(target=target, dicts=incoming).delete()
+        
+    if incoming:
+        Database(target=target, dicts=incoming).delete()
