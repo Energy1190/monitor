@@ -44,7 +44,7 @@ class Base():
 
     def set_object(self):
         assert self.mainfild, "Main key value is not specified"
-        assert self.exist, "The object already exists in the storage, try use the update method"
+        assert not self.exist, "The object already exists in the storage, try use the update method"
         self.database.change(dicts={self.mainfild: self.obj.get(self.mainfild)})
         self.database.set(self.obj)
         print("The object is stored in the storage. Object name: {0}".format(str(self.obj.get(self.mainfild))),
