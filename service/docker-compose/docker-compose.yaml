@@ -1,0 +1,86 @@
+version: '2'
+
+services:
+  monitor-data:
+    image: debian
+    volumes:
+      - "/data/monitor:/data/monitor:ro"
+      
+  mongodb:
+    image: mongo
+    container_name: mongodb
+    restart: always
+    expose:
+      - "27017"
+    volumes:
+      - "/data/mongodb:/data/db"
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "1"
+    networks:
+      - "monitor-net"
+        
+  fluentd:
+    build: ./fluentd
+    image: self-fluentd
+    container_name: fluentd
+    restart: always
+    links:
+      - mongodb
+    networks:
+      - "monitor-net"
+    volumes:
+      - "/data/config/fluentd.conf:/fluentd/etc/fluent.conf"
+      - "/data/fluentd/:/fluentd/log:rw"
+      - "/data/start_fluentd.sh:/start.sh"
+      
+  webapp:
+    build: ./python
+    image: self-python
+    container_name: webapp
+    links:
+      - mongodb
+    volumes:
+      - "monitor-data:/data/monitor:ro"
+      - "/data/config:/data/config:rw"
+    environment:
+      PROGRAM: "/data/monitor/start_webapp.py"
+    ports:
+      - "80:5000"
+    networks:
+      - "monitor-net"
+      
+  watch:
+    build: ./python
+    image: self-python
+    container_name: watch
+    links:
+      - mongodb
+    environment:
+      PROGRAM: "/data/monitor/start_watch.py"
+    volumes:
+      - "monitor-data:/data/monitor:ro"
+      - "/data/config:/data/config:rw"      
+    networks:
+      - "monitor-net"
+      
+  other:
+    build: ./python
+    image: self-python  
+    container_name: other
+    links:
+      - mongodb
+    environment:
+      PROGRAM: "/data/monitor/start_other.py"    
+    volumes:
+      - "monitor-data:/data/monitor:ro"
+      - "/data/config:/data/config:rw"      
+    networks:
+      - "monitor-net"
+
+volumes:
+  monitor-data:
+  
+networks:
+  monitor-net:
