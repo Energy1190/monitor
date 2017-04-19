@@ -27,8 +27,11 @@ def main(target, out_target, vals, logging=logging):
         logging.error('Can not process incoming object')
         logging.error(str(format_exc()))
 
-    if incoming:
+    try:
         Database(target=target, dicts=incoming).delete()
+    except:
+        logging.error('Can not delete incoming object')
+        logging.error(str(format_exc()))
 
     if count:
         logging.info('In the target database {0}, there are still {1} records requiring processing'.format(str(target), str(count)))
