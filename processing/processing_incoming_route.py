@@ -31,6 +31,7 @@ def main(target, out_target, vals, logging=logging):
         Database(target=target, dicts=incoming).delete()
     except:
         logging.error('Can not delete incoming object')
+        logging.error(str(incoming))
         logging.error(str(format_exc()))
 
     if count:
