@@ -10,7 +10,7 @@ def main(target, out_target, vals, logging=logging):
         x = Database(target=target)
         if status:
             x.change(fild='Status', fild_var=status)
-        return [x.get(), x.count(x.find)]
+        return [dict(x.get()), x.count(x.find)]
 
     def object_operation(object, object_class, target):
         x = object_class(output=open(os.devnull, 'w'))
