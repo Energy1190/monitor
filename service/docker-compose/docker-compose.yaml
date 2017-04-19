@@ -21,6 +21,8 @@ services:
     image: self-fluentd
     container_name: fluentd
     restart: always
+    ports:
+      - "24224:24224/udp"
     links:
       - mongodb
     networks:

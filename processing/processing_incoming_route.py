@@ -9,7 +9,7 @@ c = [0, 0]
 def counter():
     global c
     c[0] += 1
-    if c > 1000000:
+    if c[0] > 1000000:
         c[0] = 0
         c[1] += 1
     return c
@@ -31,7 +31,7 @@ def main(target, out_target, vals, output=sys.stdout, error=sys.stderr):
     incoming, count = get_database_incoming(target, status=None)
     print('Incoming object detect: {0}'.format(str(incoming)), file=output)
     print('Counts: {0}'.format(str(counter())))
-    
+
     try:
         if incoming:
             object_operation(incoming, Route, out_target)
