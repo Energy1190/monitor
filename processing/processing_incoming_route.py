@@ -15,8 +15,8 @@ def main(target, out_target, vals):
     def object_operation(object, object_class, target):
         x = object_class(output=open(os.devnull, 'w'))
         x.set_storage(type='mongoDB', target=target)
-        x.check_collection('mongoDB', target)
         x.set_main(object)
+        x.check_collection('mongoDB', target)
         x.set_object()
 
     incoming, count = get_database_incoming(target, status=None)
