@@ -149,3 +149,13 @@ class Route(Base):
             self.set_parameter(name='hour', val=str(data_object['time'].hour))
             self.set_parameter(name='min', val=str(data_object['time'].minute))
         return True
+
+    def check_collection(self, type, target):
+        if not int(self.obj['day']) == int(target[1].split(sep="-")[-1]):
+            x = target[1].split(sep="-")
+            x[-1] = str(self.obj['day'])
+            self.set_storage(type, [target[0], '-'.join(x)])
+            print('Not a valid collection for writing data, the collection will be changed to {0}'.format(str([target[0], '-'.join(x)])),
+                  file=self.error)
+
+
