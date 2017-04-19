@@ -147,7 +147,7 @@ def get_route_info_database(*args, start_time=None, end_time=None, deep=4, outpu
         return x
 
     def detect_var(target, time, output=None):
-        if type(target) == list:
+        if type(target[0]) == list:
             target = target[0]
         x = int(time[0][0])
         y = str(time[0][0])
