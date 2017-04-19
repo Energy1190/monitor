@@ -16,9 +16,9 @@ if __name__ == '__main__':
             target_collection = 'base-{0}-{1}-{2}'.format(time_now.timetuple()[0],
                                                           time_now.timetuple()[1],
                                                           time_now.timetuple()[2])
-            processing_incoming_route(['route', 'warn'], ['route', target_collection], v)
-            processing_incoming_route(['route', 'notice'], ['route', target_collection], v)
-            processing_incoming_route(['route', 'info'], ['route', target_collection], v)
+            processing_incoming_route(['route', 'warn'], ['route', target_collection], v, logging=logging)
+            processing_incoming_route(['route', 'notice'], ['route', target_collection], v, logging=logging)
+            processing_incoming_route(['route', 'info'], ['route', target_collection], v, logging=logging)
             time.sleep(0.1)
             gc.collect()
     except Exception as err:

@@ -5,7 +5,7 @@ from traceback import format_exc
 from classes.base import Route
 from classes.db_mongo import Database
 
-def main(target, out_target, vals):
+def main(target, out_target, vals, logging=logging):
     def get_database_incoming(target, status=None):
         x = Database(target=target)
         if status:
