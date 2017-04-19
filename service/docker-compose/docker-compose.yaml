@@ -1,11 +1,6 @@
 version: '2'
 
 services:
-  monitor-data:
-    image: debian
-    volumes:
-      - "/data/monitor:/data/monitor:ro"
-      
   mongodb:
     image: mongo
     container_name: mongodb
@@ -42,7 +37,7 @@ services:
     links:
       - mongodb
     volumes:
-      - "monitor-data:/data/monitor:ro"
+      - "/data/monitor:/data/monitor:ro"
       - "/data/config:/data/config:rw"
     environment:
       PROGRAM: "/data/monitor/start_webapp.py"
@@ -60,7 +55,7 @@ services:
     environment:
       PROGRAM: "/data/monitor/start_watch.py"
     volumes:
-      - "monitor-data:/data/monitor:ro"
+      - "/data/monitor:/data/monitor:ro"
       - "/data/config:/data/config:rw"      
     networks:
       - "monitor-net"
@@ -74,7 +69,7 @@ services:
     environment:
       PROGRAM: "/data/monitor/start_other.py"    
     volumes:
-      - "monitor-data:/data/monitor:ro"
+      - "/data/monitor:/data/monitor:ro"
       - "/data/config:/data/config:rw"      
     networks:
       - "monitor-net"
