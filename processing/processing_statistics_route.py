@@ -1,15 +1,11 @@
 import datetime
-from traceback import format_exc
 from classes.db_mongo import Database
 from classes.route import Stat
-from reguests_db import get_route_info_database
-from system.logmodule import logger
-
+from system.requestus import get_route_info_database
 
 class Statistics():
     def __init__(self, target, target_stat, times=None, date=None, **kvargs):
         self.dx = kvargs
-        logger.debug('Incomig dict {0}'.format(str(self.dx)))
         self.result = []
         self.times = (times or (datetime.datetime.now() + datetime.timedelta(hours=2)).timetuple()[0:4])
         self.date = (date or (datetime.datetime.now() + datetime.timedelta(hours=2)).timetuple()[0:3])
@@ -46,7 +42,6 @@ class Statistics():
             return False
 
 def main(target_dhcp, target_stat, times=None, date=None):
-    logger.info(logger.info('Start generate statistics from router base per hour'))
     try:
         x = Statistics(target_dhcp, target_stat, times=times, date=date, conndestif='wan1', connrecvif='lan')
         x.generate()
@@ -58,9 +53,7 @@ def main(target_dhcp, target_stat, times=None, date=None):
             x.set()
         check_empty_hours(target_dhcp, target_stat, x.date, x.times)
     except Exception as err:
-        logger.error('Fail processing generate statistics from router base per {0}. Error : {1}'.format(
-            datetime.datetime.now() + datetime.timedelta(hours=2), str(err)))
-        logger.error('Trace: {0}'.format(str(format_exc())))
+        pass
 
 def check_empty_hours(target_dhcp, target_stat, date, times):
     x = list(date)
@@ -70,7 +63,6 @@ def check_empty_hours(target_dhcp, target_stat, date, times):
         x[3] = i
         y = Database(target=target_stat, fild='time', fild_var=tuple(x)).get()
         if not y:
-            logger.info('Miss hour {0} start generate'.format(str(i)))
             main(target_dhcp, target_stat, times=tuple(x), date=date)
 
 if __name__ == '__main__':

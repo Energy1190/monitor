@@ -1,3 +1,6 @@
+import sys
+import datetime
+from traceback import format_exc
 from classes.db_mongo import Database
 
 def check_base(target):
@@ -51,3 +54,131 @@ def check_base(target):
                     Database(dicts=i, target=target).delete()
         if name not in i:
             Database(dicts=i, target=target).delete()
+
+def get_route_info_database(*args, start_time=None, end_time=None, deep=4, output=sys.stdout, error=sys.stderr, **kvargs):
+    """
+    Обращается к базе данных по предоставленному фильтру. Обрабатывает и суммирует
+    полученный результат.
+    :param args:
+    :param start_time:
+    :param end_time:
+    :param deep:
+    :param kvargs:
+    :return:
+    """
+    def remove_temp(x):
+        """
+        Удаляет ненужные значения из словаря
+        :return:
+        """
+        removable = ['start_time', 'end_time', 'deep', 'limited', 'output', 'error']
+        for i in x:
+            if i in removable:
+                del x[i]
+        return x
+
+    def get_time_tuple(time_str):
+        """
+        Приведение времени к datetime
+        :param time_str:
+        :return:
+        """
+        if time_str:
+            try:
+                return datetime.datetime(*tuple(map(lambda x: int(x), time_str.split(sep='_'))))
+            except:
+                try:
+                    return datetime.datetime(*time_str)
+                except:
+                    return (datetime.datetime.now() + datetime.timedelta(hours=3))
+        else:
+            return False
+
+    def get_target(start_time, end_time):
+        if start_time.timetuple()[2] != end_time.timetuple()[2]:
+            ee = end_time.timetuple()
+            ss = start_time.timetuple()
+            target = [['route', 'base-{0}-{1}-{2}'.format(j,h,i)] for i in range(ss[2],ee[2]+1)
+                      for h in range(ss[1],ee[1]+1)
+                      for j in range(ss[0],ee[0]+1)]
+        elif start_time.timetuple()[0:2] == datetime.datetime.now().timetuple()[0:2]:
+            time_now = (datetime.datetime.now() + datetime.timedelta(hours=3))
+            target_collection = 'base-{0}-{1}-{2}'.format(time_now.timetuple()[0],
+                                                          time_now.timetuple()[1],
+                                                          time_now.timetuple()[2])
+            target = ['route', target_collection]
+        else:
+            ss = start_time.timetuple()
+            target = ['route', 'base-{0}-{1}-{2}'.format(ss[0],ss[1],ss[2])]
+        return target
+
+    def get_time_requests(start_time, end_time, deep=4):
+        try:
+            r = []
+            x = start_time.timetuple()[0:deep]
+            y = end_time.timetuple()[0:deep]
+            while x != y:
+                if x not in r:
+                    r.append(x)
+                start_time = start_time + datetime.timedelta(minutes=1)
+                x = start_time.timetuple()[0:deep]
+            r.append(x)
+            return r
+        except Exception as err:
+            pass
+
+    def get_answer(dx, target, visibal=False, output=None):
+        if visibal:
+            limit = 100
+        else:
+            limit = 1000000
+        x = []
+        y = []
+        if type(target[0]) == list:
+            for j in target:
+                y += Database(dicts=dx, target=j, limit=limit).find()
+        else:
+            y = Database(dicts=dx, target=target, limit=limit).find()
+        print('Object {0} contains {1} items'.format(str(dx), str(len(y))), file=output)
+        for i in y:
+            del i['_id']
+            if i not in x:
+                x.append(i)
+        return x
+
+    try:
+        print('Start generating a query to the database', file=output)
+        x = []
+        limited = kvargs.get('limited')         # Флаг лимитирующий результаты запросов.
+        dx = remove_temp(kvargs)                # Фильтер для поиска в базе.
+        start_time = get_time_tuple(start_time or
+                                     kvargs.get('start_time') or
+                                     ((datetime.datetime.now() + datetime.timedelta(hours=3)) - datetime.timedelta(days=1)))
+        end_time = get_time_tuple((end_time or
+                                   kvargs.get('end_time') or
+                                   (datetime.datetime.now() + datetime.timedelta(hours=3))))
+        target = get_target(start_time, end_time)
+        t = get_time_requests(start_time, end_time, deep=deep)
+        print('All parameters were successfully received', file=output)
+        print('Filter for request: {0}'.format(str(dx)), file=output)
+        print('Collection(s) of destination: {0}'.format(str(target)), file=output)
+        print('Time Filter: {0}'.format(str(t)), file=output)
+        if t:
+            for j in t:
+                if len(j) >= 1:
+                    dx['year'] = str(j[0])
+                if len(j) >= 2:
+                    dx['month'] = str(j[1])
+                if len(j) >= 3:
+                    dx['day'] = str(j[2])
+                if len(j) >= 4:
+                    dx['hour'] = str(j[3])
+                if len(j) >= 5:
+                    dx['minute'] = str(j[4])
+                for i in get_answer(dx, target, visibal=limited, output=output):
+                    x.append(i)
+            print('Request successfully processed, returned {0} items'.format(str(len(x))), file=output)
+            return x
+    except:
+        print('An error occurred while processing the request', file=error)
+        print(format_exc(), file=error)
