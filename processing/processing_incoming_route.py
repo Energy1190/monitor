@@ -29,3 +29,6 @@ def main(target, out_target, vals):
 
     if incoming:
         Database(target=target, dicts=incoming).delete()
+
+    if count:
+        logging.info('In the target database {0}, there are still {1} records requiring processing'.format(str(target), str(count)))

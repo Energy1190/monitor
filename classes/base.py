@@ -151,7 +151,14 @@ class Route(Base):
         return True
 
     def check_collection(self, type, target):
-        if not int(self.obj['day']) == int(target[1].split(sep="-")[-1]):
+        """
+        В случае, если в базе остались записи относящиеся не к текущему дню им
+        необходимо исправить коллекцию назначения
+        :param type:
+        :param target:
+        :return:
+        """
+        if self.obj.get('day') and not int(self.obj['day']) == int(target[1].split(sep="-")[-1]):
             x = target[1].split(sep="-")
             x[-1] = str(self.obj['day'])
             self.set_storage(type, [target[0], '-'.join(x)])
