@@ -139,12 +139,26 @@ def get_route_info_database(*args, start_time=None, end_time=None, deep=4, outpu
                 y += Database(dicts=dx, target=j, limit=limit).find()
         else:
             y = Database(dicts=dx, target=target, limit=limit).find()
-        print('Object {0} contains {1} items'.format(str(dx), str(len(y))), file=output)
         for i in y:
             del i['_id']
             if i not in x:
                 x.append(i)
+        print('Object {0} contains {1} items'.format(str(dx), str(len(x))), file=output)
         return x
+
+    def detect_var(target, time, output=None):
+        if type(target) == list:
+            target = target[0]
+        x = int(time[0][0])
+        y = str(time[0][0])
+        d = Database(target=target)
+        d.change(dicts={'year': x})
+        if d.count(d.find):
+            return int
+        d.change(dicts={'year': y})
+        if d.count(d.find):
+            return str
+        return False
 
     try:
         print('Start generating a query to the database', file=output)
@@ -163,21 +177,25 @@ def get_route_info_database(*args, start_time=None, end_time=None, deep=4, outpu
         print('Filter for request: {0}'.format(str(dx)), file=output)
         print('Collection(s) of destination: {0}'.format(str(target)), file=output)
         print('Time Filter: {0}'.format(str(t)), file=output)
-        if t:
+        typeus = detect_var(target, t)
+        if t and typeus:
             for j in t:
                 if len(j) >= 1:
-                    dx['year'] = str(j[0])
+                    dx['year'] = typeus(j[0])
                 if len(j) >= 2:
-                    dx['month'] = str(j[1])
+                    dx['month'] = typeus(j[1])
                 if len(j) >= 3:
-                    dx['day'] = str(j[2])
+                    dx['day'] = typeus(j[2])
                 if len(j) >= 4:
-                    dx['hour'] = str(j[3])
+                    dx['hour'] = typeus(j[3])
                 if len(j) >= 5:
-                    dx['minute'] = str(j[4])
+                    dx['minute'] = typeus(j[4])
                 for i in get_answer(dx, target, visibal=limited, output=output):
                     x.append(i)
             print('Request successfully processed, returned {0} items'.format(str(len(x))), file=output)
+            return x
+        else:
+            print('No data matched the query or an error occurred with the type of variables')
             return x
     except:
         print('An error occurred while processing the request', file=error)
