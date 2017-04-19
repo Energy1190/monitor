@@ -10,7 +10,9 @@ def main(target, out_target, vals, logging=logging):
         x = Database(target=target)
         if status:
             x.change(fild='Status', fild_var=status)
-        return [dict(x.get()), x.count(x.find)]
+        c = x.get()
+        logging.error('Object: {0}'.format(str(c)))
+        return [c, x.count(x.find)]
 
     def object_operation(object, object_class, target):
         x = object_class(output=open(os.devnull, 'w'))
@@ -28,7 +30,8 @@ def main(target, out_target, vals, logging=logging):
         logging.error(str(format_exc()))
 
     try:
-        Database(target=target, dicts=incoming).delete()
+        if incoming:
+            Database(target=target, dicts=incoming).delete()
     except:
         logging.error('Can not delete incoming object')
         logging.error(str(incoming))
