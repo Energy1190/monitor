@@ -1,11 +1,20 @@
 import os
-import gc
+import sys
 import logging
 from traceback import format_exc
 from classes.base import Route
 from classes.db_mongo import Database
 
-def main(target, out_target, vals, logging=logging):
+c = [0, 0]
+def counter():
+    global c
+    c[0] += 1
+    if c > 1000000:
+        c[0] = 0
+        c[1] += 1
+    return c
+
+def main(target, out_target, vals, output=sys.stdout, error=sys.stderr):
     def get_database_incoming(target, status=None):
         x = Database(target=target)
         if status:
@@ -20,20 +29,23 @@ def main(target, out_target, vals, logging=logging):
         x.set_object()
 
     incoming, count = get_database_incoming(target, status=None)
+    print('Incoming object detect: {0}'.format(str(incoming)), file=output)
+    print('Counts: {0}'.format(str(counter())))
+    
     try:
         if incoming:
             object_operation(incoming, Route, out_target)
     except Exception as err:
-        logging.error('Can not process incoming object')
-        logging.error(str(format_exc()))
+        print('Can not process incoming object', file=error)
+        print(str(format_exc()), file=error)
 
     try:
         if incoming:
             Database(target=target, dicts=incoming).delete()
     except:
-        logging.error('Can not delete incoming object')
-        logging.error(str(incoming))
-        logging.error(str(format_exc()))
+        print('Can not delete incoming object', file=error)
+        print(str(incoming), file=error)
+        print(str(format_exc()), file=error)
 
     if count:
-        logging.info('In the target database {0}, there are still {1} records requiring processing'.format(str(target), str(count)))
+        print('In the target database {0}, there are still {1} records requiring processing'.format(str(target), str(count)), file=output)
