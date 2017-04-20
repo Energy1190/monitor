@@ -20,7 +20,7 @@ if __name__ == '__main__':
             processing_incoming_route(['route', 'warn'], ['route', target_collection], v, output=sys.stdout)
             processing_incoming_route(['route', 'notice'], ['route', target_collection], v, output=sys.stdout)
             processing_incoming_route(['route', 'info'], ['route', target_collection], v, output=sys.stdout)
-            time.sleep(0.1)
+            time.sleep(10)
             gc.collect()
     except Exception as err:
         logging.error('A critical error occurred while processing logs')
