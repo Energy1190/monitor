@@ -1,7 +1,6 @@
 import sys
 import pytz
 import datetime
-import logging
 from traceback import format_exc
 from classes.base import Base, Comp, User, Dhcp
 from classes.db_mongo import Database
@@ -28,6 +27,11 @@ def main(target, out_target_users, out_target_comps, out_dhcp_target, output=sys
             else:
                 x.set_object()
 
+    def decrypt(target, key):
+        x = Crypt()
+        x.set_key(key)
+        return x.remove_end(target)
+
     print('---'*20, file=output)
     print('A new inbound object was detected', file=output)
     incoming, count = get_database_incoming(target, status='New')
@@ -35,7 +39,7 @@ def main(target, out_target_users, out_target_comps, out_dhcp_target, output=sys
     try:
         if incoming:
             d = incoming.get('Targets')
-            x = Crypt().remove_end(incoming.get('Body'))
+            x = decrypt(incoming.get('Body'), incoming.get('Key'))
             if x:
                 incoming = x
             else:
