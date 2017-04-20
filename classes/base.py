@@ -121,8 +121,8 @@ class Dhcp(Base):
         """Метод выводит более удобочитаемый список на основании полученного JSON-объекта.
         И сортирует полученный список по IP-адресам.
         """
-        time_info = list_object.get("Timeinfo")
-        list_object = list_object['Dhcpinfo']
+        time_info = list_object.get('Timeinfo')
+        list_object = list_object.get('Dhcpinfo')
         return sorted([{'name': list_object['name'][i],
                         'ip': list_object['ip'][i]['IPAddressToString'],
                         'mac': list_object['mac'][i],
