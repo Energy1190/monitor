@@ -40,7 +40,7 @@ def main(target, out_target_users, out_target_comps, out_dhcp_target, output=sys
                 incoming = x
             else:
                 print('The object was not decrypted', file=error)
-            print('Object contains the following keys: {0}'.format(str(list(x))), file=output)
+            print('Object contains the following keys: {0}'.format(str(list(incoming))), file=output)
             print('Assign an object - {0}'.format(str(d)), file=output)
             if d == 'report':
                 if int(incoming['Version']) > 2:
@@ -53,6 +53,7 @@ def main(target, out_target_users, out_target_comps, out_dhcp_target, output=sys
                 error_log_write(str(original), err='Can not be processed')
     except Exception as err:
         print('There were errors processing the incoming object', file=error)
+        print(str(incoming), file=error)
         print(str(format_exc()), file=error)
         error_log_write(str(original), err='Errors occurred')
 

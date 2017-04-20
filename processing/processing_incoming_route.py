@@ -21,7 +21,9 @@ def main(target, out_target, vals, output=sys.stdout, error=sys.stderr):
 
     i = 'Incoming object'
     incoming, count = get_database_incoming(target, status=None)
-    print('Processing of {0} incoming requests from the {1} collection starts'.format(str(count), str(target)), file=output)
+
+    if count:
+        print('Processing of {0} incoming requests from the {1} collection starts'.format(str(count), str(target)), file=output)
 
     try:
         if incoming:
