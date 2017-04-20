@@ -1,3 +1,4 @@
+import sys
 import pytz
 import datetime
 import logging
@@ -7,7 +8,7 @@ from classes.db_mongo import Database
 from classes.crypts import Crypt
 from system.system import error_log_write
 
-def main(target, out_target_users, out_target_comps, out_dhcp_target):
+def main(target, out_target_users, out_target_comps, out_dhcp_target, output=sys.stdout, error=sys.stderr):
     def get_database_incoming(target, status=None):
         x = Database(target=target)
         if status:
@@ -27,8 +28,8 @@ def main(target, out_target_users, out_target_comps, out_dhcp_target):
             else:
                 x.set_object()
 
-    logging.info('---'*20)
-    logging.info('A new inbound object was detected')
+    print('---'*20, file=output)
+    print('A new inbound object was detected', file=output)
     incoming, count = get_database_incoming(target, status='New')
     original = incoming
     try:
@@ -37,6 +38,10 @@ def main(target, out_target_users, out_target_comps, out_dhcp_target):
             x = Crypt().remove_end(incoming.get('Body'))
             if x:
                 incoming = x
+            else:
+                print('The object was not decrypted', file=error)
+            print('Object contains the following keys: {0}'.format(str(list(x))), file=output)
+            print('Assign an object - {0}'.format(str(d)), file=output)
             if d == 'report':
                 if int(incoming['Version']) > 2:
                     object_operation(incoming, Comp, out_target_comps, incoming['Userinfo']['Computername'])
@@ -44,14 +49,14 @@ def main(target, out_target_users, out_target_comps, out_dhcp_target):
             elif d == 'dhcp':
                 object_operation(incoming.get("Dhcpinfo"), Dhcp, out_dhcp_target, None)
             else:
-                logging.error('The incoming object can not be processed, information about it is placed in the log file')
+                print('The incoming object can not be processed, information about it is placed in the log file', file=error)
                 error_log_write(str(original), err='Can not be processed')
     except Exception as err:
-        logging.error('There were errors processing the incoming object')
-        logging.error(str(format_exc()))
+        print('There were errors processing the incoming object', file=error)
+        print(str(format_exc()), file=error)
         error_log_write(str(original), err='Errors occurred')
 
     Database(target=target, dicts=original).delete()
-    logging.info('The incoming object was processed and deleted')
+    print('The incoming object was processed and deleted', file=output)
     if count >= 1:
         main(target, out_target_users, out_target_comps, out_dhcp_target)
