@@ -6,7 +6,9 @@ from classes.route import Stat
 from system.requestus import get_route_info_database
 
 class Statistics():
-    def __init__(self, target, target_stat, times=None, date=None, **kvargs):
+    def __init__(self, target, target_stat, times=None, date=None, output=sys.stdout, error=sys.stderr, **kvargs):
+        self.output = output
+        self.error = error
         self.dx = kvargs
         self.result = []
         self.times = (times or (datetime.datetime.now() + datetime.timedelta(hours=2)).timetuple()[0:4])
@@ -21,6 +23,8 @@ class Statistics():
         self.full = False
         self.body = {'stat': self.result, 'time': times, 'inter': 'hour', 'incomplete': self.incomplete, 'nozero': self.nozero,
                      'full': self.full}
+        print('A new class of statistics was generated', file=output)
+        print('Body of the class - {0}'.format(str(self.body)), file=output)
 
     def check(self):
         target_collection = 'base-{0}-{1}-{2}'.format(self.times[0],
@@ -35,6 +39,10 @@ class Statistics():
             x = incoming.get('time')
             if x.day == self.times[2]:
                 self.incomplete = True
+        print('A number of inspections were carried out', file=self.output)
+        print('Incomplete: {0}, full: {1}, target: {2}'.format(str(self.incomplete),
+                                                               str(self.full),
+                                                               str(target)), file=self.output)
         if not target:
             return False
         return True
@@ -43,27 +51,34 @@ class Statistics():
         for i in self.result:
             if i['data']['in_bytes'] or i['data']['out_bytes']:
                 self.nozero = True
+        print('A check for data was performed. Data: {0}'.format(str(self.nozero)), file=self.output)
 
     def set(self, no_replase):
         if no_replase:
+            no_replase = False
             self.daystat.set(self.body)
         else:
+            no_replase = True
             self.daystat.change(dicts={'time': self.times})
             self.daystat.update(self.body)
+        print('The data was recorded in the database. Updated: {0}.'.format(str(no_replase)), file=self.output)
 
     def set_day(self, x):
         self.daystat.change(fild='time', fild_var=self.date)
         self.daystat.update(x)
+        print('Data for the day were updated and written to the database.', file=self.output)
 
     def generate(self):
         for i in self.iplist.find():
             self.dx['connsrcip'] = i['ip']
             y = Stat(get_route_info_database(**self.dx), i['ip'], i['name'], ['clients','users'])
             self.result.append(y.trg)
+        print('The statistics for {0} objects were generated'.format(str(len(self.result))), file=self.output)
         self.check_zero()
 
     def remove_day(self):
         self.daystat.change(fild='time', fild_var=self.date)
+        print('Entry for {0} has been deleted'.format(str(self.date)), file=self.output)
         return self.daystat.delete()
 
     def per_day(self):
@@ -128,6 +143,7 @@ def check_empty_hours(target_dhcp, target_stat, date, times, output=sys.stdout, 
     x = list(date)
     y = list(times)
     x.append(0)
+    print('Need to check {0} objects.'.format(str(y[3])), file=output)
     for i in range(0, int(y[3])):
         x[3] = i
         y = Database(target=target_stat, fild='time', fild_var=tuple(x)).get()
@@ -138,7 +154,7 @@ def check_empty_hours(target_dhcp, target_stat, date, times, output=sys.stdout, 
                 main(target_dhcp, target_stat, times=tuple(x), date=date, noreplase=y['nozero'])
         except:
             if not y:
-                print('An empty record of the old sample was found, dated {0}, I initialize the mechanism for generating statistics'.format(str(x)),
+                print('An empty record of the old sample was found, dated {0}, initialize the mechanism for generating statistics'.format(str(x)),
                       file=error)
                 main(target_dhcp, target_stat, times=tuple(x), date=date, noreplase=True)
 
