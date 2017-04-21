@@ -29,7 +29,7 @@ class Statistics():
         hour = self.times[3]
         incoming = Database(target=['route', 'info']).get()
         target = Database(target=['route', target_collection], dicts={'hour': hour}).get()
-        full = Database(target=['route', self.target], dicts={'time': self.date}).get().get('full')
+        full = Database(target=self.target, dicts={'time': self.date}).get().get('full')
         self.full = full
         if incoming and incoming.get('time') and type(incoming.get('time')) == datetime.datetime:
             x = incoming.get('time')
