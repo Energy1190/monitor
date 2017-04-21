@@ -100,9 +100,13 @@ class Statistics():
             return self.body
 
 def main(target_dhcp, target_stat, times=None, date=None, noreplase=True, full=False, output=sys.stdout, error=sys.stderr):
+    print('--'*20, file=output)
+    print('Start of statistics generation', file=output)
+    print('Incoming time - {0} and date - {1}'.format(str(times), str(date)), file=output)
     try:
         x = Statistics(target_dhcp, target_stat, times=times, date=date, conndestif='wan1', connrecvif='lan')
         if x.check():
+            print('In the target database, data is found', file=output)
             x.full = full
             x.generate()
             x.set(noreplase)
@@ -111,13 +115,16 @@ def main(target_dhcp, target_stat, times=None, date=None, noreplase=True, full=F
                 x.set_day(y)
             else:
                 x.set(True)
-        check_empty_hours(target_dhcp, target_stat, x.date, x.times)
+            print('Statistics generated, start post-check', file=output)
+        check_empty_hours(target_dhcp, target_stat, x.date, x.times, output=output, error=error)
+        check_incomplete(target_dhcp, target_stat, x.date, x.times, output=output, error=error)
         check_extra_entries(target_stat, x.date)
     except Exception as err:
         print('An error occurred while generating statistics.', file=error)
         print(str(format_exc()), file=error)
 
-def check_empty_hours(target_dhcp, target_stat, date, times):
+def check_empty_hours(target_dhcp, target_stat, date, times, output=sys.stdout, error=sys.stderr):
+    print('Run a check for missing entries in the database', output=output)
     x = list(date)
     y = list(times)
     x.append(0)
@@ -126,21 +133,30 @@ def check_empty_hours(target_dhcp, target_stat, date, times):
         y = Database(target=target_stat, fild='time', fild_var=tuple(x)).get()
         try:
             if not y or not y['nozero']:
+                print('An empty record was found, dated {0}, initialized the mechanism for generating statistics'.format(str(x)),
+                      file=error)
                 main(target_dhcp, target_stat, times=tuple(x), date=date, noreplase=y['nozero'])
         except:
             if not y:
+                print('An empty record of the old sample was found, dated {0}, I initialize the mechanism for generating statistics'.format(str(x)),
+                      file=error)
                 main(target_dhcp, target_stat, times=tuple(x), date=date, noreplase=True)
 
+def check_incomplete(target_dhcp, target_stat, date, times, output=sys.stdout, error=sys.stderr):
+    print('Run integrity check', file=output)
+    x = list(date)
     x[2] = x[2] - 1
     c = Statistics(target_dhcp, target_stat, times=times, date=tuple(x), conndestif='wan1', connrecvif='lan')
     c.check()
     if not c.incomplete and not c.full:
+        print('Mismatch detected, start database regeneration', file=output)
         c.remove_day()
         for i in range(0,23):
             x[3] = i
             main(target_dhcp, target_stat, times=tuple(x), date=tuple(x[:-1]), noreplase=False, full=True)
 
 def check_extra_entries(target_stat, date):
+    print('Run the check for extra entries', file=sys.stdout)
     x = list(date)
     x.append(0)
     result = []
