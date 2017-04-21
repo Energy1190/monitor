@@ -32,7 +32,8 @@ class Statistics():
                                                       self.times[2])
         hour = self.times[3]
         incoming = Database(target=['route', 'info']).get()
-        target = Database(target=['route', target_collection], dicts={'hour': hour}).get()
+        target = Database(target=['route', target_collection], dicts={'hour': str(hour)}).get()
+        if not target: target = Database(target=['route', target_collection], dicts={'hour': hour}).get()
         full = Database(target=self.target, dicts={'time': self.date}).get().get('full')
         self.full = full
         if incoming and incoming.get('time') and type(incoming.get('time')) == datetime.datetime:
@@ -147,6 +148,7 @@ def check_empty_hours(target_dhcp, target_stat, date, times, output=sys.stdout, 
     for i in range(0, int(y[3])):
         x[3] = i
         y = Database(target=target_stat, fild='time', fild_var=tuple(x)).get()
+        print('Check nuber {0}. Object: {1}'.format(str(x[3]), str(y)), file=sys.stdout)
         try:
             if not y or not y['nozero']:
                 print('An empty record was found, dated {0}, initialized the mechanism for generating statistics'.format(str(x)),
