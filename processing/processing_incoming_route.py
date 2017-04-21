@@ -1,6 +1,5 @@
 import os
 import sys
-import logging
 from traceback import format_exc
 from classes.base import Route
 from classes.db_mongo import Database
