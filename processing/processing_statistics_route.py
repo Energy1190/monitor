@@ -124,7 +124,7 @@ def main(target_dhcp, target_stat, times=None, date=None, noreplase=True, full=F
         print(str(format_exc()), file=error)
 
 def check_empty_hours(target_dhcp, target_stat, date, times, output=sys.stdout, error=sys.stderr):
-    print('Run a check for missing entries in the database', output=output)
+    print('Run a check for missing entries in the database', file=output)
     x = list(date)
     y = list(times)
     x.append(0)
