@@ -142,6 +142,7 @@ def check_empty_hours(target_dhcp, target_stat, date, times):
 
 def check_extra_entries(target_stat, date):
     x = list(date)
+    x.append(0)
     result = []
     c = Database(target=target_stat, dicts={'time': date})
 
