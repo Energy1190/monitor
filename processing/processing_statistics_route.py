@@ -1,5 +1,6 @@
 import sys
 import datetime
+from traceback import format_exc
 from classes.db_mongo import Database
 from classes.route import Stat
 from system.requestus import get_route_info_database
@@ -98,7 +99,7 @@ class Statistics():
         else:
             return self.body
 
-def main(target_dhcp, target_stat, times=None, date=None, noreplase=True, full=False):
+def main(target_dhcp, target_stat, times=None, date=None, noreplase=True, full=False, output=sys.stdout, error=sys.stderr):
     try:
         x = Statistics(target_dhcp, target_stat, times=times, date=date, conndestif='wan1', connrecvif='lan')
         if x.check():
@@ -113,7 +114,8 @@ def main(target_dhcp, target_stat, times=None, date=None, noreplase=True, full=F
         check_empty_hours(target_dhcp, target_stat, x.date, x.times)
         check_extra_entries(target_stat, x.date)
     except Exception as err:
-        pass
+        print('An error occurred while generating statistics.', file=error)
+        print(str(format_exc()), file=error)
 
 def check_empty_hours(target_dhcp, target_stat, date, times):
     x = list(date)
