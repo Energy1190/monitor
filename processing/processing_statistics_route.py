@@ -160,7 +160,7 @@ def check_empty_hours(target_dhcp, target_stat, date, times, output=sys.stdout, 
             if not y:
                 print('An empty record of the old sample was found, dated {0}, initialize the mechanism for generating statistics'.format(str(x)),
                       file=error)
-                main(target_dhcp, target_stat, times=tuple(x), date=date, noreplase=True)
+                main(target_dhcp, target_stat, times=tuple(x), date=date, noreplase=False)
 
 def check_incomplete(target_dhcp, target_stat, date, times, output=sys.stdout, error=sys.stderr):
     print('Run integrity check', file=output)
