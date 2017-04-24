@@ -151,16 +151,11 @@ def check_empty_hours(target_dhcp, target_stat, date, times, output=sys.stdout, 
     for i in range(0, int(y[3])):
         x[3] = i
         y = Database(target=target_stat, fild='time', fild_var=tuple(x)).get()
-        try:
-            if not y or not y['nozero']:
-                print('An empty record was found, dated {0}, initialized the mechanism for generating statistics'.format(str(x)),
-                      file=error)
-                main(target_dhcp, target_stat, times=tuple(x), date=date, noreplase=y['nozero'])
-        except:
-            if not y:
-                print('An empty record of the old sample was found, dated {0}, initialize the mechanism for generating statistics'.format(str(x)),
-                      file=error)
-                main(target_dhcp, target_stat, times=tuple(x), date=date, noreplase=False)
+        if not y or not y.get('nozero'):
+            print('An empty record was found, dated {0}, initialized the mechanism for generating statistics'.format(str(x)),
+                  file=error)
+            main(target_dhcp, target_stat, times=tuple(x), date=date, noreplase=y.get('nozero'))
+
 
 def check_incomplete(target_dhcp, target_stat, date, times, output=sys.stdout, error=sys.stderr):
     print('Run integrity check', file=output)
