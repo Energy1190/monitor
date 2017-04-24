@@ -10,6 +10,7 @@ class Statistics():
         self.output = output
         self.error = error
         self.dx = kvargs
+        self.recursion = False
         self.result = []
         self.times = (times or (datetime.datetime.now() + datetime.timedelta(hours=2)).timetuple()[0:4])
         self.date = (date or (datetime.datetime.now() + datetime.timedelta(hours=2)).timetuple()[0:3])
@@ -22,7 +23,7 @@ class Statistics():
         self.nozero = False
         self.full = False
         self.body = {'stat': self.result, 'time': times, 'inter': 'hour', 'incomplete': self.incomplete, 'nozero': self.nozero,
-                     'full': self.full}
+                     'full': self.full, 'recursion': self.recursion}
         print('A new class of statistics was generated', file=output)
         print('Body of the class - {0}'.format(str(self.body)), file=output)
 
@@ -93,7 +94,7 @@ class Statistics():
             b = [Stat(dicts=i) for i in self.body.get('stat')]
             c = [i + j for i in a for j in b if str(i['ip']) == str(j['ip'])]
             return {'stat': c, 'time': self.date, 'inter': 'day', 'incomplete': self.incomplete, 'nozero': self.nozero,
-                    'full': self.full}
+                    'full': self.full, 'recursion': self.recursion}
         else:
             self.body['time'] = self.date
             self.body['inter'] = 'day'
@@ -118,7 +119,8 @@ class Statistics():
         else:
             return self.body
 
-def main(target_dhcp, target_stat, times=None, date=None, noreplase=True, full=False, output=sys.stdout, error=sys.stderr):
+def main(target_dhcp, target_stat, times=None, date=None, noreplase=True, full=False, output=sys.stdout, error=sys.stderr,
+         recursion_fix=False):
     print('--'*20, file=output)
     print('Start of statistics generation', file=output)
     print('Incoming time - {0} and date - {1}'.format(str(times), str(date)), file=output)
@@ -127,6 +129,7 @@ def main(target_dhcp, target_stat, times=None, date=None, noreplase=True, full=F
         if x.check():
             print('In the target database, data is found', file=output)
             x.full = full
+            x.recursion = recursion_fix
             x.generate()
             x.set(noreplase)
             y = x.per_day()
@@ -151,10 +154,10 @@ def check_empty_hours(target_dhcp, target_stat, date, times, output=sys.stdout, 
     for i in range(0, int(y[3])):
         x[3] = i
         y = Database(target=target_stat, fild='time', fild_var=tuple(x)).get()
-        if not y or not y.get('nozero'):
+        if not y or not y.get('nozero') and not y.get('recursion'):
             print('An empty record was found, dated {0}, initialized the mechanism for generating statistics'.format(str(x)),
                   file=error)
-            main(target_dhcp, target_stat, times=tuple(x), date=date, noreplase=y.get('nozero'))
+            main(target_dhcp, target_stat, times=tuple(x), date=date, noreplase=y.get('nozero'), recursion_fix=True)
 
 
 def check_incomplete(target_dhcp, target_stat, date, times, output=sys.stdout, error=sys.stderr):
