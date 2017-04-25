@@ -58,9 +58,9 @@ class Statistics():
                 self.nozero = True
         print('A check for data was performed. Data: {0}'.format(str(self.nozero)), file=self.output)
 
-    def set(self, no_replase):
+    def set(self, x, no_replase):
         if no_replase:
-            self.daystat.set(self.body)
+            self.daystat.set(x)
             no_replase = False
             if len(self.body['stat']) > 1:
                 x = self.body['stat'][0]
@@ -76,9 +76,9 @@ class Statistics():
         else:
             self.daystat.change(dicts={'time': self.times})
             if self.daystat.get():
-                self.daystat.update(self.body)
+                self.daystat.update(x)
             else:
-                self.set(True)
+                self.set(x, True)
                 print('The argument "noreplase" is not specified correctly. Object does not exist in the database',
                       file=self.output)
                 return True
@@ -147,12 +147,12 @@ def main(target_dhcp, target_stat, times=None, date=None, noreplase=True, full=F
             print('In the target database, data is found', file=output)
             x.full = full
             x.generate()
-            x.set(noreplase)
+            x.set(x.body, noreplase)
             y = x.per_day()
             if y:
                 x.set_day(y)
             else:
-                x.set(True)
+                x.set(x.body, True)
             print('Statistics generated, start post-check', file=output)
         check_empty_hours(target_dhcp, target_stat, x.date, x.times, output=output, error=error, check_list=check_list)
         check_incomplete(target_dhcp, target_stat, x.date, x.times, output=output, error=error)
