@@ -60,12 +60,29 @@ class Statistics():
 
     def set(self, no_replase):
         if no_replase:
-            no_replase = False
             self.daystat.set(self.body)
+            no_replase = False
+            if len(self.body['stat']) > 1:
+                x = self.body['stat'][0]
+            else:
+                x = self.body['stat']
+            print('A new object was added to the database',
+                  file=self.output)
+            print('**'*20,  file=self.output)
+            print('* Time: {0} as {1}'.format(str(self.body['time']), type(self.body['time'])), file=self.output)
+            print('* Inter: {0} as {1}'.format(str(self.body['inter']), type(self.body['inter'])), file=self.output)
+            print('* Data: {0} as {1}'.format(str(x), type(x)), file=self.output)
+            print('**' * 20, file=self.output)
         else:
-            no_replase = True
             self.daystat.change(dicts={'time': self.times})
-            self.daystat.update(self.body)
+            if self.daystat.get():
+                self.daystat.update(self.body)
+            else:
+                self.set(True)
+                print('The argument "noreplase" is not specified correctly. Object does not exist in the database',
+                      file=self.output)
+                return True
+            no_replase = True
         print('The data was recorded in the database. Updated: {0}.'.format(str(no_replase)), file=self.output)
 
     def set_day(self, x):
