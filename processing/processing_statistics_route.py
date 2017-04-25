@@ -154,11 +154,15 @@ def check_empty_hours(target_dhcp, target_stat, date, times, output=sys.stdout, 
         if i not in check_list:
             x[3] = i
             y = Database(target=target_stat, fild='time', fild_var=tuple(x)).get()
-            if not y or not y.get('nozero'):
+            try:
+                nozero = y.get('nozero')
+            except:
+                nozero = False
+            if not y or not nozero:
                 print('An empty record was found, dated {0}, initialized the mechanism for generating statistics'.format(str(x)),
                       file=error)
                 check_list.append(i)
-                main(target_dhcp, target_stat, times=tuple(x), date=date, noreplase=y.get('nozero'), check_list=check_list)
+                main(target_dhcp, target_stat, times=tuple(x), date=date, noreplase=nozero, check_list=check_list)
 
 
 def check_incomplete(target_dhcp, target_stat, date, times, output=sys.stdout, error=sys.stderr):
