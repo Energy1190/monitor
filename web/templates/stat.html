@@ -39,4 +39,36 @@
     </div>
 </div>
 </div>
+{% if debug %}
+<div class="row">
+<div class="panel panel-default">
+  <div class="panel-heading">Statistics</div>
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+            <tr>
+                <th>Time</th>
+                <th>Inter</th>
+                <th>Incomplete</th>
+                <th>Nozero</th>
+                <th>Full</th>
+                <th>Count</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>{% data.get('time') %}</td>
+                <td>{% data.get('inter') %}</td>
+                <td>{% data.get('incomplete') %}</td>
+                <td>{% data.get('nozero') %}</td>
+                <td>{% data.get('full') %}</td>
+                <td>{% debug %}</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</div>
+{% endif %}
+
 {% endblock %}

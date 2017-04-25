@@ -10,7 +10,6 @@ class Statistics():
         self.output = output
         self.error = error
         self.dx = kvargs
-        self.recursion = False
         self.result = []
         self.times = (times or (datetime.datetime.now() + datetime.timedelta(hours=2)).timetuple()[0:4])
         self.date = (date or (datetime.datetime.now() + datetime.timedelta(hours=2)).timetuple()[0:3])
@@ -19,6 +18,7 @@ class Statistics():
         self.daystat = Database(target=target_stat)
         self.dx['start_time'] = (kvargs.get('start_time') or times or self.times)
         self.dx['end_time'] = (kvargs.get('end_time') or times or self.times)
+        self.recursion = False
         self.incomplete = False
         self.nozero = False
         self.full = False
@@ -120,7 +120,7 @@ class Statistics():
             return self.body
 
 def main(target_dhcp, target_stat, times=None, date=None, noreplase=True, full=False, output=sys.stdout, error=sys.stderr,
-         recursion_fix=False):
+         check_list=[]):
     print('--'*20, file=output)
     print('Start of statistics generation', file=output)
     print('Incoming time - {0} and date - {1}'.format(str(times), str(date)), file=output)
@@ -129,7 +129,6 @@ def main(target_dhcp, target_stat, times=None, date=None, noreplase=True, full=F
         if x.check():
             print('In the target database, data is found', file=output)
             x.full = full
-            x.recursion = recursion_fix
             x.generate()
             x.set(noreplase)
             y = x.per_day()
@@ -138,26 +137,28 @@ def main(target_dhcp, target_stat, times=None, date=None, noreplase=True, full=F
             else:
                 x.set(True)
             print('Statistics generated, start post-check', file=output)
-        check_empty_hours(target_dhcp, target_stat, x.date, x.times, output=output, error=error)
+        check_empty_hours(target_dhcp, target_stat, x.date, x.times, output=output, error=error, check_list=check_list)
         check_incomplete(target_dhcp, target_stat, x.date, x.times, output=output, error=error)
         check_extra_entries(target_stat, x.date)
     except Exception as err:
         print('An error occurred while generating statistics.', file=error)
         print(str(format_exc()), file=error)
 
-def check_empty_hours(target_dhcp, target_stat, date, times, output=sys.stdout, error=sys.stderr):
+def check_empty_hours(target_dhcp, target_stat, date, times, output=sys.stdout, error=sys.stderr, check_list=[]):
     print('Run a check for missing entries in the database', file=output)
     x = list(date)
     y = list(times)
     x.append(0)
     print('Need to check {0} objects.'.format(str(y[3])), file=output)
     for i in range(0, int(y[3])):
-        x[3] = i
-        y = Database(target=target_stat, fild='time', fild_var=tuple(x)).get()
-        if not y or not y.get('nozero') and not y.get('recursion'):
-            print('An empty record was found, dated {0}, initialized the mechanism for generating statistics'.format(str(x)),
-                  file=error)
-            main(target_dhcp, target_stat, times=tuple(x), date=date, noreplase=y.get('nozero'), recursion_fix=True)
+        if i not in check_list:
+            x[3] = i
+            y = Database(target=target_stat, fild='time', fild_var=tuple(x)).get()
+            if not y or not y.get('nozero'):
+                print('An empty record was found, dated {0}, initialized the mechanism for generating statistics'.format(str(x)),
+                      file=error)
+                check_list.append(i)
+                main(target_dhcp, target_stat, times=tuple(x), date=date, noreplase=y.get('nozero'), check_list=check_list)
 
 
 def check_incomplete(target_dhcp, target_stat, date, times, output=sys.stdout, error=sys.stderr):

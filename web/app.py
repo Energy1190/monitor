@@ -43,12 +43,19 @@ def requests_g():
 @app.route("/<name>", methods=['GET'])
 @auth
 def users_p(name):
+    debug = False
     names = False
     users = False
     if name in ['comps', 'users', 'dhcp', 'stat']:
         args_r = {i: request.args.get(i) for i in list(request.args)}
         if 'time' in args_r:
             args_r['time'] = list(map(int, args_r['time'].replace('(', '').replace(')', '').split(sep=', ')))
+        if 'debug' in args_r:
+            debug = True
+            del args_r['debug']
+            x = Database(dicts=args_r, target=['clients', name], limit=500)
+            if x.count(x.find):
+                debug = x.count(x.find)
         if name == 'stat':
             database_json = Database(dicts=args_r, target=['clients', name]).get()
             if database_json:
@@ -61,7 +68,8 @@ def users_p(name):
             database_json = Database(dicts=args_r, target=['clients', name], limit=500).find()
         return render_template(str(name + '.html'), data=database_json, time=(datetime.datetime.now() + datetime.timedelta(hours=2)).timetuple(),
                                names=names,
-                               users=users)
+                               users=users,
+                               debug=debug)
     else:
         return "Not Found 404", 404
 
