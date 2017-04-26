@@ -22,7 +22,7 @@ class Statistics():
         self.incomplete = False
         self.nozero = False
         self.full = False
-        self.body = {'stat': self.result, 'time': times, 'inter': 'hour', 'incomplete': self.incomplete, 'nozero': self.nozero,
+        self.body = {'stat': self.result, 'time': self.times, 'inter': 'hour', 'incomplete': self.incomplete, 'nozero': self.nozero,
                      'full': self.full, 'recursion': self.recursion}
         print('A new class of statistics was generated', file=output)
         print('Body of the class - {0}'.format(str(self.body)), file=output)
@@ -107,15 +107,23 @@ class Statistics():
         self.daystat.change(fild='time', fild_var=self.date)
         x = self.daystat.get()
         if x:
+            print("A day's record already exists in the database", file=self.output)
             a = [Stat(dicts=i) for i in x.get('stat')]
             b = [Stat(dicts=i) for i in self.body.get('stat')]
             c = [i + j for i in a for j in b if str(i['ip']) == str(j['ip'])]
             return {'stat': c, 'time': self.date, 'inter': 'day', 'incomplete': self.incomplete, 'nozero': self.nozero,
                     'full': self.full, 'recursion': self.recursion}
         else:
-            self.body['time'] = self.date
-            self.body['inter'] = 'day'
+            print("Daily records do not exist in the database", file=self.output)
             return False
+
+    def regenerate_per_day(self, x):
+        result = {}
+        for i in x:
+            result[i] = x[i]
+        result['time'] = self.date
+        result['inter'] = 'day'
+        return result
 
     def __add__(self, other):
         result = []
@@ -152,7 +160,7 @@ def main(target_dhcp, target_stat, times=None, date=None, noreplase=True, full=F
             if y:
                 x.set_day(y)
             else:
-                x.set(x.body, True)
+                x.set(x.regenerate_per_day(x.body), True)
             print('Statistics generated, start post-check', file=output)
         check_empty_hours(target_dhcp, target_stat, x.date, x.times, output=output, error=error, check_list=check_list)
         check_incomplete(target_dhcp, target_stat, x.date, x.times, output=output, error=error)
