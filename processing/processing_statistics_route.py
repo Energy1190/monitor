@@ -60,7 +60,7 @@ class Statistics():
 
     def set(self, x, no_replase):
         if no_replase:
-            self.daystat.set(x)
+            self.daystat.set2(x)
             no_replase = False
             if len(self.body['stat']) > 1:
                 x = self.body['stat'][0]

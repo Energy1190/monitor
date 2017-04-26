@@ -62,6 +62,14 @@ class Database():
             else:
                 return self.path.save(x)
 
+    def set2(self, x, path=None):
+        x = self._del(dict(x))
+        if x:
+            if path:
+                return self._db_path(target=path).save(x)
+            else:
+                return self.path.insert_one(x)
+
     def get(self):
         if self.dicts:
             return self.path.find_one(self.dicts)
