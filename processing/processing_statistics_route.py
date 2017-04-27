@@ -60,6 +60,7 @@ class Statistics():
 
     def set(self, x, no_replase, check=None, force=False):
         if no_replase:
+            self.daystat.change(dicts={'time': check})
             self.daystat.set2(x)
             no_replase = False
             if len(self.body['stat']) > 1:
@@ -75,7 +76,7 @@ class Statistics():
             print('**' * 20, file=self.output)
         else:
             self.daystat.change(dicts={'time': check})
-            if self.daystat.get() and not force:
+            if self.daystat.get() or force:
                 self.daystat.update(x)
             else:
                 self.set(x, True)
@@ -155,12 +156,14 @@ def main(target_dhcp, target_stat, times=None, date=None, noreplase=True, full=F
             print('In the target database, data is found', file=output)
             x.full = full
             x.generate()
-            x.set(x.regenerate_dicts(x.body), noreplase, check=x.times, force=force)
+            object = x.regenerate_dicts(x.body)
+            x.set(object, noreplase, check=object['time'], force=force)
             y = x.per_day()
             if y:
                 x.set_day(x.regenerate_dicts(y))
             else:
-                x.set(x.regenerate_dicts(x.body, time=x.date, inter='day'), True, check=x.date)
+                object = x.regenerate_dicts(x.body, time=x.date, inter='day')
+                x.set(object, True, check=object['time'])
             print('Statistics generated, start post-check', file=output)
 #        check_empty_hours(target_dhcp, target_stat, x.date, x.times, output=output, error=error, check_list=check_list)
 #        check_incomplete(target_dhcp, target_stat, x.date, x.times, output=output, error=error)
