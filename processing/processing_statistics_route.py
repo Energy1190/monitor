@@ -58,7 +58,7 @@ class Statistics():
                 self.nozero = True
         print('A check for data was performed. Data: {0}'.format(str(self.nozero)), file=self.output)
 
-    def set(self, x, no_replase, check=self.times):
+    def set(self, x, no_replase, check=None):
         if no_replase:
             self.daystat.set2(x)
             no_replase = False
@@ -155,7 +155,7 @@ def main(target_dhcp, target_stat, times=None, date=None, noreplase=True, full=F
             print('In the target database, data is found', file=output)
             x.full = full
             x.generate()
-            x.set(x.regenerate_dicts(x.body), noreplase)
+            x.set(x.regenerate_dicts(x.body), noreplase, check=x.times)
             y = x.per_day()
             if y:
                 x.set_day(x.regenerate_dicts(y))
