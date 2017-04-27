@@ -58,7 +58,7 @@ class Statistics():
                 self.nozero = True
         print('A check for data was performed. Data: {0}'.format(str(self.nozero)), file=self.output)
 
-    def set(self, x, no_replase, check=None):
+    def set(self, x, no_replase, check=None, force=False):
         if no_replase:
             self.daystat.set2(x)
             no_replase = False
@@ -75,7 +75,7 @@ class Statistics():
             print('**' * 20, file=self.output)
         else:
             self.daystat.change(dicts={'time': check})
-            if self.daystat.get():
+            if self.daystat.get() and not force:
                 self.daystat.update(x)
             else:
                 self.set(x, True)
@@ -145,7 +145,7 @@ class Statistics():
             return self.body
 
 def main(target_dhcp, target_stat, times=None, date=None, noreplase=True, full=False, output=sys.stdout, error=sys.stderr,
-         check_list=[]):
+         check_list=[], force=False):
     print('--'*20, file=output)
     print('Start of statistics generation', file=output)
     print('Incoming time - {0} and date - {1}'.format(str(times), str(date)), file=output)
@@ -155,7 +155,7 @@ def main(target_dhcp, target_stat, times=None, date=None, noreplase=True, full=F
             print('In the target database, data is found', file=output)
             x.full = full
             x.generate()
-            x.set(x.regenerate_dicts(x.body), noreplase, check=x.times)
+            x.set(x.regenerate_dicts(x.body), noreplase, check=x.times, force=force)
             y = x.per_day()
             if y:
                 x.set_day(x.regenerate_dicts(y))
@@ -163,8 +163,9 @@ def main(target_dhcp, target_stat, times=None, date=None, noreplase=True, full=F
                 x.set(x.regenerate_dicts(x.body, time=x.date, inter='day'), True, check=x.date)
             print('Statistics generated, start post-check', file=output)
         check_empty_hours(target_dhcp, target_stat, x.date, x.times, output=output, error=error, check_list=check_list)
-        check_incomplete(target_dhcp, target_stat, x.date, x.times, output=output, error=error)
+#        check_incomplete(target_dhcp, target_stat, x.date, x.times, output=output, error=error)
         check_extra_entries(target_stat, x.date)
+        return [x.times, x.date]
     except Exception as err:
         print('An error occurred while generating statistics.', file=error)
         print(str(format_exc()), file=error)
@@ -231,6 +232,21 @@ def check_extra_entries(target_stat, date):
             while c.count(c.find) > 1:
                 print('Deleting unneeded entries - {0}. The number of {1}'.format(str(x), str(c.count(c.find))), file=sys.stderr)
                 c.delete()
+
+def rebild_statistics(target_dhcp, target_stat, date, times, output=sys.stdout, error=sys.stderr):
+    x = list(date)
+    x[2] = x[2] - 1
+    x.append(23)
+    if x[2]:
+        c = Statistics(target_dhcp, target_stat, times=tuple(x), date=tuple(x)[-1], conndestif='wan1', connrecvif='lan')
+        c.check()
+        if not c.incomplete and not c.full:
+            print('***'*20, file=output)
+            print('* Begin rebild', file=output)
+            c.remove_day()
+            for i in range(0, 23):
+                x[3] = i
+                main(target_dhcp, target_stat, times=tuple(x), date=tuple(x[:-1]), noreplase=False, full=True, force=True)
 
 if __name__ == '__main__':
     pass
