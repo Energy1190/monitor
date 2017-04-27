@@ -58,7 +58,7 @@ class Statistics():
                 self.nozero = True
         print('A check for data was performed. Data: {0}'.format(str(self.nozero)), file=self.output)
 
-    def set(self, x, no_replase):
+    def set(self, x, no_replase, check=self.times):
         if no_replase:
             self.daystat.set2(x)
             no_replase = False
@@ -74,7 +74,7 @@ class Statistics():
             print('* Data: {0} as {1}'.format(str(x), type(x)), file=self.output)
             print('**' * 20, file=self.output)
         else:
-            self.daystat.change(dicts={'time': self.times})
+            self.daystat.change(dicts={'time': check})
             if self.daystat.get():
                 self.daystat.update(x)
             else:
@@ -117,12 +117,12 @@ class Statistics():
             print("Daily records do not exist in the database", file=self.output)
             return False
 
-    def regenerate_per_day(self, x):
+    def regenerate_dicts(self, x, **kwargs):
         result = {}
         for i in x:
             result[i] = x[i]
-        result['time'] = self.date
-        result['inter'] = 'day'
+        for i in kwargs:
+            result[i] = kwargs[i]
         return result
 
     def __add__(self, other):
@@ -155,12 +155,12 @@ def main(target_dhcp, target_stat, times=None, date=None, noreplase=True, full=F
             print('In the target database, data is found', file=output)
             x.full = full
             x.generate()
-            x.set(x.body, noreplase)
+            x.set(x.regenerate_dicts(x.body), noreplase)
             y = x.per_day()
             if y:
-                x.set_day(y)
+                x.set_day(x.regenerate_dicts(y))
             else:
-                x.set(x.regenerate_per_day(x.body), True)
+                x.set(x.regenerate_dicts(x.body, time=x.date, inter='day'), True, check=x.date)
             print('Statistics generated, start post-check', file=output)
         check_empty_hours(target_dhcp, target_stat, x.date, x.times, output=output, error=error, check_list=check_list)
         check_incomplete(target_dhcp, target_stat, x.date, x.times, output=output, error=error)
@@ -194,6 +194,7 @@ def check_incomplete(target_dhcp, target_stat, date, times, output=sys.stdout, e
     print('Run integrity check', file=output)
     x = list(date)
     x[2] = x[2] - 1
+    x.append(0)
     c = Statistics(target_dhcp, target_stat, times=times, date=tuple(x), conndestif='wan1', connrecvif='lan')
     c.check()
     if not c.incomplete and not c.full:
@@ -218,6 +219,18 @@ def check_extra_entries(target_stat, date):
 
     if sum(result) > 24:
         print('More records found than allowed - {0}'.format(str(sum(result))), file=sys.stderr)
+
+    for i in range(0, len(result)):
+        if result[i] > 1:
+            x = list(date)
+            if i:
+                if len(x) < 4:
+                    x.append(0)
+                x[3] = i-1
+            c.change(dicts={'time': tuple(x)})
+            while c.count(c.find) > 1:
+                print('Deleting unneeded entries - {0}. The number of {1}'.format(str(x), str(c.count(c.find))), file=sys.stderr)
+                c.delete()
 
 if __name__ == '__main__':
     pass
