@@ -238,11 +238,12 @@ def rebild_statistics(target_dhcp, target_stat, date, times, output=sys.stdout, 
     x[2] = x[2] - 1
     x.append(23)
     if x[2]:
-        c = Statistics(target_dhcp, target_stat, times=tuple(x), date=tuple(x)[-1], conndestif='wan1', connrecvif='lan')
+        c = Statistics(target_dhcp, target_stat, times=tuple(x), date=tuple(x)[:-1], conndestif='wan1', connrecvif='lan')
         c.check()
         if not c.incomplete and not c.full:
             print('***'*20, file=output)
             print('* Begin rebild', file=output)
+            check_extra_entries(target_stat, tuple(x)[:-1])
             c.remove_day()
             for i in range(0, 23):
                 x[3] = i
