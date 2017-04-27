@@ -162,10 +162,10 @@ def main(target_dhcp, target_stat, times=None, date=None, noreplase=True, full=F
             else:
                 x.set(x.regenerate_dicts(x.body, time=x.date, inter='day'), True, check=x.date)
             print('Statistics generated, start post-check', file=output)
-        check_empty_hours(target_dhcp, target_stat, x.date, x.times, output=output, error=error, check_list=check_list)
+#        check_empty_hours(target_dhcp, target_stat, x.date, x.times, output=output, error=error, check_list=check_list)
 #        check_incomplete(target_dhcp, target_stat, x.date, x.times, output=output, error=error)
-        check_extra_entries(target_stat, x.date)
-        return [x.times, x.date]
+#        check_extra_entries(target_stat, x.date)
+        return [x.date, x.times]
     except Exception as err:
         print('An error occurred while generating statistics.', file=error)
         print(str(format_exc()), file=error)
