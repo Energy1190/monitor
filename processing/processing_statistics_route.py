@@ -269,7 +269,8 @@ def sum_stat(target_dhcp, target_stat, date, times, output=sys.stdout, error=sys
     for i in range(0, 23):
         x[3] = i
         o = c.get(time=tuple(x))
-        statistic.append([Stat(dicts=i) for i in o['stat']])
+        if o:
+            statistic.append([Stat(dicts=i) for i in o['stat']])
 
     x = statistic.pop()
 
