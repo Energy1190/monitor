@@ -8,6 +8,7 @@ from processing.processing_statistics_route import main as processing_statistics
 from processing.processing_statistics_route import rebild_statistics as rebild
 from processing.processing_statistics_route import check_empty_hours as hours
 from processing.processing_statistics_route import check_extra_entries as entries
+from processing.processing_statistics_route import sum_stat
 from processing.processing_maintenance import main as processing_maintenance
 
 if __name__ == '__main__':
@@ -16,6 +17,7 @@ if __name__ == '__main__':
         time.sleep(10)
         hours(['clients', 'dhcp'], ['clients', 'stat'], x[0], x[1])
         entries(['clients', 'stat'], x[0])
+        sum_stat(['clients', 'dhcp'], ['clients', 'stat'], x[0], x[1])
         rebild(['clients', 'dhcp'], ['clients', 'stat'], x[0], x[1])
         processing_maintenance()
     except Exception as err:

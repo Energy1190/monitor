@@ -18,12 +18,13 @@ class Statistics():
         self.daystat = Database(target=target_stat)
         self.dx['start_time'] = (kvargs.get('start_time') or times or self.times)
         self.dx['end_time'] = (kvargs.get('end_time') or times or self.times)
+        self.hours = [self.times[3]]
         self.recursion = False
         self.incomplete = False
         self.nozero = False
         self.full = False
         self.body = {'stat': self.result, 'time': self.times, 'inter': 'hour', 'incomplete': self.incomplete, 'nozero': self.nozero,
-                     'full': self.full, 'recursion': self.recursion}
+                     'full': self.full, 'recursion': self.recursion, 'hours': self.hours}
         print('A new class of statistics was generated', file=output)
         print('Body of the class - {0}'.format(str(self.body)), file=output)
 
@@ -76,7 +77,7 @@ class Statistics():
             print('**' * 20, file=self.output)
         else:
             self.daystat.change(dicts={'time': check})
-            if self.daystat.get() or force:
+            if self.daystat.get():
                 self.daystat.update(x)
             else:
                 self.set(x, True)
@@ -113,10 +114,16 @@ class Statistics():
             b = [Stat(dicts=i) for i in self.body.get('stat')]
             c = [i + j for i in a for j in b if str(i['ip']) == str(j['ip'])]
             return {'stat': c, 'time': self.date, 'inter': 'day', 'incomplete': self.incomplete, 'nozero': self.nozero,
-                    'full': self.full, 'recursion': self.recursion}
+                    'full': self.full, 'recursion': self.recursion, 'hours': [i for i in self.hours + x['hours']]}
         else:
             print("Daily records do not exist in the database", file=self.output)
             return False
+
+    def get(self, time=None):
+        self.daystat.change(fild='time', fild_var=time)
+        x = self.daystat.get()
+        if x:
+            return x
 
     def regenerate_dicts(self, x, **kwargs):
         result = {}
@@ -159,12 +166,12 @@ def main(target_dhcp, target_stat, times=None, date=None, noreplase=True, full=F
             object = x.regenerate_dicts(x.body)
             x.set(object, noreplase, check=object['time'], force=force)
             y = x.per_day()
-            if y:
-                x.set_day(x.regenerate_dicts(y))
-            else:
-                object = x.regenerate_dicts(x.body, time=x.date, inter='day')
-                x.set(object, True, check=object['time'])
-            print('Statistics generated, start post-check', file=output)
+#           if y:
+#                x.set_day(x.regenerate_dicts(y))
+#            else:
+#                object = x.regenerate_dicts(x.body, time=x.date, inter='day')
+#                x.set(object, True, check=object['time'])
+#            print('Statistics generated, start post-check', file=output)
 #        check_empty_hours(target_dhcp, target_stat, x.date, x.times, output=output, error=error, check_list=check_list)
 #        check_incomplete(target_dhcp, target_stat, x.date, x.times, output=output, error=error)
 #        check_extra_entries(target_stat, x.date)
@@ -251,6 +258,30 @@ def rebild_statistics(target_dhcp, target_stat, date, times, output=sys.stdout, 
             for i in range(0, 23):
                 x[3] = i
                 main(target_dhcp, target_stat, times=tuple(x), date=tuple(x[:-1]), noreplase=False, full=True, force=True)
+
+def sum_stat(target_dhcp, target_stat, date, times, output=sys.stdout, error=sys.stderr):
+    x = list(date)
+    x.append(0)
+    c = Statistics(target_dhcp, target_stat, times=tuple(x), date=tuple(x)[:-1], conndestif='wan1', connrecvif='lan')
+    c.check()
+    c.remove_day()
+    statistic = []
+    for i in range(0, 23):
+        x[3] = i
+        o = c.get(time=tuple(x))
+        statistic.append([Stat(dicts=i) for i in o['stat']])
+
+    x = statistic.pop()
+
+    for i in range(0, len(statistic)):
+        y = statistic.pop()
+        for j in range(len(x)):
+            for jj in y:
+                if str(x[j]['ip']) == str(jj['ip']):
+                    x[j] = x[j] + jj
+
+    result = {'stat': x, 'time': date, 'inter': 'day', 'incomplete': c.incomplete, 'nozero': c.nozero, 'full': c.full}
+    c.set(c.regenerate_dicts(result), True, check=date)
 
 if __name__ == '__main__':
     pass
