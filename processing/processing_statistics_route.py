@@ -101,7 +101,7 @@ class Statistics():
         self.check_zero()
 
     def remove_day(self):
-        self.daystat.change(fild='time', fild_var=self.date)
+        self.daystat.change(dicts={'time': self.date})
         print('Entry for {0} has been deleted'.format(str(self.date)), file=self.output)
         return self.daystat.delete()
 
@@ -120,7 +120,7 @@ class Statistics():
             return False
 
     def get(self, time=None):
-        self.daystat.change(fild='time', fild_var=time)
+        self.daystat.change(dicts={'time': time})
         x = self.daystat.get()
         if x:
             return x
@@ -189,16 +189,22 @@ def check_empty_hours(target_dhcp, target_stat, date, times, output=sys.stdout, 
     for i in range(0, int(y[3])):
         if i not in check_list:
             x[3] = i
-            y = Database(target=target_stat, fild='time', fild_var=tuple(x)).get()
+            y = Database(target=target_stat, dicts={'time': tuple(x)}).get()
             try:
                 nozero = y.get('nozero')
             except:
                 nozero = False
-            if not y or not nozero:
+
+            if nozero:
+                noreplase = False
+            else:
+                noreplase = True
+
+            if not y or nozero:
                 print('An empty record was found, dated {0}, initialized the mechanism for generating statistics'.format(str(x)),
                       file=error)
                 check_list.append(i)
-                main(target_dhcp, target_stat, times=tuple(x), date=date, noreplase=nozero, check_list=check_list)
+                main(target_dhcp, target_stat, times=tuple(x), date=date, noreplase=noreplase, check_list=check_list)
 
 
 def check_incomplete(target_dhcp, target_stat, date, times, output=sys.stdout, error=sys.stderr):
@@ -265,6 +271,7 @@ def sum_stat(target_dhcp, target_stat, date, times, output=sys.stdout, error=sys
     x.append(0)
     c = Statistics(target_dhcp, target_stat, times=tuple(x), date=tuple(x)[:-1], conndestif='wan1', connrecvif='lan')
     c.check()
+    c.check_zero()
     c.remove_day()
     statistic = []
     for i in range(0, 23):
@@ -272,7 +279,7 @@ def sum_stat(target_dhcp, target_stat, date, times, output=sys.stdout, error=sys
         o = c.get(time=tuple(x))
         print('Get object {0} as {1}'.format(str(o), str(tuple(x))), file=output)
         if o:
-            statistic.append([Stat(dicts=i) for i in o['stat']])
+            statistic.append([i for i in o['stat']])
 
     if any(statistic):
         x = statistic.pop()
@@ -280,12 +287,13 @@ def sum_stat(target_dhcp, target_stat, date, times, output=sys.stdout, error=sys
     if len(statistic):
         for i in range(0, len(statistic)):
             y = statistic.pop()
-            for j in range(len(x)):
-                for jj in y:
-                    if str(x[j]['ip']) == str(jj['ip']):
-                        x[j] = x[j] + jj
+            if y:
+                for j in range(len(x)):
+                    for jj in y:
+                        if str(x[j]['ip']) == str(jj['ip']):
+                            x[j] = Stat(dicts=x[j]) + Stat(dicts=jj)
 
-    result = {'stat': x, 'time': date, 'inter': 'day', 'incomplete': c.incomplete, 'nozero': c.nozero, 'full': c.full}
+    result = {'stat': x, 'time': date[0:3], 'inter': 'day', 'incomplete': c.incomplete, 'nozero': c.nozero, 'full': c.full}
     c.set(c.regenerate_dicts(result), True, check=date)
 
 if __name__ == '__main__':

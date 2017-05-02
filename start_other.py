@@ -50,9 +50,6 @@ if __name__ == '__main__':
                     if end_time > start_time + 3:
                         print('Exit by timeout. Counter: {0} list: {1}'.format(str(count), str(check_list)), file=sys.stderr)
                         break
-                print('The batch of threads was completed. Check: {}'.format(str(check_list)), file=sys.stdout)
-                print('Time: {0}'.format(str(end_time-start_time)), file=sys.stdout)
-                sys.stdout.flush()
 
             gc.collect()
             print('The cycle is completed, the beginning of the next iteration.', file=sys.stdout)
