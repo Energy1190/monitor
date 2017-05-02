@@ -84,12 +84,14 @@ def get_route_info_database(*args, start_time=None, end_time=None, deep=4, outpu
         :return:
         """
         if time_str:
+            print('Incoming time parameters: {0} as type {1}'.format(str(time_str), type(time_str)), file=sys.stdout)
             try:
                 return datetime.datetime(*tuple(map(lambda x: int(x), time_str.split(sep='_'))))
             except:
                 try:
                     return datetime.datetime(*time_str)
                 except:
+                    print('All checks are failed, return the current time', file=sys.stdout)
                     return (datetime.datetime.now() + datetime.timedelta(hours=3))
         else:
             return False
@@ -163,8 +165,6 @@ def get_route_info_database(*args, start_time=None, end_time=None, deep=4, outpu
     try:
         print('Start generating a query to the database', file=output)
         x = []
-        limited = kvargs.get('limited')         # Флаг лимитирующий результаты запросов.
-        dx = remove_temp(kvargs)                # Фильтер для поиска в базе.
         start_time = get_time_tuple(start_time or
                                      kvargs.get('start_time') or
                                      ((datetime.datetime.now() + datetime.timedelta(hours=3)) - datetime.timedelta(days=1)))
@@ -173,6 +173,8 @@ def get_route_info_database(*args, start_time=None, end_time=None, deep=4, outpu
                                    (datetime.datetime.now() + datetime.timedelta(hours=3))))
         target = get_target(start_time, end_time)
         t = get_time_requests(start_time, end_time, deep=deep)
+        limited = kvargs.get('limited')         # Флаг лимитирующий результаты запросов.
+        dx = remove_temp(kvargs)                # Фильтер для поиска в базе.
         print('All parameters were successfully received', file=output)
         print('Filter for request: {0}'.format(str(dx)), file=output)
         print('Collection(s) of destination: {0}'.format(str(target)), file=output)

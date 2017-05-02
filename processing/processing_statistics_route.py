@@ -260,6 +260,7 @@ def rebild_statistics(target_dhcp, target_stat, date, times, output=sys.stdout, 
                 main(target_dhcp, target_stat, times=tuple(x), date=tuple(x[:-1]), noreplase=False, full=True, force=True)
 
 def sum_stat(target_dhcp, target_stat, date, times, output=sys.stdout, error=sys.stderr):
+    print('Start sum statistics per day', file=output)
     x = list(date)
     x.append(0)
     c = Statistics(target_dhcp, target_stat, times=tuple(x), date=tuple(x)[:-1], conndestif='wan1', connrecvif='lan')
@@ -269,17 +270,20 @@ def sum_stat(target_dhcp, target_stat, date, times, output=sys.stdout, error=sys
     for i in range(0, 23):
         x[3] = i
         o = c.get(time=tuple(x))
+        print('Get object {0} as {1}'.format(str(o), str(tuple(x))), file=output)
         if o:
             statistic.append([Stat(dicts=i) for i in o['stat']])
 
-    x = statistic.pop()
+    if any(statistic):
+        x = statistic.pop()
 
-    for i in range(0, len(statistic)):
-        y = statistic.pop()
-        for j in range(len(x)):
-            for jj in y:
-                if str(x[j]['ip']) == str(jj['ip']):
-                    x[j] = x[j] + jj
+    if len(statistic):
+        for i in range(0, len(statistic)):
+            y = statistic.pop()
+            for j in range(len(x)):
+                for jj in y:
+                    if str(x[j]['ip']) == str(jj['ip']):
+                        x[j] = x[j] + jj
 
     result = {'stat': x, 'time': date, 'inter': 'day', 'incomplete': c.incomplete, 'nozero': c.nozero, 'full': c.full}
     c.set(c.regenerate_dicts(result), True, check=date)

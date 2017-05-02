@@ -4,12 +4,15 @@ from traceback import format_exc
 from classes.base import Route
 from classes.db_mongo import Database
 
-def main(target, out_target, vals, output=sys.stdout, error=sys.stderr):
-    def get_database_incoming(target, status=None):
+def main(target, out_target, vals, object=None, get_full=False, check_list=None, output=sys.stdout, error=sys.stderr):
+    def get_database_incoming(target, status=None, fulllist=False):
         x = Database(target=target)
         if status:
             x.change(fild='Status', fild_var=status)
-        return [x.get(), x.count(x.find)]
+        if fulllist:
+            return [x.find(), x.count(x.find)]
+        else:
+            return [x.get(), x.count(x.find)]
 
     def object_operation(object, object_class, target):
         x = object_class(output=open(os.devnull, 'w'))
@@ -18,8 +21,15 @@ def main(target, out_target, vals, output=sys.stdout, error=sys.stderr):
         x.check_collection('mongoDB', target)
         x.set_object()
 
-    i = 'Incoming object'
-    incoming, count = get_database_incoming(target, status=None)
+    if get_full:
+        return get_database_incoming(target, status=None)
+
+    if not object:
+        i = 'Incoming object'
+        incoming, count = get_database_incoming(target, status=None)
+    else:
+        incoming = object
+        count = 1
 
     try:
         if incoming:
@@ -36,6 +46,9 @@ def main(target, out_target, vals, output=sys.stdout, error=sys.stderr):
         print('Can not delete incoming object', file=error)
         print(str(incoming), file=error)
         print(str(format_exc()), file=error)
+
+    if check_list:
+        check_list.append(True)
 
     return count
 
