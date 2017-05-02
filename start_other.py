@@ -21,14 +21,14 @@ if __name__ == '__main__':
                                                           time_now.timetuple()[1],
                                                           time_now.timetuple()[2])
             for i in processing_incoming_route(['route', 'warn'], ['route', target_collection], v, get_full=True,
-                                               output=sys.stdout):
-                q.put(i[0])
+                                               output=sys.stdout)[0]:
+                q.put(i)
             for i in processing_incoming_route(['route', 'notice'], ['route', target_collection], v, get_full=True,
-                                               output=sys.stdout):
-                q.put(i[0])
+                                               output=sys.stdout)[0]:
+                q.put(i)
             for i in processing_incoming_route(['route', 'info'], ['route', target_collection], v, get_full=True,
-                                               output=sys.stdout):
-                q.put(i[0])
+                                               output=sys.stdout)[0]:
+                q.put(i)
 
             check_list=[]
             for i in range(0, 5):
