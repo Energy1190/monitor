@@ -22,7 +22,7 @@ def main(target, out_target, vals, object=None, get_full=False, check_list=None,
         x.set_object()
 
     if get_full:
-        return get_database_incoming(target, status=None)
+        return get_database_incoming(target, status=None, fulllist=True)
 
     if not object:
         i = 'Incoming object'
