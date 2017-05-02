@@ -1,3 +1,4 @@
+import sys
 import datetime
 from system.configuration import get_val
 from system.system import send_mail
@@ -34,6 +35,7 @@ def sending_mails():
             xl.append(i)
     t = send_text(xl)
     if t:
+        print('Sending mail', file=sys.stdout)
         send_mail(t, subject='Daemon status')
 
 def clear_collection(collection_now):
