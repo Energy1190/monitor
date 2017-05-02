@@ -29,6 +29,7 @@ def main(target, out_target, vals, object=None, get_full=False, check_list=None,
         i = 'Incoming object'
         incoming, count = get_database_incoming(target, status=None)
     else:
+        i = 'Incoming object'
         incoming = object
         count = 1
 
