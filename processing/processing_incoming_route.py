@@ -48,6 +48,7 @@ def main(target, out_target, vals, object=None, get_full=False, check_list=None,
         print(str(format_exc()), file=error)
 
     if check_list:
+        print('th done', file=output)
         check_list.append(True)
 
     return count

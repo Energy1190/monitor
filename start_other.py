@@ -43,8 +43,8 @@ if __name__ == '__main__':
             while len(check_list) < count:
                 time.sleep(0.1)
                 end_time = time.localtime()[4]
-                print('DEBUG', start_time, end_time, file=sys.stdout)
-                if end_time > start_time + 2:
+                if end_time > start_time + 3:
+                    print('Exit by timeout. Counter: {0} list: {1}'.format(str(count), str(check_list)), file=sys.stderr)
                     break
 
             gc.collect()
