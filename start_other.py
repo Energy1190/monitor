@@ -31,16 +31,19 @@ if __name__ == '__main__':
                 q.put(i)
 
             check_list=[]
+            count = 0
             for i in range(0, 5):
                 threading.Thread(target=processing_incoming_route, name='route + str(i)', args=(['route', 'warn'], ['route', target_collection], v),
                                  kwargs={'check_list': check_list, 'object': q.get(), 'output': sys.stdout}).start()
+                count += 1
                 if not q.qsize():
                     break
 
             start_time = time.localtime()[4]
-            while len(check_list) < 5:
+            while len(check_list) < count:
                 time.sleep(0.1)
                 end_time = time.localtime()[4]
+                print('DEBUG', start_time, end_time, file=sys.stdout)
                 if end_time > start_time + 2:
                     break
 

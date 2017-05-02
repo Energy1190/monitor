@@ -103,7 +103,7 @@ def get_route_info_database(*args, start_time=None, end_time=None, deep=4, outpu
             target = [['route', 'base-{0}-{1}-{2}'.format(j,h,i)] for i in range(ss[2],ee[2]+1)
                       for h in range(ss[1],ee[1]+1)
                       for j in range(ss[0],ee[0]+1)]
-        elif start_time.timetuple()[0:2] == datetime.datetime.now().timetuple()[0:2]:
+        elif start_time.timetuple()[0:3] == datetime.datetime.now().timetuple()[0:3]:
             time_now = (datetime.datetime.now() + datetime.timedelta(hours=3))
             target_collection = 'base-{0}-{1}-{2}'.format(time_now.timetuple()[0],
                                                           time_now.timetuple()[1],
