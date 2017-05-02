@@ -58,6 +58,7 @@ class Statistics():
             if i['data']['in_bytes'] or i['data']['out_bytes']:
                 self.nozero = True
         print('A check for data was performed. Data: {0}'.format(str(self.nozero)), file=self.output)
+        return self.nozero
 
     def set(self, x, no_replase, check=None, force=False):
         if no_replase:
@@ -88,7 +89,7 @@ class Statistics():
         print('The data was recorded in the database. Updated: {0}.'.format(str(no_replase)), file=self.output)
 
     def set_day(self, x):
-        self.daystat.change(fild='time', fild_var=self.date)
+        self.daystat.change(dicts={'time': self.date})
         self.daystat.update(x)
         print('Data for the day were updated and written to the database.', file=self.output)
 
@@ -106,7 +107,7 @@ class Statistics():
         return self.daystat.delete()
 
     def per_day(self):
-        self.daystat.change(fild='time', fild_var=self.date)
+        self.daystat.change(dicts={'time': self.date})
         x = self.daystat.get()
         if x:
             print("A day's record already exists in the database", file=self.output)
@@ -163,18 +164,8 @@ def main(target_dhcp, target_stat, times=None, date=None, noreplase=True, full=F
             print('In the target database, data is found', file=output)
             x.full = full
             x.generate()
-            object = x.regenerate_dicts(x.body)
+            object = x.regenerate_dicts(x.body, nozero=x.check_zero(), incomplete=x.incomplete, full=full)
             x.set(object, noreplase, check=object['time'], force=force)
-            y = x.per_day()
-#           if y:
-#                x.set_day(x.regenerate_dicts(y))
-#            else:
-#                object = x.regenerate_dicts(x.body, time=x.date, inter='day')
-#                x.set(object, True, check=object['time'])
-#            print('Statistics generated, start post-check', file=output)
-#        check_empty_hours(target_dhcp, target_stat, x.date, x.times, output=output, error=error, check_list=check_list)
-#        check_incomplete(target_dhcp, target_stat, x.date, x.times, output=output, error=error)
-#        check_extra_entries(target_stat, x.date)
         return [x.date, x.times]
     except Exception as err:
         print('An error occurred while generating statistics.', file=error)
@@ -200,7 +191,7 @@ def check_empty_hours(target_dhcp, target_stat, date, times, output=sys.stdout, 
             else:
                 noreplase = True
 
-            if not y or nozero:
+            if not y or not nozero:
                 print('An empty record was found, dated {0}, initialized the mechanism for generating statistics'.format(str(x)),
                       file=error)
                 check_list.append(i)
@@ -264,8 +255,9 @@ def rebild_statistics(target_dhcp, target_stat, date, times, output=sys.stdout, 
             for i in range(0, 23):
                 x[3] = i
                 main(target_dhcp, target_stat, times=tuple(x), date=tuple(x[:-1]), noreplase=False, full=True, force=True)
+            sum_stat(target_dhcp, target_stat, tuple(x[:-1]), tuple(x), full=True, output=sys.stdout, error=sys.stderr)
 
-def sum_stat(target_dhcp, target_stat, date, times, output=sys.stdout, error=sys.stderr):
+def sum_stat(target_dhcp, target_stat, date, times, full=False, output=sys.stdout, error=sys.stderr):
     print('Start sum statistics per day', file=output)
     x = list(date)
     x.append(0)
@@ -293,7 +285,7 @@ def sum_stat(target_dhcp, target_stat, date, times, output=sys.stdout, error=sys
                         if str(x[j]['ip']) == str(jj['ip']):
                             x[j] = Stat(dicts=x[j]) + Stat(dicts=jj)
 
-    result = {'stat': x, 'time': date[0:3], 'inter': 'day', 'incomplete': c.incomplete, 'nozero': c.nozero, 'full': c.full}
+    result = {'stat': x, 'time': date[0:3], 'inter': 'day', 'incomplete': c.incomplete, 'nozero': c.nozero, 'full': full}
     c.set(c.regenerate_dicts(result), True, check=date)
 
 if __name__ == '__main__':
