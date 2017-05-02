@@ -6,7 +6,6 @@ from classes.db_mongo import Database
 from system.system import error_log_write
 
 def main(target, out_target, vals, object=None, get_full=False, check_list=None, output=sys.stdout, error=sys.stderr):
-    error_log_write('Get params: {}, {}, {}, {}, {}.'.format(str(target), str(out_target), str(vals), str(object), str(check_list)), err='Check params')
     def get_database_incoming(target, status=None, fulllist=False):
         x = Database(target=target)
         if status:
@@ -49,7 +48,7 @@ def main(target, out_target, vals, object=None, get_full=False, check_list=None,
         print(str(incoming), file=error)
         print(str(format_exc()), file=error)
 
-    if check_list:
+    if type(check_list) == list:
         check_list.append(True)
 
     return count
