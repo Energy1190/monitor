@@ -5,7 +5,6 @@ import gc
 import sys
 import time
 import datetime
-import logging
 import queue
 import threading
 from traceback import format_exc
@@ -31,6 +30,7 @@ if __name__ == '__main__':
                                                output=sys.stdout)[0]:
                 q.put(i)
 
+            print('Prepared a queue that contains {0} elements'.format(str(q.qsize())), file=sys.stdout)
             while q.qsize():
                 check_list = []
                 count = 0
@@ -53,5 +53,5 @@ if __name__ == '__main__':
             gc.collect()
             print('The cycle is completed, the beginning of the next iteration.', file=sys.stdout)
     except Exception as err:
-        logging.error('A critical error occurred while processing logs')
-        logging.error(str(format_exc()))
+        print('A critical error occurred while processing logs', file=sys.stderr)
+        print(str(format_exc()), file=sys.stderr)
