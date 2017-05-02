@@ -22,13 +22,13 @@ if __name__ == '__main__':
                                                           time_now.timetuple()[2])
             for i in processing_incoming_route(['route', 'warn'], ['route', target_collection], v, get_full=True,
                                                output=sys.stdout)[0]:
-                q.put(i)
+                q.put([i, ['route', 'warn']])
             for i in processing_incoming_route(['route', 'notice'], ['route', target_collection], v, get_full=True,
                                                output=sys.stdout)[0]:
-                q.put(i)
+                q.put([i, ['route', 'notice']])
             for i in processing_incoming_route(['route', 'info'], ['route', target_collection], v, get_full=True,
                                                output=sys.stdout)[0]:
-                q.put(i)
+                q.put([i, ['route', 'info']])
 
             print('Prepared a queue that contains {0} elements'.format(str(q.qsize())), file=sys.stdout)
             sys.stdout.flush()
@@ -36,9 +36,9 @@ if __name__ == '__main__':
                 check_list = []
                 count = 0
                 time.sleep(0.1)
-                for i in range(0, 3):
-                    threading.Thread(target=processing_incoming_route, name='route + str(i)', args=(['route', 'warn'], ['route', target_collection], v),
-                                     kwargs={'check_list': check_list, 'object': q.get(), 'output': sys.stdout}).start()
+                for i in range(0, 5):
+                    threading.Thread(target=processing_incoming_route, name='route + str(i)', args=(q.get()[1], ['route', target_collection], v),
+                                     kwargs={'check_list': check_list, 'object': q.get()[0], 'output': sys.stdout}).start()
                     count += 1
                     if not q.qsize():
                         break

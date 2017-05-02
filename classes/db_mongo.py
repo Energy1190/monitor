@@ -103,3 +103,4 @@ class Database():
 
     def drop(self):
         return self.path.drop()
+
