@@ -36,7 +36,7 @@ if __name__ == '__main__':
                 check_list = []
                 count = 0
                 time.sleep(0.1)
-                for i in range(0, 5):
+                for i in range(0, 10):
                     threading.Thread(target=processing_incoming_route, name='route + str(i)', args=(q.get()[1], ['route', target_collection], v),
                                      kwargs={'check_list': check_list, 'object': q.get()[0], 'output': sys.stdout}).start()
                     count += 1
