@@ -20,8 +20,9 @@ def sending_mails():
         target = get_val(name)
         return [ i['name'] for i in target]
 
-    def send_text(xl):
-        x = ["Can't connect to server {0} \n".format(i) for i in xl if i != 'start' ]
+    def send_text(xl, check=None):
+        x = ["Can't connect to server {0} \n".format(i) for i in xl if i != 'start' or type(i) != tuple]
+        [x.append("Fail check {1} on server {0} \n".format(i[0], i[1])) for i in xl if type(i) == tuple]
         if 'start' in xl:
             x.append("Daemon start work.")
             Database(target=['systems', 'watch'], dicts={'name': 'start'}).update({'name': 'start', 'status': True})
@@ -33,6 +34,10 @@ def sending_mails():
         x = Database(target=['systems', 'watch'], dicts={'name': i}).get()
         if x and not x['status']:
             xl.append(i)
+        elif x and x.get('checks'):
+            for j in x.get('checks'):
+                if not x.get('checks')[j]:
+                    xl.append((i, j))
     t = send_text(xl)
     if t:
         print('Sending mail', file=sys.stdout)

@@ -38,10 +38,31 @@ def get_db_connect(http, flag='url'):
 
 def get_check_list(name):
     target = get_val(name)
-    return [{'target': i['name'], 'flag': i['flag']} for i in target ]
+    [i.setdefault('target', i['name']) for i in target]
+    return target
+
+def check_smb_v1(target, result):
+    from smb import smb_structs
+    from smb import SMBConnection
+
+    if target.get('user') and target.get('password') and target.get('domain_name') and target.get('domain'):
+        try:
+            smb_structs.SUPPORT_SMB2 = target.get('SMBv1')
+            x = SMBConnection.SMBConnection(target.get('user'), target.get('password'), 'testus', target.get('domain_name'), domain=target.get('domain'), is_direct_tcp=True)
+            r = x.connect(target.get('target'), port=445, timeout=60)
+        except:
+            r = False
+    else:
+        r = not result
+
+    if result == r:
+        return True
+    else:
+        return False
 
 def checks_server(i, flag=None):
     logger.debug('Launched check to {0} as {1}'.format(i['target'], i['flag']))
+    checks = []
     status = True
     if flag == 'ping':
         x = os.system("ping -c 1 " + i['target'] + " 1>/dev/null")
@@ -55,7 +76,9 @@ def checks_server(i, flag=None):
             time.sleep(300)
             if not x:
                 status = False
-    check_db({'name': i['target'], 'status': status}, dicts={'name': i['target']})
+    if 'SMBv1' in i:
+        checks.append({'SMBv1': check_smb_v1(i, i['SMBv1'])})
+    check_db({'name': i['target'], 'status': status, 'checks': checks}, dicts={'name': i['target']})
 
 def main():
     logger.info('begin to follow...')

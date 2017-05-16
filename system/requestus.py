@@ -162,6 +162,22 @@ def get_route_info_database(*args, start_time=None, end_time=None, deep=4, outpu
             return str
         return False
 
+    def collection_check(time_filter, collection, output=sys.stdout, error=sys.stderr, recursion=False):
+        if type(collection[0]) == list:
+            return collection
+        else:
+            for i in time_filter:
+                t = list(map(str, list(i)[:-1]))
+                if t != collection[1].split(sep='-')[1:]:
+                    print('Alert! The search filter does not match the collection', file=error)
+                    print('Fix it', file=error)
+                    x = [collection[0], 'base-{0}-{1}-{2}'.format(t[0], t[1], t[2])]
+                    if not recursion:
+                        return collection_check(time_filter, x, recursion=True)
+                    else:
+                        print('Critical error, the collection could not be fixed', file=error)
+                        return collection
+            return collection
     try:
         print('Start generating a query to the database', file=output)
         x = []
@@ -171,8 +187,9 @@ def get_route_info_database(*args, start_time=None, end_time=None, deep=4, outpu
         end_time = get_time_tuple((end_time or
                                    kvargs.get('end_time') or
                                    (datetime.datetime.now() + datetime.timedelta(hours=3))))
-        target = get_target(start_time, end_time)
         t = get_time_requests(start_time, end_time, deep=deep)
+        target = get_target(start_time, end_time)
+        target = collection_check(t, target)
         limited = kvargs.get('limited')         # Флаг лимитирующий результаты запросов.
         dx = remove_temp(kvargs)                # Фильтер для поиска в базе.
         print('All parameters were successfully received', file=output)
