@@ -2,6 +2,7 @@
 #  -*- coding: utf-8 -*-
 
 import os
+import sys
 import threading
 import time
 import requests
@@ -46,15 +47,20 @@ def check_smb_v1(target, result):
     from smb import SMBConnection
 
     if target.get('user') and target.get('password') and target.get('domain_name') and target.get('domain'):
+        print('Start SMBv1 check', file=sys.stdout)
         try:
             smb_structs.SUPPORT_SMB2 = target.get('SMBv1')
             x = SMBConnection.SMBConnection(target.get('user'), target.get('password'), 'testus', target.get('domain_name'), domain=target.get('domain'), is_direct_tcp=True)
             r = x.connect(target.get('target'), port=445, timeout=60)
+            print('SMBv1 check end with out error', file=sys.stdout)
         except:
+            print('SMBv1 check end error connection', file=sys.stdout)
             r = False
     else:
+        print('missing parameters', file=sys.stdout)
         r = not result
 
+    print(result, r, file=sys.stdout)
     if result == r:
         return True
     else:
@@ -62,7 +68,7 @@ def check_smb_v1(target, result):
 
 def checks_server(i, flag=None):
     logger.debug('Launched check to {0} as {1}'.format(i['target'], i['flag']))
-    checks = []
+    checks = {}
     status = True
     if flag == 'ping':
         x = os.system("ping -c 1 " + i['target'] + " 1>/dev/null")
@@ -77,7 +83,7 @@ def checks_server(i, flag=None):
             if not x:
                 status = False
     if 'SMBv1' in i:
-        checks.append({'SMBv1': check_smb_v1(i, i['SMBv1'])})
+        checks['SMBv1'] = check_smb_v1(i, i['SMBv1'])
     check_db({'name': i['target'], 'status': status, 'checks': checks}, dicts={'name': i['target']})
 
 def main():
