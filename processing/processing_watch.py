@@ -47,20 +47,17 @@ def check_smb_v1(target, result):
     from smb import SMBConnection
 
     if target.get('user') and target.get('password') and target.get('domain_name') and target.get('domain'):
-        print('Start SMBv1 check', file=sys.stdout)
         try:
-            smb_structs.SUPPORT_SMB2 = target.get('SMBv1')
+            if target.get('SMBv1') == 'False': b = False
+            else: b = True
+            smb_structs.SUPPORT_SMB2 = b
             x = SMBConnection.SMBConnection(target.get('user'), target.get('password'), 'testus', target.get('domain_name'), domain=target.get('domain'), is_direct_tcp=True)
             r = x.connect(target.get('target'), port=445, timeout=60)
-            print('SMBv1 check end with out error', file=sys.stdout)
         except:
-            print('SMBv1 check end error connection', file=sys.stdout)
             r = False
     else:
-        print('missing parameters', file=sys.stdout)
         r = not result
 
-    print(result, r, file=sys.stdout)
     if result == r:
         return True
     else:

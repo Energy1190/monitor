@@ -22,7 +22,7 @@ def sending_mails():
 
     def send_text(xl, check=None):
         x = ["Can't connect to server {0} \n".format(i) for i in xl if i != 'start' or type(i) != tuple]
-        [x.append("Fail check {1} on server {0} \n".format(i[0], i[1])) for i in xl if type(i) == tuple]
+        [x.append("\tFail check {1} on server {0} \n".format(i[0], i[1])) for i in xl if type(i) == tuple]
         if 'start' in xl:
             x.append("Daemon start work.")
             Database(target=['systems', 'watch'], dicts={'name': 'start'}).update({'name': 'start', 'status': True})
