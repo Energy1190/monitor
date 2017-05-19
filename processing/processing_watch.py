@@ -48,8 +48,12 @@ def check_smb_v1(target, result):
 
     if target.get('user') and target.get('password') and target.get('domain_name') and target.get('domain'):
         try:
-            if target.get('SMBv1') == 'False': b = False
-            else: b = True
+            if target.get('SMBv1') == 'False':
+                b = False
+                result = False
+            else:
+                b = True
+                result = True
             smb_structs.SUPPORT_SMB2 = b
             x = SMBConnection.SMBConnection(target.get('user'), target.get('password'), 'testus', target.get('domain_name'), domain=target.get('domain'), is_direct_tcp=True)
             r = x.connect(target.get('target'), port=445, timeout=60)
