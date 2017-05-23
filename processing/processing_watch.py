@@ -32,6 +32,8 @@ def get_db_connect(http, flag='url'):
                 return True
         elif flag == 'forbidden' and r.status_code == 403:
             return True
+        elif flag == 'forbidden' and r.status_code == 401:
+            return True
         else:
             return False
     except:
