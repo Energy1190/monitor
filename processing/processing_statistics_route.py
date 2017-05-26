@@ -6,9 +6,10 @@ from classes.route import Stat
 from system.requestus import get_route_info_database
 
 class Statistics():
-    def __init__(self, target, target_stat, times=None, date=None, output=sys.stdout, error=sys.stderr, **kvargs):
+    def __init__(self, target, target_stat, times=None, date=None, name=None, output=sys.stdout, error=sys.stderr, **kvargs):
         self.output = output
         self.error = error
+        self.name = name
         self.dx = kvargs
         self.result = []
         self.times = (times or (datetime.datetime.now() + datetime.timedelta(hours=2)).timetuple()[0:4])
@@ -153,6 +154,22 @@ class Statistics():
         else:
             return self.body
 
+class Interface(Statistics):
+    def reverse(self, bools):
+        self.revers = bools
+
+    def generate(self):
+        d = self.regenerate_dicts(self.dx, start_time=self.date, end_time=self.date, deep=3)
+        y = Stat(get_route_info_database(**d), self.name, 'Interface', ['clients','users'])
+        self.result.append(y.trg)
+        if self.revers:
+            t1 = d['conndestif']
+            t2 = d['connrecvif']
+            x = self.regenerate_dicts(d, connrecvif=t1, conndestif=t2)
+            y2 = Stat(get_route_info_database(**x), str(self.name + '-reverse'), 'Interface', ['clients','users'])
+            self.result.append(y2.trg)
+        print('The statistics for {0} objects were generated'.format(str(len(self.result))), file=self.output)
+
 def main(target_dhcp, target_stat, times=None, date=None, noreplase=True, full=False, output=sys.stdout, error=sys.stderr,
          check_list=[], force=False):
     print('--'*20, file=output)
@@ -164,9 +181,30 @@ def main(target_dhcp, target_stat, times=None, date=None, noreplase=True, full=F
             print('In the target database, data is found', file=output)
             x.full = full
             x.generate()
-            object = x.regenerate_dicts(x.body, nozero=x.check_zero(), incomplete=x.incomplete, full=full)
+            object = x.regenerate_dicts(x.body, nozero=x.check_zero(), incomplete=x.incomplete, full=full,
+                                        name='lan')
             x.set(object, noreplase, check=object['time'], force=force)
         return [x.date, x.times]
+    except Exception as err:
+        print('An error occurred while generating statistics.', file=error)
+        print(str(format_exc()), file=error)
+
+def bild_day_stat(target_dhcp, target_stat, times=None, date=None, output=sys.stdout, error=sys.stderr):
+    print('--' * 20, file=output)
+    print('Generate daily statistics on interfaces', file=output)
+    try:
+        x = Interface(target_dhcp, target_stat, times=times, date=date, conndestif='aws_tunn', connrecvif='lan', name='aws_tunn')
+        x.revers(True)
+        x.generate()
+        object = x.regenerate_dicts(x.body, nozero=True, incomplete=False, full=True, inter='Interface',
+                                    name='aws_tunn')
+        x.set(object, True, check=object['time'])
+
+        x = Interface(target_dhcp, target_stat, times=times, date=date, conndestif='lan', connrecvif='wan1', name='wan1')
+        x.generate()
+        object = x.regenerate_dicts(x.body, nozero=True, incomplete=False, full=True, inter='Interface',
+                                    name='wan1')
+        x.set(object, True, check=object['time'])
     except Exception as err:
         print('An error occurred while generating statistics.', file=error)
         print(str(format_exc()), file=error)
@@ -256,6 +294,7 @@ def rebild_statistics(target_dhcp, target_stat, date, times, output=sys.stdout, 
                 x[3] = i
                 main(target_dhcp, target_stat, times=tuple(x), date=tuple(x[:-1]), noreplase=False, full=True, force=True)
             sum_stat(target_dhcp, target_stat, tuple(x[:-1]), tuple(x), full=True, output=sys.stdout, error=sys.stderr)
+    bild_day_stat(target_dhcp, target_stat, times=times, date=date, output=output, error=error)
 
 def sum_stat(target_dhcp, target_stat, date, times, full=False, output=sys.stdout, error=sys.stderr):
     print('Start sum statistics per day', file=output)
