@@ -19,6 +19,7 @@ def main(target, out_target_users, out_target_comps, out_dhcp_target, output=sys
         x.set_storage(type='mongoDB', target=target)
         y = (x.set_main(object) or x.generate_main_list(object))
         if type(y) == list:
+            x.mainfild = 'ip'
             x.generate_from_list(y, 'dhcp', time=datetime.datetime.now(pytz.timezone('Europe/Moscow')))
         else:
             x.check_object(name)

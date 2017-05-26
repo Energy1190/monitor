@@ -73,10 +73,10 @@ class Base():
         for i in list_object:
             for j in i:
                 self.set_parameter(name=j, val=i[j])
-                if self.check_object(j):
-                    self.update_object()
-                else:
-                    self.set_object()
+            if self.check_object(i[self.mainfild]):
+                self.update_object()
+            else:
+                self.set_object()
             x.append(self.obj)
             self.obj = {}
         print("{0} objects added to and generated in the repository".format(str(len(list_object))), file=self.output)
