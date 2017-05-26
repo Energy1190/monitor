@@ -121,14 +121,11 @@ class Dhcp(Base):
         """Метод выводит более удобочитаемый список на основании полученного JSON-объекта.
         И сортирует полученный список по IP-адресам.
         """
-        time_info = list_object.get('Timeinfo')
-        list_object = list_object.get('Dhcpinfo')
         return sorted([{'name': list_object['name'][i],
                         'ip': list_object['ip'][i]['IPAddressToString'],
                         'mac': list_object['mac'][i],
                         'endtime': (lambda x=list_object['timeend'][i]: time.gmtime((return_nub(x) + 10800000)/1000.) if x else x)(),
-                        'time': time.gmtime((return_nub(time_info) + 10800000)/1000.),
-                        'rezervation': list_object['timeend'][i]} for i in range(0, len(list_object['name']))],
+                        'rezervation': list_object['rezervation'][i]} for i in range(0, len(list_object['name']))],
                       key=lambda y: y['ip'])
 
 class Route(Base):

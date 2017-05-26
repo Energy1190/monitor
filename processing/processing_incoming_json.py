@@ -51,7 +51,7 @@ def main(target, out_target_users, out_target_comps, out_dhcp_target, output=sys
                     object_operation(incoming, Comp, out_target_comps, incoming['Userinfo']['Computername'])
                 object_operation(incoming, User, out_target_users, incoming['Userinfo']['Username'])
             elif d == 'dhcp':
-                object_operation(incoming.get("Dhcpinfo"), Dhcp, out_dhcp_target, None)
+                object_operation(incoming["Dhcpinfo"], Dhcp, out_dhcp_target, None)
             else:
                 print('The incoming object can not be processed, information about it is placed in the log file', file=error)
                 error_log_write(str(original), err='Can not be processed')
