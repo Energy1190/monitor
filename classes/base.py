@@ -128,7 +128,7 @@ class Dhcp(Base):
                         'mac': list_object['mac'][i],
                         'endtime': (lambda x=list_object['timeend'][i]: time.gmtime((return_nub(x) + 10800000)/1000.) if x else x)(),
                         'time': time.gmtime((return_nub(time_info) + 10800000)/1000.),
-                        'rezervation': list_object['rezervation'][i]} for i in range(0, len(list_object['name']))],
+                        'rezervation': list_object['timeend'][i]} for i in range(0, len(list_object['name']))],
                       key=lambda y: y['ip'])
 
 class Route(Base):
