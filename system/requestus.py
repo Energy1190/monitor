@@ -41,11 +41,11 @@ def check_base(target):
                         y.append(i[j].lower())
                         break
                     elif name == 'ip' and str(i[j]).lower() not in list(y):
-                        if y.get(str(i[j]).lower()) and i['time'] < y.get(str(i[j]).lower()):
+                        if y.get(str(i[j]).lower()) and i.get('time') < y.get(str(i[j]).lower()):
                             print('delete:', i)
                             Database(dicts=i, target=target).delete()
                         else:
-                            y[str(i[j]).lower()] = i['time']
+                            y[str(i[j]).lower()] = i.get('time')
                     else:
                         print('delete:', i)
                         Database(dicts=i, target=target).delete()

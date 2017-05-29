@@ -194,7 +194,7 @@ def bild_day_stat(target_dhcp, target_stat, times=None, date=None, output=sys.st
     print('Generate daily statistics on interfaces', file=output)
     try:
         x = Interface(target_dhcp, target_stat, times=times, date=date, conndestif='aws_tunn', connrecvif='lan', name='aws_tunn')
-        x.revers(True)
+        x.reverse(True)
         x.generate()
         object = x.regenerate_dicts(x.body, nozero=True, incomplete=False, full=True, inter='Interface',
                                     name='aws_tunn')

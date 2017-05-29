@@ -1,5 +1,6 @@
 import sys
 import time
+import pytz
 import datetime
 from system.system import return_nub
 from classes.db_mongo import Database
@@ -124,6 +125,7 @@ class Dhcp(Base):
         return sorted([{'name': list_object['name'][i],
                         'ip': list_object['ip'][i]['IPAddressToString'],
                         'mac': list_object['mac'][i],
+                        'time': datetime.datetime(pytz.timezone('Europe/Moscow')),
                         'endtime': (lambda x=list_object['timeend'][i]: time.gmtime((return_nub(x) + 10800000)/1000.) if x else x)(),
                         'rezervation': list_object['rezervation'][i]} for i in range(0, len(list_object['name']))],
                       key=lambda y: y['ip'])
