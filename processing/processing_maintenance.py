@@ -54,10 +54,9 @@ def clear_collection(collection_now):
     for i in x:
         for j in i:
             if not i[j]:
-                print('Delete collection {0}'.format(str('base-' + '-'.join(map(str, list(i))))))
-                base = Database(target=['route', str('base-' + '-'.join(map(str, list(i))))])
+                print('Delete collection {0}'.format(str('base-' + '-'.join(list(map(str, j))))))
+                base = Database(target=['route', str('base-' + '-'.join(list(map(str, j))))])
                 print(base.delete_all())
-                print(base.drop_collection())
                 print(base.drop())
 
 def main():
