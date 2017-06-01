@@ -167,9 +167,10 @@ def get_route_info_database(*args, start_time=None, end_time=None, deep=4, outpu
             return collection
         else:
             for i in time_filter:
-                t = list(map(str, list(i)[:-1]))
+                t = list(map(str, list(i)[:-1])) if len(i) >= 4 else list(map(str, list(i)))
                 if t != collection[1].split(sep='-')[1:]:
                     print('Alert! The search filter does not match the collection', file=error)
+                    print('Time filter is {0}'.format(str(time_filter)), file=error)
                     print('Fix it', file=error)
                     x = [collection[0], 'base-{0}-{1}-{2}'.format(t[0], t[1], t[2])]
                     if not recursion:

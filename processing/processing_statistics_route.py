@@ -24,6 +24,7 @@ class Statistics():
         self.incomplete = False
         self.nozero = False
         self.full = False
+        self.revers = False
         self.body = {'stat': self.result, 'time': self.times, 'inter': 'hour', 'incomplete': self.incomplete, 'nozero': self.nozero,
                      'full': self.full, 'recursion': self.recursion, 'hours': self.hours}
         print('A new class of statistics was generated', file=output)
@@ -155,6 +156,7 @@ class Statistics():
             return self.body
 
 class Interface(Statistics):
+
     def reverse(self, bools):
         self.revers = bools
 
