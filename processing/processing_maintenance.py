@@ -55,8 +55,10 @@ def clear_collection(collection_now):
         for j in i:
             if not i[j]:
                 print('Delete collection {0}'.format(str('base-' + '-'.join(map(str, list(i))))))
-                Database(target=['route', str('base-' + '-'.join(map(str, list(i))))]).delete_all()
-                Database(target=['route', str('base-' + '-'.join(map(str, list(i))))]).drop()
+                base = Database(target=['route', str('base-' + '-'.join(map(str, list(i))))])
+                print(base.delete_all())
+                print(base.drop_collection())
+                print(base.drop())
 
 def main():
     time_now = (datetime.datetime.now() + datetime.timedelta(hours=3))

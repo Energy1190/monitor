@@ -104,3 +104,7 @@ class Database():
     def drop(self):
         return self.path.drop()
 
+    def drop_collection(self):
+        return self.path.drop_collection(self.target)
+
+

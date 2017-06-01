@@ -199,13 +199,13 @@ def bild_day_stat(target_dhcp, target_stat, times=None, date=None, output=sys.st
         x.reverse(True)
         x.generate()
         object = x.regenerate_dicts(x.body, nozero=True, incomplete=False, full=True, inter='Interface',
-                                    name='aws_tunn')
+                                    name='aws_tunn', time=date[0:3])
         x.set(object, True, check=object['time'])
 
         x = Interface(target_dhcp, target_stat, times=times, date=date, conndestif='lan', connrecvif='wan1', name='wan1')
         x.generate()
         object = x.regenerate_dicts(x.body, nozero=True, incomplete=False, full=True, inter='Interface',
-                                    name='wan1')
+                                    name='wan1', time=date[0:3])
         x.set(object, True, check=object['time'])
     except Exception as err:
         print('An error occurred while generating statistics.', file=error)
@@ -296,7 +296,7 @@ def rebild_statistics(target_dhcp, target_stat, date, times, output=sys.stdout, 
                 x[3] = i
                 main(target_dhcp, target_stat, times=tuple(x), date=tuple(x[:-1]), noreplase=False, full=True, force=True)
             sum_stat(target_dhcp, target_stat, tuple(x[:-1]), tuple(x), full=True, output=sys.stdout, error=sys.stderr)
-    bild_day_stat(target_dhcp, target_stat, times=times, date=date, output=output, error=error)
+            bild_day_stat(target_dhcp, target_stat, times=tuple(x), date=tuple(x[:-1]), output=output, error=error)
 
 def sum_stat(target_dhcp, target_stat, date, times, full=False, output=sys.stdout, error=sys.stderr):
     print('Start sum statistics per day', file=output)
@@ -327,7 +327,7 @@ def sum_stat(target_dhcp, target_stat, date, times, full=False, output=sys.stdou
                             x[j] = Stat(dicts=x[j]) + Stat(dicts=jj)
 
     result = {'stat': x, 'time': date[0:3], 'inter': 'day', 'incomplete': c.incomplete, 'nozero': c.nozero, 'full': full}
-    c.set(c.regenerate_dicts(result), True, check=date)
+    c.set(c.regenerate_dicts(result, name='lan'), True, check=date)
 
 if __name__ == '__main__':
     pass
